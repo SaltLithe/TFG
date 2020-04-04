@@ -82,7 +82,7 @@ public class JoinSessionPanel extends JPanel {
 						String remoteaddr;
 
 						//
-						DeveloperMainFrame frame = new DeveloperMainFrame(socket);
+						DeveloperMainFrame frame = new DeveloperMainFrame(socket, null);
 
 						frame.setSessionOwner(n);
 						frame.setIpIndicator(address);

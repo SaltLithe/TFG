@@ -4,28 +4,28 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 
-public class SessionOwnerComponent extends DeveloperComponent {
+public class SessionOwnerComponent extends SessionComponent {
 
 	ServerSocket serverSocket;
 	DataOutputStream os;
 	BufferedReader is;
 
-	public SessionOwnerComponent(DeveloperMainFrame dpmf, ServerSocket server) {
-
-		super(dpmf);
+	public SessionOwnerComponent(ServerSocket server) {
 
 		serverSocket = server;
 		boolean listening = true;
-		while (listening) {
-			new Thread(() -> {
+
+		new Thread(() -> {
+			while (listening) {
 				try {
+
 					serverSocket.accept();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}).start();
-		}
+			}
+		}).start();
 
 		// os = new DataOutputStream(serverSocket.getOutputStream());
 		// is = new BufferedReader(new

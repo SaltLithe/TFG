@@ -1,11 +1,10 @@
 import java.net.Socket;
 
-public class SessionClientComponent extends DeveloperComponent {
+public class SessionClientComponent extends SessionComponent {
 
 	private Socket clientSocket;
 
-	public SessionClientComponent(DeveloperMainFrame dpmf, Socket clientSocket, String ip, String password) {
-		super(dpmf);
+	public SessionClientComponent(Socket clientSocket) {
 		this.clientSocket = clientSocket;
 		// TODO Auto-generated constructor stub
 	}

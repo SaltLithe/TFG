@@ -1,6 +1,8 @@
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -17,9 +19,10 @@ public class DeveloperComponent {
 	private FileManager fileManager;
 	private DeveloperMainFrame developerMainFrame;
 	private ThreadPoolExecutor executor;
+	private SessionComponent session;
 
 	// private constructor.
-	public DeveloperComponent(DeveloperMainFrame dpmf)
+	public DeveloperComponent(DeveloperMainFrame dpmf, Socket socket, ServerSocket server)
 
 	{
 		// Creo los componentes que me hacen falta para gestionar compilación y archivos
@@ -28,6 +31,14 @@ public class DeveloperComponent {
 		compiler = new PersonalCompiler();
 
 		executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+
+		if (server != null) {
+
+			session = new SessionOwnerComponent(server);
+		} else {
+
+			session = new SessionClientComponent(socket);
+		}
 
 	}
 

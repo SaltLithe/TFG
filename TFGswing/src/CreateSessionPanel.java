@@ -102,7 +102,7 @@ public class CreateSessionPanel extends JPanel {
 					e.printStackTrace();
 				}
 //
-				DeveloperMainFrame frame = new DeveloperMainFrame(server);
+				DeveloperMainFrame frame = new DeveloperMainFrame(null, server);
 
 				frame.setSessionOwner(n);
 				frame.setIpIndicator(remoteaddr);

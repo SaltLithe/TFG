@@ -31,22 +31,11 @@ public class DeveloperMainFrame extends JFrame {
 
 	}
 
-	public DeveloperMainFrame(ServerSocket server) {
-		developerComponent = new SessionOwnerComponent(this, server);
-
-		new DeveloperMainFrame();
-
-	}
-
-	public DeveloperMainFrame(Socket client) {
-		developerComponent = new SessionClientComponent(this, null, null, null);
-
-		new DeveloperMainFrame();
-	}
-
-	private DeveloperMainFrame() {
+	public DeveloperMainFrame(Socket client, ServerSocket server) {
 
 		super("Pair Leap");
+
+		developerComponent = new DeveloperComponent(this, client, server);
 
 		// Inicializo lo que lleva toda la funcionalidad
 
