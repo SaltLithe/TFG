@@ -1,5 +1,4 @@
 
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -103,7 +102,7 @@ public class CreateSessionPanel extends JPanel {
 					e.printStackTrace();
 				}
 //
-				DeveloperMainFrame frame = new DeveloperMainFrame(true, server);
+				DeveloperMainFrame frame = new DeveloperMainFrame(server);
 
 				frame.setSessionOwner(n);
 				frame.setIpIndicator(remoteaddr);

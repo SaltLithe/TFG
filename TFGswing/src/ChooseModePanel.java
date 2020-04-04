@@ -8,8 +8,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import ui.JoinSessionPanel;
-
 public class ChooseModePanel extends JPanel {
 
 	private JButton create;
@@ -45,7 +43,7 @@ public class ChooseModePanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				joinSessionPanel = new JoinSessionPanel();
+				joinSessionPanel = new JoinSessionPanel(frame);
 				this.deleteAll();
 				add(joinSessionPanel, BorderLayout.CENTER);
 				updateUI();

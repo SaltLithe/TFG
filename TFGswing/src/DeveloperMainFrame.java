@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
@@ -30,17 +31,23 @@ public class DeveloperMainFrame extends JFrame {
 
 	}
 
-	public DeveloperMainFrame(boolean isowner, ServerSocket server) {
+	public DeveloperMainFrame(ServerSocket server) {
+		developerComponent = new SessionOwnerComponent(this, server);
+
+		new DeveloperMainFrame();
+
+	}
+
+	public DeveloperMainFrame(Socket client) {
+		developerComponent = new SessionClientComponent(this, null, null, null);
+
+		new DeveloperMainFrame();
+	}
+
+	private DeveloperMainFrame() {
 
 		super("Pair Leap");
 
-		if (isowner) {
-
-			developerComponent = new SessionOwnerComponent(this, server);
-		} else {
-
-			developerComponent = new SessionClientComponent(this);
-		}
 		// Inicializo lo que lleva toda la funcionalidad
 
 		// Tomo el tamaño de la pantalla y pongo el layout
