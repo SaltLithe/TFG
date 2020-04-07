@@ -85,7 +85,7 @@ public class DeveloperComponent {
 	}
 
 	private String compile(String code, String className) {
-		return compiler.run(code, className);
+		return compiler.run(code, className, fileManager.getCurrentFolder());
 
 	}
 

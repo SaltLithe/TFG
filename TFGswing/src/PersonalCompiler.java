@@ -28,9 +28,9 @@ public class PersonalCompiler {
 	PrintStream stdout = System.out;
 	PrintStream stderr = System.err;
 
-	public String run(String source, String className) {
+	public String run(String source, String className, String currentpath) {
 
-		File folder = new File("./src");
+		File folder = new File(currentpath + "/");
 		String path = folder.getPath() + "/" + className + ".java";
 		File sourceFile = new File(path);
 
@@ -54,6 +54,7 @@ public class PersonalCompiler {
 
 		System.setOut(out2);
 		System.setErr(out3);
+		// despues de darle a run se crea un archivo .class que habria que eliminar
 		int compilationResult = compiler.run(null, null, null, sourceFile.getPath());
 		if (compilationResult == 0) {
 
@@ -90,7 +91,10 @@ public class PersonalCompiler {
 			results = outbaos.toString();
 		}
 
-		sourceFile.delete();
+		String resultspath = folder.getPath() + "/" + className + ".class";
+		File resultsFile = new File(resultspath);
+		resultsFile.delete();
+
 		System.err.println("Results : " + outbaos.toString());
 		System.err.println("Errors : " + errbaos.toString());
 		return results;
