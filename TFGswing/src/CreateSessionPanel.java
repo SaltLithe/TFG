@@ -29,9 +29,11 @@ public class CreateSessionPanel extends JPanel {
 	JPanel areaNombre;
 
 	JFrame frame;
+	DeveloperMainFrame mf;
 
 	public CreateSessionPanel(JFrame f) {
 
+		// Añade todos los elementos necesarios para crear la sesión
 		frame = f;
 		setLayout(new BorderLayout());
 
@@ -64,9 +66,11 @@ public class CreateSessionPanel extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// Si los campos con la información necesaria para crear una sesión no se han
+				// dejado en
+				// blanco llama al método para invocar una nueva ventana
 				if (!campoNombre.getText().equals("") && !campoContraseña.getText().equals("")) {
 					initMainFrame(campoNombre.getText());
-					// frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 				}
 
 			}
@@ -75,6 +79,8 @@ public class CreateSessionPanel extends JPanel {
 
 	}
 
+	// Método que invoca en un nuevo hilo la nueva ventana y crea un ServerSocket
+	// para pasárselo
 	public void initMainFrame(String nombre) {
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -89,7 +95,6 @@ public class CreateSessionPanel extends JPanel {
 
 				} catch (IOException e) {
 					server = null;
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -97,21 +102,19 @@ public class CreateSessionPanel extends JPanel {
 				try {
 					remoteaddr = InetAddress.getLocalHost().getHostAddress();
 				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
 					remoteaddr = null;
 					e.printStackTrace();
 				}
-//
-				DeveloperMainFrame frame = new DeveloperMainFrame(null, server);
 
-				frame.setSessionOwner(n);
-				frame.setIpIndicator(remoteaddr);
+				DeveloperMainFrame mainframe = new DeveloperMainFrame(null, server);
 
-				// DeveloperMainFrame mainFrame = new DeveloperMainFrame();
+				mainframe.setSessionOwner(n);
+				mainframe.setIpIndicator(remoteaddr);
 
 			}
 
 		});
+		this.setVisible(false);
 
 	}
 

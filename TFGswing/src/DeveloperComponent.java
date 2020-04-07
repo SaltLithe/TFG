@@ -1,4 +1,5 @@
 
+//Julio no te fijes mucho en esta clase que es un monstruo 
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -19,27 +20,50 @@ public class DeveloperComponent {
 	private FileManager fileManager;
 	private DeveloperMainFrame developerMainFrame;
 	private ThreadPoolExecutor executor;
-	private SessionComponent session;
+	@SuppressWarnings("unused")
+	private Socket socket;
+	private ServerSocket server;
 
-	// private constructor.
 	public DeveloperComponent(DeveloperMainFrame dpmf, Socket socket, ServerSocket server)
 
 	{
+		this.socket = socket;
+		this.server = server;
+
 		// Creo los componentes que me hacen falta para gestionar compilación y archivos
 		developerMainFrame = dpmf;
 		interpreter = new PersonalInterpreter();
 		compiler = new PersonalCompiler();
 
+		// Aqui esta el famoso threadpool cache , un peligro
 		executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
+	}
+
+	public void runServer() {
 		if (server != null) {
 
-			session = new SessionOwnerComponent(server);
-		} else {
+			executor.execute(runServer(server));
+		} else {// Esto de momento no tocarlo porque es para hacer gestiones posteriores y no se
+				// como
+			// las voy a hacer
 
-			session = new SessionClientComponent(socket);
+			// session = new SessionClientComponent(socket);
+		}
+	}
+
+	private Runnable runServer(ServerSocket serverSocket) {
+
+		// boolean listening = true;
+
+		try {
+			new MultiServerThread(serverSocket.accept()).start();
+		} catch (IOException e) {
+			e.printStackTrace();
+
 		}
 
+		return null;
 	}
 
 	// Metodo publico para ejecutar código que maneja solo si ejecutar clase o
@@ -81,12 +105,9 @@ public class DeveloperComponent {
 		fileManager.createClassFile(Name, contents, true);
 		fileManager.updateAllFiles();
 
-		// TODO Auto-generated method stub
-
 	}
 
 	public void getFile(String name) {
-		// TODO Auto-generated method stub
 		fileManager.getFile(name);
 	}
 
@@ -98,7 +119,6 @@ public class DeveloperComponent {
 
 	public String openFile(String name, String contents) {
 		return fileManager.openFile(name, contents);
-		// TODO Auto-generated method stub
 
 	}
 
@@ -107,7 +127,6 @@ public class DeveloperComponent {
 	}
 
 	public void saveCurrentFile() throws IOException {
-		// TODO Auto-generated method stub
 		fileManager.saveCurrentFile();
 
 	}
@@ -117,27 +136,22 @@ public class DeveloperComponent {
 		try {
 			fileManager.saveCurrentFile();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		Future<String> future = executor.submit(() -> run());
 		try {
 			return future.get();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		// TODO Auto-generated method stub
 		return null;
 
 	}
 
 	public void setTextEditorToolbar(TextEditorToolbar textEditorToolbar) {
 		fileManager = new FileManager(textEditorToolbar);
-		// TODO Auto-generated method stub
 
 	}
 

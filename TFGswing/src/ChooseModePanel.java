@@ -20,6 +20,12 @@ public class ChooseModePanel extends JPanel {
 		create = new JButton("Create Session");
 		join = new JButton("Join Session");
 
+		// Este panel contiene referencias a ambos tipos de paneles de sesión (creación
+		// y unirse)
+		// Según el botón que le des borra los elementos previos (los botones) y añade
+		// el panel de sesión
+		// correspondiente , luego actualiza la ui
+
 		create.addActionListener(new ActionListener() {
 
 			@Override

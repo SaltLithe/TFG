@@ -32,6 +32,7 @@ public class JoinSessionPanel extends JPanel {
 
 	public JoinSessionPanel(JFrame f) {
 
+		// Añade todos los elementos necesarios para unirse a una sesión
 		frame = f;
 		setLayout(new BorderLayout());
 
@@ -50,17 +51,23 @@ public class JoinSessionPanel extends JPanel {
 
 		botonOk.addActionListener(new ActionListener() {
 
+			// Si los campos con la información necesaria para unirse a una sesión no se han
+			// dejado en
+			// blanco llama al método para invocar una nueva ventana
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (!campoNombre.getText().equals("") && !campoContraseña.getText().equals("")
 						&& !campoIp.getText().equals("")) {
 					initMainFrame(campoNombre.getText(), campoIp.getText());
-					// frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 				}
-
+				setVisible(false);
 			}
 
 			private void initMainFrame(String nombre, String ad) {
+
+				// Método que invoca en un nuevo hilo la nueva ventana, crea un Socket
+				// y lo conecta a la ip dada
 
 				SwingUtilities.invokeLater(new Runnable() {
 
@@ -75,25 +82,17 @@ public class JoinSessionPanel extends JPanel {
 
 						} catch (IOException e) {
 							socket = null;
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 
-						String remoteaddr;
-
-						//
 						DeveloperMainFrame frame = new DeveloperMainFrame(socket, null);
 
 						frame.setSessionOwner(n);
-						frame.setIpIndicator(address);
-
-						// DeveloperMainFrame mainFrame = new DeveloperMainFrame();
 
 					}
 
 				});
 			}
-
 		});
 
 		areaIP = new JPanel();

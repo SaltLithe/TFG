@@ -91,8 +91,8 @@ public class PersonalCompiler {
 		}
 
 		sourceFile.delete();
-		// System.err.println("Results : " + outbaos.toString());
-		// System.err.println("Errors : " + errbaos.toString());
+		System.err.println("Results : " + outbaos.toString());
+		System.err.println("Errors : " + errbaos.toString());
 		return results;
 	}
 }

@@ -35,7 +35,12 @@ public class DeveloperMainFrame extends JFrame {
 
 		super("Pair Leap");
 
-		developerComponent = new DeveloperComponent(this, client, server);
+		try {
+			developerComponent = new DeveloperComponent(this, client, server);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		// Inicializo lo que lleva toda la funcionalidad
 
@@ -69,6 +74,7 @@ public class DeveloperMainFrame extends JFrame {
 		setSize(screenSize.width, screenSize.height);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
+
 	}
 
 	// Metodo que actualiza las divisiones que contienen los elementos

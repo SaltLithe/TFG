@@ -14,6 +14,13 @@ public class MenuToolbar extends JPanel {
 	private JButton saveAll;
 	private FileExplorerToolbar fileExplorerToolbar;
 	private DeveloperComponent developerComponent;
+	private JButton startserver;
+
+	public void runServer() {
+
+		developerComponent.runServer();
+
+	}
 
 	public MenuToolbar(DeveloperComponent dc, FileExplorerToolbar fet, TextEditorToolbar textEditorToolbar) {
 
@@ -23,6 +30,7 @@ public class MenuToolbar extends JPanel {
 		folder = new JButton("Open Folder");
 		save = new JButton("Save File");
 		saveAll = new JButton("Save All");
+		startserver = new JButton("Start Server");
 
 		save.setEnabled(false);
 		saveAll.setEnabled(false);
@@ -31,6 +39,17 @@ public class MenuToolbar extends JPanel {
 		add(folder);
 		add(save);
 		add(saveAll);
+		add(startserver);
+
+		startserver.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				runServer();
+				folder.setEnabled(true);
+			}
+
+		});
 
 		folder.addActionListener(new ActionListener() {
 
