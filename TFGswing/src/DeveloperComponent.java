@@ -43,7 +43,13 @@ public class DeveloperComponent {
 	public void runServer() {
 		if (server != null) {
 
-			executor.execute(runServer(server));
+			try {
+				server.accept();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		} else {// Esto de momento no tocarlo porque es para hacer gestiones posteriores y no se
 				// como
 			// las voy a hacer
@@ -97,6 +103,7 @@ public class DeveloperComponent {
 
 	public void selectFocusedFolder() {
 		fileManager.openFolder(developerMainFrame);
+
 		fileManager.updateAllFiles();
 
 	}
