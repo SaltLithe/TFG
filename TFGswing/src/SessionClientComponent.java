@@ -1,6 +1,6 @@
 import java.net.Socket;
 
-public class SessionClientComponent extends SessionComponent {
+public class SessionClientComponent {
 
 	private Socket clientSocket;
 
