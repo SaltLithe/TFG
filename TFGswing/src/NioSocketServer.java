@@ -1,5 +1,7 @@
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -90,4 +92,15 @@ public class NioSocketServer {
 		}
 	}
 
+	public String getaddress() {
+		String remoteaddr;
+		try {
+			remoteaddr = InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			remoteaddr = null;
+			e.printStackTrace();
+		}
+
+		return remoteaddr;
+	}
 }

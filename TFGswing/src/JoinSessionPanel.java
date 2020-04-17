@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 import javax.swing.JButton;
@@ -85,6 +87,15 @@ public class JoinSessionPanel extends JPanel {
 							e.printStackTrace();
 						}
 
+						OutputStream output = null;
+						try {
+							output = socket.getOutputStream();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						PrintWriter writer = new PrintWriter(output, true);
+						writer.println("This is a message sent to the server");
 						DeveloperMainFrame frame = new DeveloperMainFrame(socket, null);
 
 						frame.setSessionOwner(n);

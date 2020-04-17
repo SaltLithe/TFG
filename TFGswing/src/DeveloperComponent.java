@@ -22,13 +22,13 @@ public class DeveloperComponent {
 	private ThreadPoolExecutor executor;
 	@SuppressWarnings("unused")
 	private Socket socket;
-	private ServerSocket server;
+	private NioSocketServer server;
 
-	public DeveloperComponent(DeveloperMainFrame dpmf, Socket socket, ServerSocket server)
+	public DeveloperComponent(DeveloperMainFrame dpmf, Socket socket, NioSocketServer server2)
 
 	{
 		this.socket = socket;
-		this.server = server;
+		this.server = server2;
 
 		// Creo los componentes que me hacen falta para gestionar compilación y archivos
 		developerMainFrame = dpmf;
@@ -42,13 +42,6 @@ public class DeveloperComponent {
 
 	public void runServer() {
 		if (server != null) {
-
-			try {
-				server.accept();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 
 		} else {// Esto de momento no tocarlo porque es para hacer gestiones posteriores y no se
 				// como

@@ -3,7 +3,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 import javax.swing.JFrame;
@@ -31,7 +30,7 @@ public class DeveloperMainFrame extends JFrame {
 
 	}
 
-	public DeveloperMainFrame(Socket client, ServerSocket server) {
+	public DeveloperMainFrame(Socket client, NioSocketServer server) {
 
 		super("Pair Leap");
 

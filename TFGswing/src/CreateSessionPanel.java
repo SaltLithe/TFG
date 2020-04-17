@@ -4,10 +4,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -89,23 +85,10 @@ public class CreateSessionPanel extends JPanel {
 
 			@Override
 			public void run() {
-				ServerSocket server;
-				try {
-					server = new ServerSocket(8080);
 
-				} catch (IOException e) {
-					server = null;
-					e.printStackTrace();
-				}
+				NioSocketServer server = new NioSocketServer();
 
-				String remoteaddr;
-				try {
-					remoteaddr = InetAddress.getLocalHost().getHostAddress();
-				} catch (UnknownHostException e) {
-					remoteaddr = null;
-					e.printStackTrace();
-				}
-
+				String remoteaddr = server.getaddress();
 				DeveloperMainFrame mainframe = new DeveloperMainFrame(null, server);
 
 				mainframe.setSessionOwner(n);
