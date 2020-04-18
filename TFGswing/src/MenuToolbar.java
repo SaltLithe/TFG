@@ -39,18 +39,15 @@ public class MenuToolbar extends JPanel {
 		add(folder);
 		add(save);
 		add(saveAll);
-		add(startserver);
-
-		startserver.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				runServer();
-				folder.setEnabled(true);
-			}
-
-		});
-
+		// add(startserver);
+		/*
+		 * startserver.addActionListener(new ActionListener() {
+		 * 
+		 * @Override public void actionPerformed(ActionEvent e) { runServer();
+		 * folder.setEnabled(true); }
+		 * 
+		 * });
+		 */
 		folder.addActionListener(new ActionListener() {
 
 			@Override

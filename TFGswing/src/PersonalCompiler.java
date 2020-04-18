@@ -44,12 +44,18 @@ public class PersonalCompiler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.err.println(sourceFile.getPath());
+
+		DEBUG.debugmessage("SE VA A INTENTAR COMPILAR EL FICHERO EN EL DIRECTORIO " + sourceFile.getPath());
+
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		if (compiler == null) {
-			System.err.println("JDK required (running inside of JRE)");
+
+			DEBUG.debugmessage("SE REQUIERE EL USO DE JAVA JDK ");
+
 		} else {
-			System.err.println("you got it!");
+
+			DEBUG.debugmessage("SE PUEDE COMPILAR EL FICHERO");
+
 		}
 
 		System.setOut(out2);
@@ -74,7 +80,8 @@ public class PersonalCompiler {
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.err.println("something wrong");
+
+				DEBUG.debugmessage("HA OCURRIDO UN ERROR A LA HORA DE COMPILAR");
 			}
 
 		} else {
