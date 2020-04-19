@@ -62,9 +62,10 @@ public class CreateSessionPanel extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// Si los campos con la información necesaria para crear una sesión no se han
-				// dejado en
-				// blanco llama al método para invocar una nueva ventana
+				/*
+				 * Si los campos con la información necesaria para crear una sesión no se han
+				 * dejado en blanco llama al método para invocar una nueva ventana
+				 */
 				if (!campoNombre.getText().equals("") && !campoContraseña.getText().equals("")) {
 					initMainFrame(campoNombre.getText());
 				}
@@ -75,7 +76,7 @@ public class CreateSessionPanel extends JPanel {
 
 	}
 
-	// Método que invoca en un nuevo hilo la nueva ventana y crea un ServerSocket
+	// Método que invoca en un nuevo hilo la nueva ventana y crea un ServerComponent
 	// para pasárselo
 	public void initMainFrame(String nombre) {
 
@@ -86,9 +87,12 @@ public class CreateSessionPanel extends JPanel {
 			@Override
 			public void run() {
 
-				NioSocketServer server = new NioSocketServer();
+				DEBUG.debugmessage("SE HA INVOCADO EL HILO PARA LA INTERFAZ PRINCIPAL");
+
+				ServerComponent server = new ServerComponent();
 
 				String remoteaddr = server.getaddress();
+
 				DeveloperMainFrame mainframe = new DeveloperMainFrame(null, server);
 
 				mainframe.setSessionOwner(n);

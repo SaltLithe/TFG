@@ -49,18 +49,21 @@ public class PersonalCompiler {
 
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		if (compiler == null) {
+			System.setOut(stdout);
+			System.setErr(stderr);
 
 			DEBUG.debugmessage("SE REQUIERE EL USO DE JAVA JDK ");
 
 		} else {
-
+			System.setOut(stdout);
+			System.setErr(stderr);
 			DEBUG.debugmessage("SE PUEDE COMPILAR EL FICHERO");
 
 		}
 
+		// despues de darle a run se crea un archivo .class que habria que eliminar
 		System.setOut(out2);
 		System.setErr(out3);
-		// despues de darle a run se crea un archivo .class que habria que eliminar
 		int compilationResult = compiler.run(null, null, null, sourceFile.getPath());
 		if (compilationResult == 0) {
 
@@ -69,6 +72,7 @@ public class PersonalCompiler {
 				URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { folder.toURI().toURL() });
 				Class<?> cls = Class.forName(className, true, classLoader);
 				Object instance = cls.newInstance();
+				@SuppressWarnings("rawtypes")
 				Class[] argTypes = new Class[] { String[].class };
 				Method method = cls.getDeclaredMethod("main", argTypes);
 
@@ -77,18 +81,21 @@ public class PersonalCompiler {
 				String[] mainArgs = Arrays.copyOfRange(args, 0, args.length);
 
 				method.invoke(instance, (Object) mainArgs);
+				System.setOut(stdout);
+				System.setErr(stderr);
 
 			} catch (Exception e) {
 				e.printStackTrace();
-
-				DEBUG.debugmessage("HA OCURRIDO UN ERROR A LA HORA DE COMPILAR");
+				System.setOut(stdout);
+				System.setErr(stderr);
+				DEBUG.debugmessage("HA OCURRIDO UN ERROR A LA HORA DE COMPILAR EXTERNO AL CODIGO");
 			}
 
 		} else {
-			System.err.println("Compilation Failed");
+			System.setOut(stdout);
+			System.setErr(stderr);
+			System.err.println("HA OCURRIDO UN ERROR A LA HORA DE COMPILAR DEBIDO AL CODIGO");
 		}
-		System.setOut(stdout);
-		System.setErr(stderr);
 
 		String results = null;
 		if (!errbaos.toString().equals("")) {
@@ -102,8 +109,8 @@ public class PersonalCompiler {
 		File resultsFile = new File(resultspath);
 		resultsFile.delete();
 
-		System.err.println("Results : " + outbaos.toString());
-		System.err.println("Errors : " + errbaos.toString());
+		DEBUG.debugmessage("EL CODIGO SE HA PODIDO EJECUTAR CORRECTAMENTE CON RESULTADOS" + results);
+
 		return results;
 	}
 }

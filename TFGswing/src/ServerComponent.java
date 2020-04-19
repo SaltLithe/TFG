@@ -11,7 +11,11 @@ import java.nio.channels.CompletionHandler;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class NioSocketServer {
+/*Esto es una clase sin finalizar , aun le queda mucho trabajo pero en el futuro podra gestionar
+ * las peticiones de distintos clientes de forma concurrente
+ */
+
+public class ServerComponent {
 	// No me importa que el bucle este en el constructor pero molaria que se
 	// gestionaran los mensajes en algun tipo de
 	// controller o handler
@@ -19,7 +23,9 @@ public class NioSocketServer {
 	private ConcurrentHashMap<Integer, AsynchronousSocketChannel> clientes = new ConcurrentHashMap<Integer, AsynchronousSocketChannel>();
 	private AtomicInteger ids = new AtomicInteger();
 
-	public NioSocketServer() {
+	public ServerComponent() {
+
+		DEBUG.debugmessage("SE HA INVOCADO AL CONSTRUCTOR DE SERVERCOMPONENT");
 		try {
 			// Create an AsynchronousServerSocketChannel that will listen on port 8080
 			final AsynchronousServerSocketChannel listener = AsynchronousServerSocketChannel.open()
@@ -53,7 +59,11 @@ public class NioSocketServer {
 					// lio
 					// sobre todo los broadcasts
 					// Allocate a byte buffer (4K) to read from the client
+					@SuppressWarnings("unused")
 					ByteBuffer byteBuffer = ByteBuffer.allocate(4096);
+
+					// El siguiente bloque es codigo que lee mensajes del cliente y los imprime pero
+					// solo acepta uno
 					/*
 					 * try {
 					 * 

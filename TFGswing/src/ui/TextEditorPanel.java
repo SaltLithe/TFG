@@ -1,4 +1,5 @@
 package ui;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.image.ImageObserver;
@@ -9,6 +10,12 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
+/*Clase que contiene el editor de texto usando un elemento del tipo RSyntaxTextArea 
+ * Tiene tambien una referencia al focus actual que indica el archivo sobre el que se está
+ * trabajando actualmente en la aplicación
+ * 
+ */
+@SuppressWarnings("serial")
 public class TextEditorPanel extends JPanel {
 
 	private RSyntaxTextArea textEditorArea;
@@ -16,27 +23,26 @@ public class TextEditorPanel extends JPanel {
 
 	private String focus = null;
 
+	// Activa el editor de texto
 	public void enableTextEditorArea() {
 
 		textEditorArea.setEnabled(true);
 	}
 
-	public String getCodeFromEditor() {
-
-		return textEditorArea.getText();
-
-	}
-
+	// Metodo para poner el focus del editor
 	public void setFocus(String name) {
 
 		this.focus = name;
 	}
 
+	// Metodo para recuperar el focus actual
 	public String getFocus() {
 
 		return focus;
 	}
 
+	// Metodo para establecer los contenidos del editor de forma correcta cambiando
+	// el focus actual
 	public void setTextEditorCode(String code, String filename) {
 
 		textEditorArea.setText(code);
@@ -62,21 +68,16 @@ public class TextEditorPanel extends JPanel {
 
 	}
 
+	// Metodo que recupera los contenidos del editor de texto
+
 	public String getContents() {
 
 		return textEditorArea.getText();
 	}
 
-	public void setContents(String newcontents) {
-		textEditorArea.setText("");
-		textEditorArea.setText(newcontents);
-		// TODO Auto-generated method stub
-
-	}
-
+	// Metodo para activar el editor de texto
 	public void enableEditor() {
 		textEditorArea.setEnabled(true);
-		// TODO Auto-generated method stub
 
 	}
 

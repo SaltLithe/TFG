@@ -10,6 +10,13 @@ import javax.swing.JSplitPane;
 
 import ui.UsersPanel;
 
+/*Clase que contiene todos los elementos necesarios para la interfaz principal de la aplicacion
+ * Consiste en un frame que contiene todos los componentes necesarios y sus correspondientes separaciones
+ * por motivos de flexibilidad y orden los componentes se declaran en su mayoría en sus propias clases
+ * En esta clase es donde se crea un objeto de la clase developerComponent , que es la que lleva la gran mayoría
+ * de las funcionalidades de la aplicación
+ */
+
 @SuppressWarnings("serial")
 public class DeveloperMainFrame extends JFrame {
 
@@ -24,25 +31,26 @@ public class DeveloperMainFrame extends JFrame {
 
 	private DeveloperComponent developerComponent;
 
+	// Metodo para activar la barra de exploración de archivos , se le llamará
+	// cuando se haya abierto una carpeta
 	public void enableFileExplorerToolbar() {
 
 		fileExplorerToolbar.enableToolbarButtons();
 
 	}
 
-	public DeveloperMainFrame(Socket client, NioSocketServer server) {
+	public DeveloperMainFrame(Socket client, ServerComponent server) {
 
 		super("Pair Leap");
 
+		DEBUG.debugmessage("SE HA INVOCADO EL CONSTRUCTOR DE DEVELOPERMAINFRAME");
 		try {
 			developerComponent = new DeveloperComponent(this, client, server);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		// Inicializo lo que lleva toda la funcionalidad
-
 		// Tomo el tamaño de la pantalla y pongo el layout
 		screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		setLayout(new BorderLayout());
@@ -76,8 +84,11 @@ public class DeveloperMainFrame extends JFrame {
 
 	}
 
-	// Metodo que actualiza las divisiones que contienen los elementos
-	// que pueden cambiar para que se vean los cambios
+	// Metodo que actualiza las divisiones que contienen algun elemento de interfaz
+	// que pueda cambiar
+	// en el futuro para que los cambios sean visibles
+	// en este caso son divisiones pues estas son el contenedor final de los
+	// elementos
 	public void updateAllSplits() {
 
 		usersDivision.updateUI();
@@ -85,22 +96,20 @@ public class DeveloperMainFrame extends JFrame {
 
 	}
 
-	public TextEditorToolbar getTextEditorToolbar() {
-		// TODO Auto-generated method stub
-
-		return textEditorToolbar;
-	}
-
+	// Metodo que sirve para poner en el panel de usuarios al dueño del servidor de
+	// esta sesión
 	public void setSessionOwner(String name) {
 		usersPanel.setSessionOwner(name);
-		// TODO Auto-generated method stub
 
 	}
 
+	// Método que sirve para poner en el panel de usuarios la ip del dueño del
+	// servidor de esta sesión
+	// Esto es útil para que el dueño y los clientes puedan saber siempre la ip y
+	// conectarse de nuevo o dársela
+	// a otra persona para que se conecte
 	public void setIpIndicator(String remoteaddr) {
 		usersPanel.setIpIndicator(remoteaddr);
-		// TODO Auto-generated method stub
-
 	}
 
 }

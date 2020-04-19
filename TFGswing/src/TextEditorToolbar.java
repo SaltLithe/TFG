@@ -11,6 +11,11 @@ import javax.swing.JSplitPane;
 import ui.ConsolePanel;
 import ui.TextEditorPanel;
 
+/*Clase que contiene los botones del menu asociado al editor de texto y que implementa sus
+ * funcionalidades 
+ * Qedan por implementar las funciones de ejecucion global y detener la ejecucion
+ */
+@SuppressWarnings("serial")
 public class TextEditorToolbar extends JPanel {
 
 	private TextEditorPanel textEditorPanel;
@@ -20,12 +25,10 @@ public class TextEditorToolbar extends JPanel {
 	private DeveloperComponent developerComponent;
 	private JSplitPane consoleDivision;
 	private ConsolePanel consolePanel;
-	private Thread runner;
-	private Thread observer;
 
-//
 	public TextEditorToolbar(DeveloperComponent dp) {
 
+		DEBUG.debugmessage("SE HA INVOCADO EL CONSTRUCTOR DE TEXTEDITORTOOLBAR");
 		textEditorPanel = new TextEditorPanel();
 		setLayout(new BorderLayout());
 		developerComponent = dp;
@@ -53,6 +56,7 @@ public class TextEditorToolbar extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				DEBUG.debugmessage("SE HA PULSADO EL BOTON RUNLOCAL");
 				runLocal();
 
 			}
@@ -84,34 +88,39 @@ public class TextEditorToolbar extends JPanel {
 
 	}
 
+	// Metodo que llama al metodo run de developer component para ejecutar el codigo
+	// y recupera los resultados
+	// devueltos tras la ejecucion que son mostrados en el panel de consola
 	private void runLocal() {
+		DEBUG.debugmessage("SE HA LLAMADO A RUNLOCAL EN TEXTEDITORTOOLBAR");
 		String results = developerComponent.runLocal();
 		consolePanel.setContents(results);
 	}
 
+	// Metodo para activar los botones de este toolbar
 	public void enableButtons() {
-		// TODO Auto-generated method stub
 		runLocal.setEnabled(true);
 		runGlobal.setEnabled(true);
 		terminate.setEnabled(true);
 	}
 
+	// Metodo que sirve para recuperar los contenidos del editor
 	public String getContents() {
-		// TODO Auto-generated method stub
-
+		DEBUG.debugmessage("SE HA LLAMADO A GETCONTENTS EN TEXTEDITORTOOLBAR");
 		return textEditorPanel.getContents();
 
 	}
 
-	public void setContents(String newcontents) {
-		// TODO Auto-generated method stub
-		textEditorPanel.setContents(newcontents);
+	// Metodo para establecer los contenidos del editor
+	public void setContents(String newcontents, String filename) {
+		DEBUG.debugmessage("SE HA LLAMADO A SETCONTENTS EN TEXTEDITORTOOLBAR");
+		textEditorPanel.setTextEditorCode(newcontents, filename);
 
 	}
 
+	// Metodo para activar el editor
 	public void enableEditor() {
 		textEditorPanel.enableEditor();
-		// TODO Auto-generated method stub
 
 	}
 

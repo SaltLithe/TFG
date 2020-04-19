@@ -1,3 +1,4 @@
+package developer;
 public class DEBUG {
 	/*
 	 * Clase debug que contiene metodos estaticos para que cualquier clase pueda

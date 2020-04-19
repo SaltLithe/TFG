@@ -53,9 +53,10 @@ public class JoinSessionPanel extends JPanel {
 
 		botonOk.addActionListener(new ActionListener() {
 
-			// Si los campos con la información necesaria para unirse a una sesión no se han
-			// dejado en
-			// blanco llama al método para invocar una nueva ventana
+			/*
+			 * Si los campos con la información necesaria para unirse a una sesión no se han
+			 * // dejado en // blanco llama al método para invocar una nueva ventana
+			 */
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -66,10 +67,14 @@ public class JoinSessionPanel extends JPanel {
 				setVisible(false);
 			}
 
+			/*
+			 * Método que invoca en un nuevo hilo la nueva ventana, crea un Socket // y lo
+			 * conecta a la ip dada
+			 */
 			private void initMainFrame(String nombre, String ad) {
 
-				// Método que invoca en un nuevo hilo la nueva ventana, crea un Socket
-				// y lo conecta a la ip dada
+				// Esto podria ser algo distinto a un socket pero como funciona con el
+				// Asynchronous server socket channel pues lo dejamos asi
 
 				SwingUtilities.invokeLater(new Runnable() {
 
@@ -78,20 +83,31 @@ public class JoinSessionPanel extends JPanel {
 
 					@Override
 					public void run() {
+						DEBUG.debugmessage("SE HA INVOCADO EL HILO PARA LANZAR LA INTERFAZ PRINCIPAL DEL CLIENTE");
 						Socket socket;
+						DEBUG.debugmessage("SE VA A INTENTAR CONECTAR EL CLIENTE AL SERVIDOR");
 						try {
+
 							socket = new Socket(address, 8080);
+							DEBUG.debugmessage("EL SOCKET DEL CLIENTE SE HA CONECTADO CON EXITO");
 
 						} catch (IOException e) {
+							DEBUG.debugmessage("NO SE HA LOGRADO CONECTAR EL CLIENTE AL SERVIDOR");
+
 							socket = null;
 							e.printStackTrace();
 						}
+
+						/*
+						 * Esto es un mensaje de prueba del cliente , en el futuro no deberia usarse
+						 * pues el server al conectarse un cliente debe asignarle un id , y es mejor que
+						 * el cliente no mande mensajes sin tener un id con el que identificarse
+						 */
 
 						OutputStream output = null;
 						try {
 							output = socket.getOutputStream();
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 						PrintWriter writer = new PrintWriter(output, true);

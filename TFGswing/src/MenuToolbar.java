@@ -7,30 +7,27 @@ import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+/*Clase que contiene todos los botones del menu superior de la aplicacion y que implementa sus 
+ * comportamientos
+ */
+@SuppressWarnings("serial")
 public class MenuToolbar extends JPanel {
-//
+
 	private JButton folder;
 	private JButton save;
 	private JButton saveAll;
 	private FileExplorerToolbar fileExplorerToolbar;
 	private DeveloperComponent developerComponent;
-	private JButton startserver;
-
-	public void runServer() {
-
-		developerComponent.runServer();
-
-	}
 
 	public MenuToolbar(DeveloperComponent dc, FileExplorerToolbar fet, TextEditorToolbar textEditorToolbar) {
 
+		DEBUG.debugmessage("SE HA INVOCADO AL CONSTRUCTOR DE MENUTOOLBAR");
 		developerComponent = dc;
 		fileExplorerToolbar = fet;
 
 		folder = new JButton("Open Folder");
 		save = new JButton("Save File");
 		saveAll = new JButton("Save All");
-		startserver = new JButton("Start Server");
 
 		save.setEnabled(false);
 		saveAll.setEnabled(false);
@@ -39,19 +36,12 @@ public class MenuToolbar extends JPanel {
 		add(folder);
 		add(save);
 		add(saveAll);
-		// add(startserver);
-		/*
-		 * startserver.addActionListener(new ActionListener() {
-		 * 
-		 * @Override public void actionPerformed(ActionEvent e) { runServer();
-		 * folder.setEnabled(true); }
-		 * 
-		 * });
-		 */
+
 		folder.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				DEBUG.debugmessage("SE HA PULSADO EL BOTON FOLDER");
 				developerComponent.selectFocusedFolder();
 				fileExplorerToolbar.enableToolbarButtons();
 				fileExplorerToolbar.updateAllButtons(developerComponent.getAllFiles());
@@ -67,11 +57,11 @@ public class MenuToolbar extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				DEBUG.debugmessage("SE HA PULSADO EL BOTON SAVE");
 
 				try {
 					developerComponent.saveCurrentFile();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 
@@ -83,11 +73,10 @@ public class MenuToolbar extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				DEBUG.debugmessage("SE HA PULSADO EL BOTON SAVEALL");
 				try {
 					developerComponent.saveAllFiles();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 
