@@ -3,8 +3,8 @@ package network;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import miniSockets.ClientMessageHandler;
-import miniSockets.ServerInfo;
+import javaMiniSockets.clientSide.ClientMessageHandler;
+import javaMiniSockets.clientSide.ServerInfo;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 

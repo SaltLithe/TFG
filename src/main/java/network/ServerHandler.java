@@ -2,8 +2,8 @@ package network;
 
 import java.io.Serializable;
 
-import miniSockets.ClientInfo;
-import miniSockets.ServerMessageHandler;
+import javaMiniSockets.serverSide.ClientInfo;
+import javaMiniSockets.serverSide.ServerMessageHandler;
 
 public class ServerHandler implements ServerMessageHandler {
 
