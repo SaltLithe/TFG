@@ -7,6 +7,9 @@ import java.awt.image.ImageObserver;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
+import javax.swing.UIManager;
+
+import com.formdev.flatlaf.FlatDarkLaf;
 
 /*Clase que contiene todos los elementos necesarios para la interfaz principal de la aplicacion
  * Consiste en un frame que contiene todos los componentes necesarios y sus correspondientes separaciones
@@ -41,6 +44,12 @@ public class DeveloperMainFrame extends JFrame {
 	DeveloperMainFrame() {
 
 		super("Pair Leap");
+
+		try {
+			UIManager.setLookAndFeel(new FlatDarkLaf());
+		} catch (Exception ex) {
+			System.err.println("Failed to initialize LaF");
+		}
 
 		this.controller = UIController.getInstance();
 		controller.setDeveloperMainFrame(this);

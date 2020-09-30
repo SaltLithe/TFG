@@ -1,6 +1,7 @@
 package userInterface;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeEvent;
@@ -43,6 +44,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	private int lastLenght;
 	private int newLenght;
 	private boolean messageWrite;
+	private Color dark = new Color(70, 70, 70);
 
 	// Activa el editor de texto
 	public void enableTextEditorArea() {
@@ -92,6 +94,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 		this.toolbar = toolbar;
 		textEditorArea = new RSyntaxTextArea();
+		textEditorArea.setBackground(dark);
 		textEditorArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 		textEditorArea.setCodeFoldingEnabled(true);
 		textEditorArea.setEnabled(false);
@@ -176,7 +179,8 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 						WriteMessage message = new WriteMessage();
 						message.adding = false;
-						message.caret = newCaretPos - 1;
+						// message.caret = newCaretPos - 1;
+						message.caret = newCaretPos;
 						message.lenght = e.getLength();
 						uicontroller.run(() -> developerComponent.sendMessageToEveryone(message));
 					}
