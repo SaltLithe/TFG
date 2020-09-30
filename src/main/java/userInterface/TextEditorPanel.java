@@ -42,6 +42,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	private DeveloperComponent developerComponent;
 	private int lastLenght;
 	private int newLenght;
+	private boolean messageWrite;
 
 	// Activa el editor de texto
 	public void enableTextEditorArea() {
@@ -84,6 +85,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		newLenght = 0;
 		uicontroller = UIController.getInstance();
 		developerComponent = uicontroller.getDeveloperComponent();
+		messageWrite = false;
 
 		setLayout(new BorderLayout());
 		this.setSize(new Dimension(ImageObserver.WIDTH, ImageObserver.HEIGHT));
@@ -126,25 +128,30 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 			@Override
 			public void insertUpdate(DocumentEvent e) {
+
 				newLenght = textEditorArea.getText().length();
 
-				if (newLenght > lastLenght) {
-					// Mas o menos detecta bastante bien lo que se añade al documento
+				if (!messageWrite) {
+					if (newLenght > lastLenght) {
+						// Mas o menos detecta bastante bien lo que se añade al documento
 
-					WriteMessage message = new WriteMessage();
+						WriteMessage message = new WriteMessage();
 
-					int caret = textEditorArea.getCaretPosition();
-					message.caret = caret;
-					message.lenght = e.getLength();
+						int caret = textEditorArea.getCaretPosition();
+						message.caret = caret;
+						message.lenght = e.getLength();
 
-					int lenght = caret + e.getLength();
-					String changes = textEditorArea.getText().substring(caret, lenght);
-					System.out.println("What changed " + changes);
-					message.adding = true;
-					message.added = changes;
+						int lenght = caret + e.getLength();
+						String changes = textEditorArea.getText().substring(caret, lenght);
+						System.out.println("What changed " + changes);
+						message.adding = true;
+						message.added = changes;
 
-					uicontroller.run(() -> developerComponent.sendMessageToEveryone(message));
+						uicontroller.run(() -> developerComponent.sendMessageToEveryone(message));
+					}
 				}
+				messageWrite = false;
+
 			}
 
 			@Override
@@ -152,26 +159,29 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 				newLenght = textEditorArea.getText().length();
 
-				if (newLenght < lastLenght) {
+				if (!messageWrite) {
+					if (newLenght < lastLenght) {
 
-					System.out.println("Last caret " + lastCaretPos + "New caret " + newCaretPos);
-					int changelenght = lastCaretPos - newCaretPos;
-					if (changelenght < 0) {
-						DEBUG.debugmessage("ESTO NO TENDRA QUE PASAR");
+						System.out.println("Last caret " + lastCaretPos + "New caret " + newCaretPos);
+						int changelenght = lastCaretPos - newCaretPos;
+						if (changelenght < 0) {
+							DEBUG.debugmessage("ESTO NO TENDRA QUE PASAR");
+						}
+						DEBUG.debugmessage("DIFFERENCE IS : " + changelenght);
+
+						/*
+						 * DEBUG.debugmessage("DELETED THE FOLLOWING : " +
+						 * textEditorArea.getText().substring(newCaretPos, newCaretPos + changelenght));
+						 */
+
+						WriteMessage message = new WriteMessage();
+						message.adding = false;
+						message.caret = newCaretPos - 1;
+						message.lenght = e.getLength();
+						uicontroller.run(() -> developerComponent.sendMessageToEveryone(message));
 					}
-					DEBUG.debugmessage("DIFFERENCE IS : " + changelenght);
-
-					/*
-					 * DEBUG.debugmessage("DELETED THE FOLLOWING : " +
-					 * textEditorArea.getText().substring(newCaretPos, newCaretPos + changelenght));
-					 */
-
-					WriteMessage message = new WriteMessage();
-					message.adding = false;
-					message.caret = newCaretPos - 1;
-					message.lenght = e.getLength();
-					uicontroller.run(() -> developerComponent.sendMessageToEveryone(message));
 				}
+				messageWrite = false;
 			}
 
 			@Override
@@ -232,6 +242,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			enableEditor();
 			results = (ArrayList<Object>) evt.getNewValue();
 			boolean adding = (boolean) results.get(2);
+			messageWrite = true;
 			if (adding) {
 				int caret = (int) results.get(0);
 				String added = (String) results.get(1);
@@ -246,6 +257,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			results = (ArrayList<Object>) evt.getNewValue();
 			String newcontents = (String) results.get(0);
 			String filename = (String) results.get(1);
+
 			setTextEditorCode(newcontents, filename);
 			DEBUG.debugmessage("Jamas cambieis vuestra arquitectura lo ultimo");
 			break;
