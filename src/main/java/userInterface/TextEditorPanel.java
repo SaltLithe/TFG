@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -16,6 +17,7 @@ import javax.swing.event.DocumentListener;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import core.DEBUG;
@@ -94,10 +96,17 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 		this.toolbar = toolbar;
 		textEditorArea = new RSyntaxTextArea();
-		textEditorArea.setBackground(dark);
+
 		textEditorArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 		textEditorArea.setCodeFoldingEnabled(true);
 		textEditorArea.setEnabled(false);
+
+		try {
+			Theme theme = Theme.load(getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/dark.xml"));
+			theme.apply(textEditorArea);
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
 		textEditorScrollPane = new RTextScrollPane(textEditorArea);
 		add(textEditorScrollPane, BorderLayout.CENTER);
 
