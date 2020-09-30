@@ -229,6 +229,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			enableEditor();
 			break;
 		case UPDATE_PANEL_CONTENTS:
+			enableEditor();
 			results = (ArrayList<Object>) evt.getNewValue();
 			boolean adding = (boolean) results.get(2);
 			if (adding) {

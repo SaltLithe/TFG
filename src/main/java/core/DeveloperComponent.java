@@ -258,6 +258,14 @@ public class DeveloperComponent extends Observable {
 				e.printStackTrace();
 			}
 
+		} else if (client != null) {
+			DEBUG.debugmessage("SENDING MESSAGES TO THE SERVER");
+			try {
+				client.send(message);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		// TODO Auto-generated method stub
 

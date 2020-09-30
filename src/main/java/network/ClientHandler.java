@@ -3,6 +3,7 @@ package network;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import core.DEBUG;
 import javaMiniSockets.clientSide.ClientMessageHandler;
 import javaMiniSockets.clientSide.ServerInfo;
 import userInterface.ObserverActions;
@@ -24,7 +25,9 @@ public class ClientHandler implements ClientMessageHandler {
 	public void onMessageSent(Serializable message, ServerInfo serverInfo) {
 		// TODO Auto-generated method stub
 
-		System.out.println("Mensajito");
+		DEBUG.debugmessage(message.toString());
+
+		DEBUG.debugmessage("HA LLEGADO UN MENSAJE DEL SERVER");
 		WriteMessage incoming = (WriteMessage) message;
 
 		try {
