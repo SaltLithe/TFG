@@ -1,17 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <WorkSpaces>
-<WorkSpace>
-
-  <name>MyWorkSpace</name>
-  <path>MyPath</path>
-  
-</WorkSpace>
-
-<WorkSpace>
-
-  <name>MyWorkSpace2</name>
-  <path>MyPath2</path>
-  
-</WorkSpace>
+    <WorkSpace>
+        <name>hola</name>
+        <path>mundo!</path>
+    </WorkSpace>
+    <WorkSpace>
+        <name>hola</name>
+        <path>mundo!</path>
+    </WorkSpace>
 </WorkSpaces>

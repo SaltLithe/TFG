@@ -1,7 +1,6 @@
 package userInterface;
 
 import java.awt.BorderLayout;
-import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -9,14 +8,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
 import fileManagement.WorkSpace;
-import fileManagement.WorkSpaces;
+import fileManagement.WorkSpaceManager;
 
 public class workSpaceSelect extends JFrame {
 
@@ -53,35 +49,10 @@ public class workSpaceSelect extends JFrame {
 		JButton btnNewButton = new JButton("New WorkSpace");
 		panel.add(btnNewButton);
 		this.setVisible(true);
+		WorkSpace ws = new WorkSpace();
+		ws.setName("hola");
+		ws.setPath("mundo!");
+		WorkSpaceManager.addWorkSpace(ws);
 
-		Unmarshaller jaxbUnmarshaller = null;
-		JAXBContext jaxbContext = null;
-		WorkSpaces ws = null;
-		try {
-			jaxbContext = JAXBContext.newInstance(WorkSpaces.class);
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		try {
-			ws = (WorkSpaces) jaxbUnmarshaller.unmarshal(new File("src/main/resources/WorkSpaces.xml"));
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		System.out.println(ws.getWorkSpaces().size());
-
-		for (WorkSpace workspace : ws.getWorkSpaces()) {
-			System.out.println(workspace.getName());
-			System.out.println(workspace.getPath());
-		}
 	}
 }
