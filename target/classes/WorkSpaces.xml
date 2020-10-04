@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<WorkSpaces>
+<WorkSpace>
+
+  <name>MyWorkSpace</name>
+  <path>MyPath</path>
+  
+</WorkSpace>
+
+<WorkSpace>
+
+  <name>MyWorkSpace2</name>
+  <path>MyPath2</path>
+  
+</WorkSpace>
+</WorkSpaces>

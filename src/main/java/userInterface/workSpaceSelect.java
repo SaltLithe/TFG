@@ -1,8 +1,7 @@
 package userInterface;
 
 import java.awt.BorderLayout;
-import java.io.IOException;
-import java.util.Iterator;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -10,14 +9,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
-
-import org.jdom2.Content;
-import org.jdom2.Document;
-import org.jdom2.JDOMException;
-import org.jdom2.Text;
-import org.jdom2.input.SAXBuilder;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+
+import fileManagement.WorkSpace;
+import fileManagement.WorkSpaces;
 
 public class workSpaceSelect extends JFrame {
 
@@ -55,27 +54,34 @@ public class workSpaceSelect extends JFrame {
 		panel.add(btnNewButton);
 		this.setVisible(true);
 
-		SAXBuilder builder = new SAXBuilder();
-		Document doc = null;
+		Unmarshaller jaxbUnmarshaller = null;
+		JAXBContext jaxbContext = null;
+		WorkSpaces ws = null;
 		try {
-			doc = builder.build("/resources/WorkSpaces.xml");
-		} catch (JDOMException e) {
+			jaxbContext = JAXBContext.newInstance(WorkSpaces.class);
+		} catch (JAXBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IOException e) {
+		}
+		try {
+			jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		} catch (JAXBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		for (Iterator it = doc.getRootElement().getContent().iterator(); it.hasNext();) {
-			Content content = (Content) it.next();
-			if (content instanceof Text) {
-				System.out.println("[Text: " + ((Text) content).getTextNormalize());
-			} else {
-				System.out.println(content.toString());
-			}
+		try {
+			ws = (WorkSpaces) jaxbUnmarshaller.unmarshal(new File("src/main/resources/WorkSpaces.xml"));
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
+		System.out.println(ws.getWorkSpaces().size());
+
+		for (WorkSpace workspace : ws.getWorkSpaces()) {
+			System.out.println(workspace.getName());
+			System.out.println(workspace.getPath());
+		}
 	}
-
 }
