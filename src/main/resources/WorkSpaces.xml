@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+
 <WorkSpaces>
-    <WorkSpace>
-        <name>hola</name>
-        <path>mundo!</path>
-    </WorkSpace>
-    <WorkSpace>
-        <name>hola</name>
-        <path>mundo!</path>
-    </WorkSpace>
+<WorkSpace>
+<name>MiWorkspace</name>
+<path>MiPathQueNoExiste</path>
+</WorkSpace>
+
 </WorkSpaces>

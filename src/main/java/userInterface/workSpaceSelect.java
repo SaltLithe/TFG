@@ -1,6 +1,7 @@
 package userInterface;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,10 +14,12 @@ import com.formdev.flatlaf.FlatDarkLaf;
 
 import fileManagement.WorkSpace;
 import fileManagement.WorkSpaceManager;
+import fileManagement.customWorkSpaceElement;
 
 public class workSpaceSelect extends JFrame {
 
 	private JPanel contentPane;
+	JPanel panel;
 
 	/**
 	 * Launch the application.
@@ -25,6 +28,18 @@ public class workSpaceSelect extends JFrame {
 	/**
 	 * Create the frame.
 	 */
+
+	private void readAndGenerate() {
+		ArrayList<WorkSpace> ws = (ArrayList<WorkSpace>) WorkSpaceManager.getAllWorkSpaces();
+		if (ws != null) {
+			for (WorkSpace workspace : ws) {
+				panel.add(new customWorkSpaceElement(workspace.getName(), workspace.getPath()));
+			}
+
+		}
+
+	}
+
 	public workSpaceSelect() {
 
 		try {
@@ -43,16 +58,13 @@ public class workSpaceSelect extends JFrame {
 		JLabel lblNewLabel = new JLabel("LAUNCH");
 		contentPane.add(lblNewLabel, BorderLayout.NORTH);
 
-		JPanel panel = new JPanel();
+		panel = new JPanel();
 		contentPane.add(panel, BorderLayout.WEST);
 
 		JButton btnNewButton = new JButton("New WorkSpace");
 		panel.add(btnNewButton);
+		readAndGenerate();
 		this.setVisible(true);
-		WorkSpace ws = new WorkSpace();
-		ws.setName("hola");
-		ws.setPath("mundo!");
-		WorkSpaceManager.addWorkSpace(ws);
 
 	}
 }
