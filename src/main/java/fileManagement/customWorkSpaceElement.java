@@ -6,6 +6,7 @@ import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 public class customWorkSpaceElement extends JPanel {
 
@@ -40,6 +41,16 @@ public class customWorkSpaceElement extends JPanel {
 
 		checkExistance();
 
+		nameLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		nameLabel.setAlignmentX(0.5f);
+
+		removeButton.setHorizontalAlignment(SwingConstants.LEFT);
+		removeButton.setAlignmentX(0.5f);
+
+		deleteLocateButton.setHorizontalAlignment(SwingConstants.LEFT);
+		deleteLocateButton.setAlignmentX(0.5f);
+
+		this.setAlignmentX(0.5f);
 		this.setVisible(true);
 
 	}
