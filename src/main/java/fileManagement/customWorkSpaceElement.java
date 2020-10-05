@@ -1,7 +1,11 @@
 package fileManagement;
 
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.font.TextAttribute;
 import java.io.File;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -21,14 +25,17 @@ public class customWorkSpaceElement extends JPanel {
 	private JButton deleteLocateButton;
 	private JLabel nameLabel;
 
+	private Color notFoundColor;
+
 	public customWorkSpaceElement(String name, String path) {
 
 		this.name = name;
 		this.path = path;
 		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
+		notFoundColor = new Color(222, 57, 49);
+
 		nameLabel = new JLabel(name + ": " + path);
-		add(nameLabel);
 
 		removeButton = new JButton("Remove");
 		add(removeButton);
@@ -51,6 +58,14 @@ public class customWorkSpaceElement extends JPanel {
 		deleteLocateButton.setAlignmentX(0.5f);
 
 		this.setAlignmentX(0.5f);
+
+		Font font = nameLabel.getFont();
+		Map attributes = font.getAttributes();
+		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+		nameLabel.setFont(font.deriveFont(attributes));
+
+		add(nameLabel);
+
 		this.setVisible(true);
 
 	}
@@ -63,6 +78,8 @@ public class customWorkSpaceElement extends JPanel {
 
 		} else {
 			deleteLocateButton.setText("Locate");
+			nameLabel.setForeground(notFoundColor);
+
 		}
 
 	}

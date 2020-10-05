@@ -82,7 +82,7 @@ public class workSpaceSelect extends JFrame {
 		gbc_lblNewLabel.gridy = 0;
 		contentPane.add(lblNewLabel, gbc_lblNewLabel);
 
-		btnNewButton = new JButton("New button");
+		btnNewButton = new JButton("New WorkSpace");
 		btnNewButton.setHorizontalAlignment(SwingConstants.LEFT);
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.anchor = GridBagConstraints.WEST;
@@ -99,6 +99,9 @@ public class workSpaceSelect extends JFrame {
 		contentPane.add(panel, gbc_panel);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		readAndGenerate();
+
+		setSize(600, 600);
+		setResizable(false);
 		this.setVisible(true);
 
 	}
