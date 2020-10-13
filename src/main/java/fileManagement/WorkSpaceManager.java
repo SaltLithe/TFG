@@ -10,6 +10,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
+import core.DEBUG;
+
 public class WorkSpaceManager {
 
 	public static void addWorkSpace(WorkSpace workspace) {
@@ -24,38 +26,55 @@ public class WorkSpaceManager {
 
 			ws = new ArrayList<WorkSpace>();
 		}
-		ws.add(workspace);
-		WorkSpaces newws = new WorkSpaces();
-		newws.setWorkSpaces(ws);
+		boolean repeated = false;
+		int counter = 0;
+		while (counter < ws.size() && !repeated) {
+			WorkSpace w = ws.get(counter);
+			if (w.getName() == workspace.getName()) {
+				repeated = true;
 
-		JAXBContext jaxbContext = null;
-		try {
-			jaxbContext = JAXBContext.newInstance(WorkSpaces.class);
-		} catch (JAXBException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		Marshaller jaxbMarshaller = null;
-		try {
-			jaxbMarshaller = jaxbContext.createMarshaller();
-		} catch (JAXBException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+			} else {
+				counter++;
+			}
 
-		try {
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-		} catch (PropertyException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
+		if (!repeated) {
+			ws.add(workspace);
+			WorkSpaces newws = new WorkSpaces();
+			newws.setWorkSpaces(ws);
 
-		// Marshal the employees list in file
-		try {
-			jaxbMarshaller.marshal(newws, workspacefile);
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JAXBContext jaxbContext = null;
+			try {
+				jaxbContext = JAXBContext.newInstance(WorkSpaces.class);
+			} catch (JAXBException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			Marshaller jaxbMarshaller = null;
+			try {
+				jaxbMarshaller = jaxbContext.createMarshaller();
+			} catch (JAXBException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			try {
+				jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			} catch (PropertyException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			// Marshal the employees list in file
+			try {
+				jaxbMarshaller.marshal(newws, workspacefile);
+			} catch (JAXBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+
+			DEBUG.debugmessage("Esta repetido el workspace");
 		}
 	}
 
