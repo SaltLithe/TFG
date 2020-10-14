@@ -3,12 +3,17 @@ package userInterface;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+
+import core.DEBUG;
+import fileManagement.WorkSpaceManager;
 
 public class AddWorkSpaceDialog extends JDialog {
 	private JTextField nameField;
@@ -92,6 +97,28 @@ public class AddWorkSpaceDialog extends JDialog {
 		gbc_cancelButton.gridy = 5;
 		cancelButton.setPreferredSize(BrowseButton.getPreferredSize());
 		getContentPane().add(cancelButton, gbc_cancelButton);
+
+		BrowseButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				String path = WorkSpaceManager.getFilePath();
+				if (path != null) {
+
+					String search = "\\";
+					int index = path.lastIndexOf(search);
+					String subname = path.substring(index + 1, path.length());
+					DEBUG.debugmessage(index + " " + subname);
+					path = path.substring(0, index);
+					pathField.setText(path);
+
+					nameField.setText(subname);
+				}
+
+			}
+
+		});
 
 		setSize(500, 300);
 		setResizable(false);
