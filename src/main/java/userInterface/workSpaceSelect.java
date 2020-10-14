@@ -1,9 +1,12 @@
 package userInterface;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -27,8 +30,10 @@ public class workSpaceSelect extends JFrame {
 	private JPanel contentPane;
 	LinkedList<Component> selectPanelComponents;
 	private JLabel lblNewLabel;
-	private JButton btnNewButton;
+	private JButton newWorkSpaceButton;
 	private JPanel panel;
+	private JButton btnNewButton_1;
+	private Color frameDark = new Color(0, 0, 0);
 
 	/**
 	 * Launch the application.
@@ -53,13 +58,14 @@ public class workSpaceSelect extends JFrame {
 	}
 
 	public workSpaceSelect() {
-
+		super("PairLeap");
 		try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
 		} catch (Exception ex) {
 			System.err.println("Failed to initialize LaF");
 		}
 //aaaaç
+
 		selectPanelComponents = new LinkedList<Component>();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -67,7 +73,7 @@ public class workSpaceSelect extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[] { 85, 0 };
+		gbl_contentPane.columnWidths = new int[] { 197, 0 };
 		gbl_contentPane.rowHeights = new int[] { 0, 21, 0, 0, 0 };
 		gbl_contentPane.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
 		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
@@ -82,18 +88,27 @@ public class workSpaceSelect extends JFrame {
 		gbc_lblNewLabel.gridy = 0;
 		contentPane.add(lblNewLabel, gbc_lblNewLabel);
 
-		btnNewButton = new JButton("New WorkSpace");
-		btnNewButton.setHorizontalAlignment(SwingConstants.LEFT);
-		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
-		gbc_btnNewButton.anchor = GridBagConstraints.WEST;
-		gbc_btnNewButton.insets = new Insets(0, 0, 5, 0);
-		gbc_btnNewButton.gridx = 0;
-		gbc_btnNewButton.gridy = 2;
-		contentPane.add(btnNewButton, gbc_btnNewButton);
+		btnNewButton_1 = new JButton("Add existing WorkSpace");
+		GridBagConstraints gbc_btnNewButton_1 = new GridBagConstraints();
+		gbc_btnNewButton_1.anchor = GridBagConstraints.WEST;
+		gbc_btnNewButton_1.insets = new Insets(0, 0, 5, 0);
+		gbc_btnNewButton_1.gridx = 0;
+		gbc_btnNewButton_1.gridy = 1;
+		contentPane.add(btnNewButton_1, gbc_btnNewButton_1);
+
+		newWorkSpaceButton = new JButton("New WorkSpace");
+		newWorkSpaceButton.setHorizontalAlignment(SwingConstants.LEFT);
+		GridBagConstraints gbc_newWorkSpaceButton = new GridBagConstraints();
+		gbc_newWorkSpaceButton.anchor = GridBagConstraints.WEST;
+		gbc_newWorkSpaceButton.insets = new Insets(0, 0, 5, 0);
+		gbc_newWorkSpaceButton.gridx = 0;
+		gbc_newWorkSpaceButton.gridy = 2;
+		contentPane.add(newWorkSpaceButton, gbc_newWorkSpaceButton);
 
 		panel = new JPanel();
 		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.fill = GridBagConstraints.BOTH;
+		gbc_panel.anchor = GridBagConstraints.WEST;
+		gbc_panel.fill = GridBagConstraints.VERTICAL;
 		gbc_panel.gridx = 0;
 		gbc_panel.gridy = 3;
 		contentPane.add(panel, gbc_panel);
@@ -102,6 +117,18 @@ public class workSpaceSelect extends JFrame {
 
 		setSize(600, 600);
 		setResizable(false);
+
+		newWorkSpaceButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				AddWorkSpaceDialog d = new AddWorkSpaceDialog();
+
+			}
+
+		});
+
 		this.setVisible(true);
 
 	}
