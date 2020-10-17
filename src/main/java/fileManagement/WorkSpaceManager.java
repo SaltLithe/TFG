@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JFileChooser;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -109,6 +110,25 @@ public class WorkSpaceManager {
 			return null;
 		}
 
+	}
+
+	public static String getFilePath() {
+		String path = null;
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new java.io.File("."));
+		fileChooser.setDialogTitle("Select a Folder to Open");
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		int returnValue = fileChooser.showSaveDialog(null);
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
+			if (fileChooser.getSelectedFile().isDirectory()) {
+				File filepath = fileChooser.getSelectedFile();
+				path = filepath.getAbsolutePath();
+				System.out.println("You selected the directory: " + fileChooser.getSelectedFile());
+			}
+		}
+
+		return path;
 	}
 
 }
