@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -27,7 +29,7 @@ public class workSpaceSelect extends JFrame {
 	private JPanel contentPane;
 	LinkedList<Component> selectPanelComponents;
 	private JLabel lblNewLabel;
-	private JButton btnNewButton;
+	private JButton newWorkSpaceButton;
 	private JPanel panel;
 
 	/**
@@ -82,14 +84,14 @@ public class workSpaceSelect extends JFrame {
 		gbc_lblNewLabel.gridy = 0;
 		contentPane.add(lblNewLabel, gbc_lblNewLabel);
 
-		btnNewButton = new JButton("New WorkSpace");
-		btnNewButton.setHorizontalAlignment(SwingConstants.LEFT);
+		newWorkSpaceButton = new JButton("New WorkSpace");
+		newWorkSpaceButton.setHorizontalAlignment(SwingConstants.LEFT);
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.anchor = GridBagConstraints.WEST;
 		gbc_btnNewButton.insets = new Insets(0, 0, 5, 0);
 		gbc_btnNewButton.gridx = 0;
 		gbc_btnNewButton.gridy = 2;
-		contentPane.add(btnNewButton, gbc_btnNewButton);
+		contentPane.add(newWorkSpaceButton, gbc_btnNewButton);
 
 		panel = new JPanel();
 		GridBagConstraints gbc_panel = new GridBagConstraints();
@@ -100,8 +102,20 @@ public class workSpaceSelect extends JFrame {
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		readAndGenerate();
 
+		newWorkSpaceButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				newWorkSpaceDialog d = new newWorkSpaceDialog();
+
+			}
+
+		});
+
 		setSize(600, 600);
 		setResizable(false);
+
 		this.setVisible(true);
 
 	}
