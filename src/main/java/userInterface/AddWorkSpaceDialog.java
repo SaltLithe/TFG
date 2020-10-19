@@ -1,5 +1,6 @@
 package userInterface;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -13,11 +14,14 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import core.DEBUG;
+import fileManagement.WorkSpace;
 import fileManagement.WorkSpaceManager;
 
 public class AddWorkSpaceDialog extends JDialog {
 	private JTextField nameField;
 	private JTextField pathField;
+	
+	
 
 	public AddWorkSpaceDialog() {
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -110,7 +114,7 @@ public class AddWorkSpaceDialog extends JDialog {
 					int index = path.lastIndexOf(search);
 					String subname = path.substring(index + 1, path.length());
 					DEBUG.debugmessage(index + " " + subname);
-					path = path.substring(0, index);
+					
 					pathField.setText(path);
 
 					nameField.setText(subname);
@@ -119,6 +123,25 @@ public class AddWorkSpaceDialog extends JDialog {
 			}
 
 		});
+		okButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				WorkSpace ws = new WorkSpace();
+				ws.setName(nameField.getText());
+				ws.setPath(pathField.getText());
+			boolean result = WorkSpaceManager.addWorkSpace(ws);
+			if(result) {
+				dispose();
+			}
+			
+			}
+
+		});
+
+		nameField.setDisabledTextColor(Color.white);
+		nameField.setEnabled(false); 
 
 		setSize(500, 300);
 		setResizable(false);

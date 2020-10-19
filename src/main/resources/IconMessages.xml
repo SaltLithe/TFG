@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<uiElements>
+<uiElement>
+<key>WARNING_ICON</key>
+<name>src/main/resources/Icons/warning_icon.png</name>
+</uiElement>
+
+</uiElements>

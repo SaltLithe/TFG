@@ -12,13 +12,18 @@ import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
 import core.DEBUG;
+import userInterface.ICON_MESSAGE;
+import userInterface.TEXT_MESSAGE;
+import userInterface.uiElementsManager;
+import userInterface.warningDialog;
 
 public class WorkSpaceManager {
 
-	public static void addWorkSpace(WorkSpace workspace) {
+	public static boolean addWorkSpace(WorkSpace workspace) {
 
 		File workspacefile = new File("src/main/resources/WorkSpaces.xml");
 		List<WorkSpace> ws = null;
+		uiElementsManager uiEM = uiElementsManager.getInstance();
 		try {
 			ws = getAllWorkSpaces();
 		} catch (Exception e) {
@@ -31,7 +36,7 @@ public class WorkSpaceManager {
 		int counter = 0;
 		while (counter < ws.size() && !repeated) {
 			WorkSpace w = ws.get(counter);
-			if (w.getName() == workspace.getName()) {
+			if (w.getPath() == workspace.getPath()) {
 				repeated = true;
 
 			} else {
@@ -73,9 +78,13 @@ public class WorkSpaceManager {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			return true; 
 		} else {
 
 			DEBUG.debugmessage("Esta repetido el workspace");
+			warningDialog diag = new warningDialog(uiEM.getStringNameFromKey(TEXT_MESSAGE.REPEATED_WORKSPACE),uiEM.getIconNameFromKey(ICON_MESSAGE.WARNING_ICON));
+			diag.setVisible(true);
+			return false; 
 		}
 	}
 

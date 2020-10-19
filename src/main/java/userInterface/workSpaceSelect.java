@@ -107,7 +107,7 @@ public class workSpaceSelect extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				newWorkSpaceDialog d = new newWorkSpaceDialog();
+				AddWorkSpaceDialog d = new AddWorkSpaceDialog();
 
 			}
 
