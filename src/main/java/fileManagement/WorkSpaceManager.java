@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -19,9 +21,65 @@ import userInterface.warningDialog;
 
 public class WorkSpaceManager {
 
-	public static boolean addWorkSpace(WorkSpace workspace) {
-
+	
+	
+	private static WorkSpaceManager instance = null;
+	
+	
+	public static WorkSpaceManager getInstance() {
+		if(instance == null) {
+			
+			instance = new WorkSpaceManager(); 
+		}
+		return instance;
+	}
+	
+	private WorkSpaceManager() {
+		
+	}
+	
+	private boolean rewriteWorkSpaces(List<WorkSpace> ws) {
 		File workspacefile = new File("src/main/resources/WorkSpaces.xml");
+		WorkSpaces newws = new WorkSpaces();
+		newws.setWorkSpaces(ws);
+
+		JAXBContext jaxbContext = null;
+		try {
+			jaxbContext = JAXBContext.newInstance(WorkSpaces.class);
+		} catch (JAXBException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		Marshaller jaxbMarshaller = null;
+		try {
+			jaxbMarshaller = jaxbContext.createMarshaller();
+		} catch (JAXBException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		try {
+			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+		} catch (PropertyException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		// Marshal the employees list in file
+		try {
+			jaxbMarshaller.marshal(newws, workspacefile);
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return true; 
+		
+	}
+	
+	
+	public boolean addWorkSpace(WorkSpace workspace , JFrame frame) {
+
+		
 		List<WorkSpace> ws = null;
 		uiElementsManager uiEM = uiElementsManager.getInstance();
 		try {
@@ -36,7 +94,7 @@ public class WorkSpaceManager {
 		int counter = 0;
 		while (counter < ws.size() && !repeated) {
 			WorkSpace w = ws.get(counter);
-			if (w.getPath() == workspace.getPath()) {
+			if (w.getPath().equals( workspace.getPath())) {
 				repeated = true;
 
 			} else {
@@ -46,49 +104,21 @@ public class WorkSpaceManager {
 		}
 		if (!repeated) {
 			ws.add(workspace);
-			WorkSpaces newws = new WorkSpaces();
-			newws.setWorkSpaces(ws);
+			
+			return rewriteWorkSpaces(ws);
 
-			JAXBContext jaxbContext = null;
-			try {
-				jaxbContext = JAXBContext.newInstance(WorkSpaces.class);
-			} catch (JAXBException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			Marshaller jaxbMarshaller = null;
-			try {
-				jaxbMarshaller = jaxbContext.createMarshaller();
-			} catch (JAXBException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-
-			try {
-				jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			} catch (PropertyException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-
-			// Marshal the employees list in file
-			try {
-				jaxbMarshaller.marshal(newws, workspacefile);
-			} catch (JAXBException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return true; 
+			
 		} else {
-
-			DEBUG.debugmessage("Esta repetido el workspace");
-			warningDialog diag = new warningDialog(uiEM.getStringNameFromKey(TEXT_MESSAGE.REPEATED_WORKSPACE),uiEM.getIconNameFromKey(ICON_MESSAGE.WARNING_ICON));
-			diag.setVisible(true);
+			JOptionPane.showMessageDialog(frame,
+				    "A workspace in the same path already exists in the list.",
+				    "Can't add this Workspace",
+				    JOptionPane.ERROR_MESSAGE);
+			
 			return false; 
 		}
 	}
 
-	public static List<WorkSpace> getAllWorkSpaces() {
+	public  List<WorkSpace> getAllWorkSpaces() {
 
 		Unmarshaller jaxbUnmarshaller = null;
 		JAXBContext jaxbContext = null;
@@ -121,7 +151,7 @@ public class WorkSpaceManager {
 
 	}
 
-	public static String getFilePath() {
+	public  String getFilePath() {
 		String path = null;
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setCurrentDirectory(new java.io.File("."));
@@ -139,5 +169,34 @@ public class WorkSpaceManager {
 
 		return path;
 	}
+
+	public  void deleteWorkSpace(int id, String name ,JFrame frame) {
+		// TODO Auto-generated method stub
+		ArrayList<WorkSpace> wslist  = (ArrayList<WorkSpace>) getAllWorkSpaces(); 
+		boolean hasName = false;
+		int count = 0 ; 
+		while ( count < wslist.size() && !hasName) {
+			if(wslist.get(count).getName().equals(name)) {
+				hasName = true;
+			}
+			count++;
+		}
+		if(hasName) {
+		wslist.remove(id);
+		rewriteWorkSpaces(wslist);
+		
+		JOptionPane.showMessageDialog(frame,
+			    "Deleted successfully.");
+		}
+		else {
+		
+			JOptionPane.showMessageDialog(frame,
+				    "Delete operation failed, could not find a WorkSpace with the name: "+ name+".", "Delete error",
+				    JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+
+	
 
 }

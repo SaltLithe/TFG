@@ -39,6 +39,9 @@ public class workSpaceSelect extends JFrame {
 	private JButton newWorkSpaceButton;
 	private JPanel panel;
 	private boolean canUpdate = false;
+	private WorkSpaceManager wsm; 
+	
+	private JFrame self; 
 	
 	private JScrollPane scrollPanel; 
 	
@@ -58,10 +61,12 @@ public class workSpaceSelect extends JFrame {
 		
 		panel.add(new Box.Filler(minSize, prefSize, maxSize));
 
-		ArrayList<WorkSpace> ws = (ArrayList<WorkSpace>) WorkSpaceManager.getAllWorkSpaces();
+		ArrayList<WorkSpace> ws = (ArrayList<WorkSpace>) wsm.getAllWorkSpaces();
 		if (ws != null) {
-			for (WorkSpace workspace : ws) {
-				customWorkSpaceElement cwse = new customWorkSpaceElement(workspace.getName(), workspace.getPath());
+			for (int i =0 ; i < ws.size() ; i++) {
+				WorkSpace workspace = ws.get(i);
+				customWorkSpaceElement cwse = new customWorkSpaceElement(workspace.getName(), workspace.getPath(),this,self);
+				cwse.tempID = i; 
 				cwse.setAlignmentY(Component.TOP_ALIGNMENT);
 				cwse.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -76,6 +81,9 @@ public class workSpaceSelect extends JFrame {
 	}
 
 	public workSpaceSelect() {
+		
+		self = this; 
+		wsm = WorkSpaceManager.getInstance();
 
 		try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
@@ -158,7 +166,7 @@ public class workSpaceSelect extends JFrame {
 
 	}
 	private void openAddWorkSpaceDialog() {
-		AddWorkSpaceDialog d = new AddWorkSpaceDialog(this);
+		AddWorkSpaceDialog d = new AddWorkSpaceDialog(this,self);
 		d.addWindowListener(new WindowAdapter() {
 		    @Override
 		    public void windowClosed(WindowEvent e) {
@@ -169,7 +177,7 @@ public class workSpaceSelect extends JFrame {
 		
 	}
 
-	private void refresh() {
+	public void refresh() {
 		DEBUG.debugmessage("Refreshing");
 		panel.removeAll();
 		

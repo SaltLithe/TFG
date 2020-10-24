@@ -22,11 +22,15 @@ public class AddWorkSpaceDialog extends JDialog {
 	private JTextField nameField;
 	private JTextField pathField;
 	private boolean parentUpdated; 
+	private JFrame self; 
+	private WorkSpaceManager wsm; 
 	
 
-	public AddWorkSpaceDialog(workSpaceSelect parent){
+	public AddWorkSpaceDialog(workSpaceSelect parent , JFrame self){
+	
+		this.self = self; 
 		parentUpdated = false;
-		
+		wsm = WorkSpaceManager.getInstance();
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 161, 0, 84, 0, 0 };
@@ -111,7 +115,8 @@ public class AddWorkSpaceDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				String path = WorkSpaceManager.getFilePath();
+				
+				String path = wsm.getFilePath();
 				if (path != null) {
 
 					String search = "\\";
@@ -135,7 +140,7 @@ public class AddWorkSpaceDialog extends JDialog {
 				WorkSpace ws = new WorkSpace();
 				ws.setName(nameField.getText());
 				ws.setPath(pathField.getText());
-			boolean result = WorkSpaceManager.addWorkSpace(ws);
+			boolean result = wsm.addWorkSpace(ws,self);
 			if(result) {
 				
 			
@@ -148,6 +153,17 @@ public class AddWorkSpaceDialog extends JDialog {
 
 		});
 
+		cancelButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				
+				dispose(); 
+
+			}
+
+		});
 		nameField.setDisabledTextColor(Color.white);
 		nameField.setEnabled(false); 
 
