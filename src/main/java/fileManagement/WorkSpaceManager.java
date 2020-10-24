@@ -170,6 +170,9 @@ public class WorkSpaceManager {
 		return path;
 	}
 
+	
+	
+	
 	public  void deleteWorkSpace(int id, String name ,JFrame frame) {
 		// TODO Auto-generated method stub
 		ArrayList<WorkSpace> wslist  = (ArrayList<WorkSpace>) getAllWorkSpaces(); 
@@ -194,6 +197,39 @@ public class WorkSpaceManager {
 				    "Delete operation failed, could not find a WorkSpace with the name: "+ name+".", "Delete error",
 				    JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	public boolean locateWorkSpace(String path, String name , JFrame frame) {
+		
+		ArrayList<WorkSpace> wslist  = (ArrayList<WorkSpace>) getAllWorkSpaces(); 
+
+		boolean hasName = false;
+		int count = 0 ; 
+		while ( count < wslist.size() && !hasName) {
+			if(wslist.get(count).getName().equals(name)) {
+				hasName = true;
+			}else {
+			count++;
+			}
+		}
+		
+		if(hasName) {
+			JOptionPane.showMessageDialog(frame,
+				    "Located successfully.");
+			
+			wslist.get(count).setPath(path);
+			this.rewriteWorkSpaces(wslist);
+					
+			return true; 
+		}else {
+			JOptionPane.showMessageDialog(frame,
+				    "Locate operation failed, could not find a WorkSpace with the name: "+ name+" matching to the path you have selected. "
+				    		+ "Try renaming the folder or adding the Workspace again.", "Locate error",
+				    JOptionPane.ERROR_MESSAGE);
+			return false; 
+		}
+		// TODO Auto-generated method stub
+		
 	}
 
 

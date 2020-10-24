@@ -36,7 +36,7 @@ public class customWorkSpaceElement extends JPanel {
 	private JLabel nameLabel;
 
 	private Color notFoundColor;
-	
+	private Color foundColor; 
 	public int tempID; 
 	
 	
@@ -58,8 +58,11 @@ public class customWorkSpaceElement extends JPanel {
 		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		notFoundColor = new Color(222, 57, 49);
-
+		
+		
+		
 		nameLabel = new JLabel(name + ": " + path);
+		foundColor = nameLabel.getForeground();
 
 		deleteLocateButton = new JButton("");
 		add(deleteLocateButton);
@@ -74,6 +77,8 @@ public class customWorkSpaceElement extends JPanel {
 
 		deleteLocateButton.setHorizontalAlignment(SwingConstants.LEFT);
 		deleteLocateButton.setAlignmentX(0.5f);
+		deleteLocateButton.setText("Delete");
+
 		
 		deleteLocateButton.addActionListener(new ActionListener() {
 
@@ -81,7 +86,7 @@ public class customWorkSpaceElement extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 
 				
-				if(canOpen) {
+			
 					
 					Object[] options = {"Delete",
 		                    "Cancel"};
@@ -99,12 +104,14 @@ public class customWorkSpaceElement extends JPanel {
 			 wsm.deleteWorkSpace(tempID,name, frame); 
 			parent.refresh(); 
 		}
-		
+					
+			
+
+				
 				}
 				
-				
 
-			}
+			
 
 			
 
@@ -123,10 +130,43 @@ public class customWorkSpaceElement extends JPanel {
 		    public void mouseClicked(MouseEvent e)  
 		    {  
 		    	if(!canOpen) {
-		    	JOptionPane.showMessageDialog(frame,
-		    		    "Locate this Workspace or delete it.",
-		    		    "Warning : Workspace not found",
-		    		    JOptionPane.WARNING_MESSAGE);
+		    		
+		    		
+					Object[] options = {"Locate",
+		                    "Cancel"};
+		int n = JOptionPane.showOptionDialog(frame,
+		 "This WorkSpace could not be located, would you like to locate it?.",
+		    "WorkSpace not found",
+		    JOptionPane.OK_CANCEL_OPTION,
+		    JOptionPane.QUESTION_MESSAGE,
+		    null,
+		    options,
+		    options[1]);
+		
+		
+		if(n == JOptionPane.OK_OPTION) {
+		  
+		    	
+		    	String path = wsm.getFilePath();
+				if (path != null) {
+					
+					String search = "\\";
+					int index = path.lastIndexOf(search);
+					String subname = path.substring(index + 1, path.length());
+					
+					
+					boolean results = 	wsm.locateWorkSpace(path,name,frame);
+					
+					if(results) {
+						nameLabel.setForeground(foundColor);
+						canOpen = true;
+						parent.refresh();					
+					}
+									
+									
+									
+				}
+		    	}
 		    	}
 		    	else {
 		    		
@@ -135,6 +175,8 @@ public class customWorkSpaceElement extends JPanel {
 		    	}
 		    }  
 		}); 
+		
+		
 		add(nameLabel);
 		
 		forcedWidth = this.getPreferredSize().width;
@@ -151,11 +193,10 @@ public class customWorkSpaceElement extends JPanel {
 
 		File workspacefile = new File(path);
 		if (workspacefile.exists()) {
-			deleteLocateButton.setText("Delete");
 			canOpen = true; 
 
 		} else {
-			deleteLocateButton.setText("Locate");
+			
 			nameLabel.setForeground(notFoundColor);
 			canOpen = false; 
 
