@@ -1,5 +1,6 @@
 package userInterface;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,6 +14,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class uiElements {
 	@XmlElement(name = "uiElements")
 	private List<uiElement> uielements = null;
+	
+	public uiElements() {
+		
+		uielements = new ArrayList<uiElement>(); 
+	}
 
 	public List<uiElement> getuiElements() {
 		return uielements;

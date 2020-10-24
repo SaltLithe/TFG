@@ -1,6 +1,7 @@
 package fileManagement;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.font.TextAttribute;
@@ -11,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import java.awt.Component;
 
 public class customWorkSpaceElement extends JPanel {
 
@@ -26,6 +28,10 @@ public class customWorkSpaceElement extends JPanel {
 	private JLabel nameLabel;
 
 	private Color notFoundColor;
+	
+	
+	private int forcedHeight = 30;
+	private int forcedWidth = 0; 
 
 	public customWorkSpaceElement(String name, String path) {
 
@@ -44,7 +50,7 @@ public class customWorkSpaceElement extends JPanel {
 		add(deleteLocateButton);
 
 		nameLabel = new JLabel(name + ": " + path);
-		this.setSize(this.getPreferredSize());
+		//this.setSize(this.getPreferredSize());
 
 		checkExistance();
 
@@ -57,14 +63,22 @@ public class customWorkSpaceElement extends JPanel {
 		deleteLocateButton.setHorizontalAlignment(SwingConstants.LEFT);
 		deleteLocateButton.setAlignmentX(0.5f);
 
-		this.setAlignmentX(0.5f);
+		this.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		Font font = nameLabel.getFont();
 		Map attributes = font.getAttributes();
 		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 		nameLabel.setFont(font.deriveFont(attributes));
-
+		
+		
+		
 		add(nameLabel);
+		
+		forcedWidth = this.getPreferredSize().width;
+		this.setMinimumSize(new Dimension(forcedWidth,forcedHeight));
+		this.setPreferredSize(new Dimension(forcedWidth,forcedHeight));
+		this.setMaximumSize(new Dimension(forcedWidth,forcedHeight));
+		
 
 		this.setVisible(true);
 

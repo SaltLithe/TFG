@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -20,10 +21,13 @@ import fileManagement.WorkSpaceManager;
 public class AddWorkSpaceDialog extends JDialog {
 	private JTextField nameField;
 	private JTextField pathField;
-	
+	private boolean parentUpdated; 
 	
 
-	public AddWorkSpaceDialog() {
+	public AddWorkSpaceDialog(workSpaceSelect parent){
+		parentUpdated = false;
+		
+		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 161, 0, 84, 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0, 41, 43, 123, 0, 0 };
@@ -133,7 +137,11 @@ public class AddWorkSpaceDialog extends JDialog {
 				ws.setPath(pathField.getText());
 			boolean result = WorkSpaceManager.addWorkSpace(ws);
 			if(result) {
-				dispose();
+				
+			
+			
+				dispose(); 
+		
 			}
 			
 			}
@@ -145,7 +153,7 @@ public class AddWorkSpaceDialog extends JDialog {
 
 		setSize(500, 300);
 		setResizable(false);
-		setVisible(true);
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 
 }

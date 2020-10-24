@@ -1,25 +1,31 @@
 package userInterface;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
+import core.DEBUG;
 import fileManagement.WorkSpace;
 import fileManagement.WorkSpaceManager;
 import fileManagement.customWorkSpaceElement;
@@ -30,7 +36,12 @@ public class workSpaceSelect extends JFrame {
 	LinkedList<Component> selectPanelComponents;
 	private JLabel lblNewLabel;
 	private JButton newWorkSpaceButton;
-	private JPanel panel;
+	private JScrollPane panel;
+	private boolean canUpdate = false;
+	
+	Dimension minSize = new Dimension(0, 0);
+	Dimension prefSize = new Dimension(0, 0);
+	Dimension maxSize = new Dimension(0, 0);
 
 	/**
 	 * Launch the application.
@@ -41,12 +52,18 @@ public class workSpaceSelect extends JFrame {
 	 */
 
 	private void readAndGenerate() {
+		panel.add(new Box.Filler(minSize, prefSize, maxSize));
+
 		ArrayList<WorkSpace> ws = (ArrayList<WorkSpace>) WorkSpaceManager.getAllWorkSpaces();
 		if (ws != null) {
 			for (WorkSpace workspace : ws) {
 				customWorkSpaceElement cwse = new customWorkSpaceElement(workspace.getName(), workspace.getPath());
-				cwse.setAlignmentX(0.5f);
+				cwse.setAlignmentY(Component.TOP_ALIGNMENT);
+				cwse.setAlignmentX(Component.LEFT_ALIGNMENT);
+
 				panel.add(cwse);
+				
+				panel.add(new Box.Filler(minSize, prefSize, maxSize));
 
 			}
 
@@ -93,23 +110,31 @@ public class workSpaceSelect extends JFrame {
 		gbc_btnNewButton.gridy = 2;
 		contentPane.add(newWorkSpaceButton, gbc_btnNewButton);
 
-		panel = new JPanel();
+		panel = new JScrollPane(); 
 		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.fill = GridBagConstraints.BOTH;
+		gbc_panel.anchor = GridBagConstraints.NORTHWEST;
 		gbc_panel.gridx = 0;
 		gbc_panel.gridy = 3;
 		contentPane.add(panel, gbc_panel);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		readAndGenerate();
 
+		
+		
 		newWorkSpaceButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				AddWorkSpaceDialog d = new AddWorkSpaceDialog();
+				
+				DEBUG.debugmessage("SET TO TRUE");
+				openAddWorkSpaceDialog();
+				
+				
 
 			}
+
+			
 
 		});
 
@@ -119,4 +144,27 @@ public class workSpaceSelect extends JFrame {
 		this.setVisible(true);
 
 	}
+	private void openAddWorkSpaceDialog() {
+		AddWorkSpaceDialog d = new AddWorkSpaceDialog(this);
+		d.addWindowListener(new WindowAdapter() {
+		    @Override
+		    public void windowClosed(WindowEvent e) {
+		    	refresh(); 
+		    }
+		});
+		d.setVisible(true);
+		
+	}
+
+	private void refresh() {
+		DEBUG.debugmessage("Refreshing");
+		panel.removeAll();
+		
+		readAndGenerate(); 
+		
+		panel.updateUI();
+	
+	}
+
+
 }
