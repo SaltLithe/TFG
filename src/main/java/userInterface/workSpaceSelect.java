@@ -19,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
@@ -36,8 +37,10 @@ public class workSpaceSelect extends JFrame {
 	LinkedList<Component> selectPanelComponents;
 	private JLabel lblNewLabel;
 	private JButton newWorkSpaceButton;
-	private JScrollPane panel;
+	private JPanel panel;
 	private boolean canUpdate = false;
+	
+	private JScrollPane scrollPanel; 
 	
 	Dimension minSize = new Dimension(0, 0);
 	Dimension prefSize = new Dimension(0, 0);
@@ -52,6 +55,7 @@ public class workSpaceSelect extends JFrame {
 	 */
 
 	private void readAndGenerate() {
+		
 		panel.add(new Box.Filler(minSize, prefSize, maxSize));
 
 		ArrayList<WorkSpace> ws = (ArrayList<WorkSpace>) WorkSpaceManager.getAllWorkSpaces();
@@ -110,13 +114,21 @@ public class workSpaceSelect extends JFrame {
 		gbc_btnNewButton.gridy = 2;
 		contentPane.add(newWorkSpaceButton, gbc_btnNewButton);
 
-		panel = new JScrollPane(); 
+		
+		panel = new JPanel();
+		scrollPanel = new JScrollPane(panel);
 		GridBagConstraints gbc_panel = new GridBagConstraints();
+		gbc_panel.fill = GridBagConstraints.BOTH;
 		gbc_panel.anchor = GridBagConstraints.NORTHWEST;
 		gbc_panel.gridx = 0;
 		gbc_panel.gridy = 3;
-		contentPane.add(panel, gbc_panel);
+	
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+	    panel.setSize(panel.getPreferredSize());
+	  
+	    scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+	    scrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		this.contentPane.add(scrollPanel, gbc_panel);
 		readAndGenerate();
 
 		
@@ -138,9 +150,10 @@ public class workSpaceSelect extends JFrame {
 
 		});
 
-		setSize(600, 600);
+		setSize(500, 500);
 		setResizable(false);
-
+	
+		
 		this.setVisible(true);
 
 	}
