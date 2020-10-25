@@ -13,11 +13,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
-import core.DEBUG;
-import userInterface.ICON_MESSAGE;
-import userInterface.TEXT_MESSAGE;
-import userInterface.uiElementsManager;
-import userInterface.warningDialog;
+
 
 public class WorkSpaceManager {
 
@@ -81,7 +77,6 @@ public class WorkSpaceManager {
 
 		
 		List<WorkSpace> ws = null;
-		uiElementsManager uiEM = uiElementsManager.getInstance();
 		try {
 			ws = getAllWorkSpaces();
 		} catch (Exception e) {
