@@ -13,46 +13,85 @@ import javax.swing.JPanel;
 
 import core.DEBUG;
 import core.DeveloperComponent;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import java.awt.BorderLayout;
+import javax.swing.BoxLayout;
+import javax.swing.JMenu;
+import javax.swing.JToolBar;
+import java.awt.Component;
 
 /*Clase que contiene todos los botones del menu superior de la aplicacion y que implementa sus 
  * comportamientos
  */
 @SuppressWarnings("serial")
 public class MenuToolbar extends JPanel implements PropertyChangeListener {
-
-	private JButton folder;
-	private JButton save;
-	private JButton saveAll;
 	private UIController uiController;
 	private DeveloperComponent developerComponent;
 	private DeveloperMainFrame developerMainFrame;
+	private JMenuBar menuBar;
 
+	JMenuItem saveMenuItem;
+	JMenuItem saveAllMenuItem;
+	
+	JButton save;
+	JButton saveAll;
+	JMenuItem newProjectMenuItem;
 	private void enableSaveButtons() {
 
 		save.setEnabled(true);
 		saveAll.setEnabled(true);
+		
+		saveMenuItem.setEnabled(true);
+		saveAllMenuItem.setEnabled(true);
 	}
 
 	public MenuToolbar(DeveloperMainFrame developerMainFrame) {
+		setAlignmentY(Component.TOP_ALIGNMENT);
+		setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		DEBUG.debugmessage("SE HA INVOCADO AL CONSTRUCTOR DE MENUTOOLBAR");
 		uiController = UIController.getInstance();
 		developerComponent = uiController.getDeveloperComponent();
 		this.developerMainFrame = developerMainFrame;
-
-		folder = new JButton("Open Folder");
-		save = new JButton("Save File");
-		saveAll = new JButton("Save All");
-
-		save.setEnabled(false);
-		saveAll.setEnabled(false);
-
-		setLayout(new FlowLayout(FlowLayout.LEFT));
-		add(folder);
-		add(save);
-		add(saveAll);
-
-		folder.addActionListener(new ActionListener() {
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		
+		menuBar = new JMenuBar();
+		menuBar.setAlignmentX(Component.LEFT_ALIGNMENT);
+		add(menuBar);
+		
+		JMenu mnNewMenu = new JMenu("File");
+		mnNewMenu.setAlignmentY(Component.TOP_ALIGNMENT);
+		mnNewMenu.setAlignmentX(Component.LEFT_ALIGNMENT);
+		menuBar.add(mnNewMenu);
+		
+		newProjectMenuItem = new JMenuItem("New Project");
+		mnNewMenu.add(newProjectMenuItem);
+		
+		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Open Project");
+		mnNewMenu.add(mntmNewMenuItem_1);
+		
+		saveMenuItem = new JMenuItem("Save");
+		mnNewMenu.add(saveMenuItem);
+		
+		saveAllMenuItem = new JMenuItem("Save all");
+		mnNewMenu.add(saveAllMenuItem);
+		
+		JToolBar toolBar = new JToolBar();
+		toolBar.setAlignmentX(Component.LEFT_ALIGNMENT);
+		add(toolBar);
+		
+		 save = new JButton("Save");
+		toolBar.add(save);
+		
+		 saveAll = new JButton("Save All");
+		toolBar.add(saveAll);
+		
+		
+		newProjectMenuItem.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -63,45 +102,54 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			}
 
 		});
-
+		
+		
 		save.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				DEBUG.debugmessage("SE HA PULSADO EL BOTON SAVE");
-
-				String contents = developerMainFrame.getEditorPanelContents();
-				uiController.run(() -> {
-					try {
-						developerComponent.saveCurrentFile(contents);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				});
+			
+				save(); 
 
 			}
 
 		});
+		
+		
 
 		saveAll.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				DEBUG.debugmessage("SE HA PULSADO EL BOTON SAVEALL");
-				String contents = developerMainFrame.getEditorPanelContents();
-				uiController.run(() -> {
-					try {
-						developerComponent.saveAllFiles(contents);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				});
-
+			
+					saveAll(); 
 			}
 
 		});
+		
+		saveAllMenuItem.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+			
+					saveAll(); 
+			}
+
+		});
+		
+		saveMenuItem.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+			
+					save(); 
+			}
+
+		});
+		
+	menuBar.setVisible(true);
+		//this.setSize(this.getPreferredSize());
+		this.setVisible(true);
 
 	}
 
@@ -118,5 +166,30 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			break;
 		}
 
+	}
+	
+	private void save() {
+		String contents = developerMainFrame.getEditorPanelContents();
+		uiController.run(() -> {
+			try {
+				developerComponent.saveCurrentFile(contents);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+	}
+	
+	public void saveAll() {
+		DEBUG.debugmessage("SE HA PULSADO EL BOTON SAVEALL");
+		String contents = developerMainFrame.getEditorPanelContents();
+		uiController.run(() -> {
+			try {
+				developerComponent.saveAllFiles(contents);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 	}
 }
