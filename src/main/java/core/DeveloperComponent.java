@@ -15,6 +15,7 @@ import javax.swing.SwingUtilities;
 import fileManagement.FileManager;
 import fileManagement.FileType;
 import fileManagement.TextFile;
+import fileManagement.WorkSpace;
 import javaMiniSockets.clientSide.AsynchronousClient;
 import javaMiniSockets.serverSide.AsynchronousServer;
 import network.ClientHandler;
@@ -76,7 +77,7 @@ public class DeveloperComponent extends Observable {
 		}
 	}
 
-	public DeveloperComponent()
+	public DeveloperComponent(WorkSpace firstWorkSpace)
 
 	{
 		DEBUG.debugmessage("SE HA CREADO UNA INSTANCIA DE DEVELOPERCOMPONENT");

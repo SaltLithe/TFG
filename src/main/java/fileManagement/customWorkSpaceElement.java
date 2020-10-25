@@ -171,7 +171,7 @@ public class customWorkSpaceElement extends JPanel {
 		    	else {
 		    		
 		    		
-		    		//TO-DO abrir el workspace 
+		    		wsm.startMainApp(tempID,frame);
 		    	}
 		    }  
 		}); 

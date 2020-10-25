@@ -13,6 +13,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
+import core.DeveloperComponent;
+
 
 
 public class WorkSpaceManager {
@@ -224,6 +226,22 @@ public class WorkSpaceManager {
 			return false; 
 		}
 		// TODO Auto-generated method stub
+		
+	}
+
+	public void startMainApp(int tempID, JFrame frame) {
+
+		List<WorkSpace> ws = this.getAllWorkSpaces();
+		
+		Thread t = new Thread(new Runnable() {
+		    @Override
+		    public void run() {
+		    	new DeveloperComponent(ws.get(tempID));
+		    }
+
+		   });
+		t.start();
+		frame.dispose(); 
 		
 	}
 
