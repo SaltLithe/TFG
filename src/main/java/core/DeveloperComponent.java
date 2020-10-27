@@ -4,7 +4,13 @@ package core;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.concurrent.Executors;
@@ -38,6 +44,8 @@ public class DeveloperComponent extends Observable {
 	private AsynchronousServer server;
 	private AsynchronousClient client;
 	private int defaultQueueSize = 100;
+	
+	private WorkSpace workSpace; 
 
 	public void setAsClient(String serverAddress, String ownAddress, int serverPort, int clientPort,
 			boolean autoConnect) {
@@ -77,12 +85,13 @@ public class DeveloperComponent extends Observable {
 		}
 	}
 
-	public DeveloperComponent(WorkSpace firstWorkSpace)
+	public DeveloperComponent(WorkSpace workSpace)
 
 	{
 		DEBUG.debugmessage("SE HA CREADO UNA INSTANCIA DE DEVELOPERCOMPONENT");
 
 		support = PropertyChangeMessenger.getInstance();
+		this.workSpace = workSpace; 
 		UIController controller = UIController.getInstance();
 		controller.setDeveloperComponent(this);
 		fileManager = new FileManager();
@@ -106,7 +115,8 @@ public class DeveloperComponent extends Observable {
 		support.addPropertyChangeListener(DeveloperMainFrameWrapper.getTextEditorToolbar());
 		support.addPropertyChangeListener(DeveloperMainFrameWrapper.getTextEditorPanel());
 		support.addPropertyChangeListener(DeveloperMainFrameWrapper.getConsolePanel());
-	}
+		
+		fileManager.scanWorkSpace(workSpace);	}
 
 	// Metodo publico para ejecutar código que maneja solo si ejecutar clase o
 	// script
@@ -149,13 +159,20 @@ public class DeveloperComponent extends Observable {
 		return null;
 
 	}
+	
+	
 
 	// Metodo que es llamado para seleccionar y abrir la carpeta donde se va a
 	// trabajar con la aplicacion
 	public void selectFocusedFolder() {
 		DEBUG.debugmessage("SE HA LLAMADO A SELECTFOCUSEDFOLDER EN DEVELOPERCOMPONENT");
-		fileManager.openFolder();
-		fileManager.updateAllFiles();
+		
+		//fileManager.openFolder()
+		
+		
+		  
+		
+	//	fileManager.updateAllFiles();
 
 	}
 

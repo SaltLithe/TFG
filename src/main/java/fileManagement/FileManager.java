@@ -4,12 +4,17 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JFileChooser;
+
 
 import core.DEBUG;
 import userInterface.ObserverActions;
@@ -24,10 +29,15 @@ public class FileManager {
 
 	private JFileChooser fileChooser;
 	private HashMap<String, TextFile> editorFiles;
+	
+	private HashMap<String, Project> editorProjects; 
 	private String currentPath;
 	private String currentFocus = null;
 	private String extension = ".java";
 	private PropertyChangeMessenger support;
+	
+	
+	public final String projectProperty = "pairleap.projectfolder";
 
 	public String getCurrentFolder() {
 		return currentPath;
@@ -41,6 +51,7 @@ public class FileManager {
 		support = PropertyChangeMessenger.getInstance();
 		fileChooser = new JFileChooser();
 		editorFiles = new HashMap<String, TextFile>();
+		editorProjects = new HashMap<String,Project>(); 
 		currentPath = null;
 
 	}
@@ -175,8 +186,89 @@ public class FileManager {
 
 	}
 
+	public void newProject(String name , WorkSpace workSpace ) {
+		
+		String newpath = workSpace.getPath()+"\\"+ name;
+		
+		File f = new File(newpath); 
+		f.mkdir();
+		   final Path file = Paths.get(f.getAbsolutePath());
+
+		    final UserDefinedFileAttributeView view = Files.getFileAttributeView(file, UserDefinedFileAttributeView.class);
+
+		    /* The file attribute */
+		    final String projectProperty = "pairleap.projectfolder";
+		    /* Write the properties */
+		    byte[] bytes = null;
+			try {
+				bytes = projectProperty.getBytes("UTF-8");
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		    final ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);
+		    writeBuffer.put(bytes);
+		    writeBuffer.flip();
+		    try {
+				view.write(projectProperty, writeBuffer);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		    
+		    
+		    DEBUG.debugmessage("PROYECTO CREADO");
+		
+	}
+	
+	
+	public void scanWorkSpace(WorkSpace workspace) {
+		
+		File path = new File(workspace.getPath());
+		
+	
+		File[] files;
+
+		files = path.listFiles();
+			for(File dir : files) {
+				final Path file = Paths.get(dir.getAbsolutePath());
+				final UserDefinedFileAttributeView view = Files.getFileAttributeView(file, UserDefinedFileAttributeView.class);
+				 ByteBuffer readBuffer = null;
+				try {
+					readBuffer = ByteBuffer.allocate(view.size(projectProperty));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				    try {
+						view.read(projectProperty, readBuffer);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				    readBuffer.flip();
+				    try {
+						final String valueFromAttributes = new String(readBuffer.array(), "UTF-8");
+						if(valueFromAttributes.equals(this.projectProperty) ) {
+							DEBUG.debugmessage("FOUND A PROJECT");
+							this.editorProjects.put(dir.getAbsolutePath(), new Project(dir.getAbsolutePath(),dir.getName()));
+						}
+					} catch (UnsupportedEncodingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				
+				
+			}
+	
+		
+		
+		
+	}
+	
 	// Metodo que abre un dialogo para elegir la carpeta actual
-	public void openFolder() {
+	private String openFolder() {
 
 		DEBUG.debugmessage("SE HA LLAMADO A OPENFOLDER EN FILEMANAGER");
 
@@ -192,7 +284,7 @@ public class FileManager {
 				System.out.println("You selected the directory: " + fileChooser.getSelectedFile());
 			}
 		}
-
+		return currentPath;
 	}
 
 	// Metodo que devuelve el contenido de un TextFile
