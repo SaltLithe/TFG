@@ -20,6 +20,7 @@ import javax.swing.WindowConstants;
 
 import core.DEBUG;
 import core.DeveloperComponent;
+import fileManagement.Project;
 
 @SuppressWarnings("serial")
 public class FileExplorerToolbar extends JPanel implements PropertyChangeListener {
@@ -184,6 +185,18 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 				createFileButton(f.getName(), ".java");
 			}
 
+			break;
+			
+		case ADD_PROJECT_TREE:
+			DEBUG.debugmessage("ADDING TREE");
+			ArrayList<Object> eventList2 = (ArrayList<Object>)evt.getNewValue();
+			File newProject = (File)eventList2.get(0);
+			fileExplorerPanel.add(new ProjectTree(newProject));
+			fileExplorerPanel.updateUI();
+			
+			
+			
+			
 			break;
 		default:
 			break;

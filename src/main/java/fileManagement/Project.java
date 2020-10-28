@@ -8,22 +8,30 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JPanel;
 
 import core.DEBUG;
+import userInterface.FileTree;
+import userInterface.ObserverActions;
+import userInterface.PropertyChangeMessenger;
+
 import javax.swing.JMenu;
 import java.awt.FlowLayout;
 import javax.swing.JMenuItem;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JTree;
 
-public class Project extends JPanel{
+public class Project {
 	
 	
 	private HashMap<String,SrcFolder> projectFolders;
 	private HashMap<String,File> projectFiles;
+	private File dir;
+	private PropertyChangeMessenger pcm; 
 	
 	private final String srcFolderProperty = "pairleap.srcfolder";
 
@@ -33,30 +41,52 @@ public class Project extends JPanel{
 	private String name; 
 	
 	public Project(String fullPath , String name) {
-		FlowLayout flowLayout = (FlowLayout) getLayout();
-		flowLayout.setAlignment(FlowLayout.LEFT);
 		
 		this.fullPath = fullPath;
 		this.name = name;
 		
-		JButton btnNewButton = new JButton("Extend");
-		add(btnNewButton);
-		
-		JLabel lblNewLabel = new JLabel(name);
-		add(lblNewLabel);
-		
-		
-		
-		
-		
-		
-		
+		this.dir = new File(fullPath) ;
+		ArrayList<Object> list = new ArrayList<Object>();
+		list.add(dir);
+		pcm = PropertyChangeMessenger.getInstance();
+		pcm.notify(ObserverActions.ADD_PROJECT_TREE, null, list);
+	
 		
 		
 		
 	}
 	
 	
+	public File getDir() {
+		return dir;
+	}
+
+
+	public void setDir(File dir) {
+		this.dir = dir;
+	}
+
+
+	public String getFullPath() {
+		return fullPath;
+	}
+
+
+	public void setFullPath(String fullPath) {
+		this.fullPath = fullPath;
+	}
+
+
+	public String getName() {
+		return name;
+	}
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
 	private void scanProject() {
 File path = new File(fullPath);
 		
