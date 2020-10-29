@@ -1,8 +1,10 @@
 package userInterface;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.TextArea;
 import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -32,8 +35,12 @@ import network.WriteMessage;
 @SuppressWarnings("serial")
 public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
+	
+	
+	
 	private RSyntaxTextArea textEditorArea;
 	private RTextScrollPane textEditorScrollPane;
+	private JTabbedPane tabPane;
 
 	private String focus = null;
 	private int linenum;
@@ -95,12 +102,15 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		this.setSize(new Dimension(ImageObserver.WIDTH, ImageObserver.HEIGHT));
 
 		this.toolbar = toolbar;
+		tabPane = new JTabbedPane();
+		
+		
+		/*
 		textEditorArea = new RSyntaxTextArea();
 
 		textEditorArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 		textEditorArea.setCodeFoldingEnabled(true);
 		textEditorArea.setEnabled(false);
-
 		try {
 			Theme theme = Theme.load(getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/dark.xml"));
 			theme.apply(textEditorArea);
@@ -109,7 +119,19 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		}
 		textEditorScrollPane = new RTextScrollPane(textEditorArea);
 		add(textEditorScrollPane, BorderLayout.CENTER);
+*/
+		
+		TextEditorTab tab = new TextEditorTab();
+		tabPane.addTab("Tab de prueba", tab.panel);
+		
+		TextEditorTab tab2 = new TextEditorTab();
+		tabPane.addTab("Tab de prueba", tab2.panel);
 
+		this.add(tabPane,BorderLayout.CENTER);
+		
+		tabPane.setVisible(true);
+		
+		/*
 		// Trackear el caret
 		textEditorArea.addCaretListener(new CaretListener() {
 			public void caretUpdate(CaretEvent e) {
@@ -134,9 +156,13 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			}
 
 		});
+		
+		*/
+		
 
+		RSyntaxTextArea dummy = new RSyntaxTextArea();
 		// trackear los cambios en el documento
-		textEditorArea.getDocument().addDocumentListener(new DocumentListener() {
+		dummy.getDocument().addDocumentListener(new DocumentListener() {
 
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -165,7 +191,8 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 				messageWrite = false;
 
 			}
-
+			
+		
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 
@@ -196,7 +223,6 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 				}
 				messageWrite = false;
 			}
-
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				// TODO Auto-generated method stub
@@ -204,7 +230,9 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			}
 
 		});
-
+		
+		
+		this.setVisible(true);
 	}
 
 	// Metodo que recupera los contenidos del editor de texto

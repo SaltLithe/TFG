@@ -46,9 +46,10 @@ public class ProjectTree extends JPanel {
 
   
   
-  DefaultMutableTreeNode scanAndAdd(DefaultMutableTreeNode currentRootNode, File dir , boolean isStart) {
+  CustomTreeNode scanAndAdd(CustomTreeNode currentRootNode, File dir , boolean isStart) {
 	  	String path = dir.getPath();
-	  	DefaultMutableTreeNode currentNode = new DefaultMutableTreeNode(path);
+	  	String name = path.substring(path.lastIndexOf("\\")+1,path.length());
+	  	CustomTreeNode currentNode = new CustomTreeNode(path,name);
 	  	if(!isStart) {
 	  		//Si no estamos empezando podemos añadir la ruta al nodo anterior 
 	  		//Esto es para que el project no se añada a sí mismo
@@ -89,7 +90,9 @@ public class ProjectTree extends JPanel {
 	  	}
 	  	//No puedes iterar y añadir no se por que
 	  	for(File g : addLater) {
-	  		currentNode.add(new DefaultMutableTreeNode(g));
+	  		String filepath = g.getAbsolutePath();
+	  		String filename = filepath.substring(filepath.lastIndexOf("\\")+1,filepath.length());
+	  		currentNode.add(new CustomTreeNode(g.getAbsolutePath(),filename));
 		
   }
 	  	return currentNode;
