@@ -10,7 +10,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.CaretEvent;
@@ -48,6 +50,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	private TextEditorToolbar toolbar;
 	private UIController uicontroller;
 	private DeveloperComponent developerComponent;
+	private HashMap <String,TextEditorTab> tabCollection;
 
 	private Color dark = new Color(70, 70, 70);
 
@@ -77,21 +80,19 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 		uicontroller = UIController.getInstance();
 		developerComponent = uicontroller.getDeveloperComponent();
+		
+		tabCollection = new HashMap<String,TextEditorTab>(); 
+		
 
 		setLayout(new BorderLayout());
 		this.setSize(new Dimension(ImageObserver.WIDTH, ImageObserver.HEIGHT));
 
 		this.toolbar = toolbar;
 		tabPane = new JTabbedPane();
+		tabPane.setTabLayoutPolicy(1);
 		
 		
-	
-		
-		TextEditorTab tab = new TextEditorTab();
-		tabPane.addTab("Tab de prueba", tab.panel);
-		
-		TextEditorTab tab2 = new TextEditorTab();
-		tabPane.addTab("Tab de prueba", tab2.panel);
+		int numPruebas = 20 ; 
 
 		this.add(tabPane,BorderLayout.CENTER);
 		
@@ -120,6 +121,21 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	public void enableEditor() {
 		textEditorArea.setEnabled(true);
 
+	}
+	
+	public void addTab(String name , String path) {
+		
+        TextEditorTab tab = new TextEditorTab();
+		
+		TabMiniPanel mp1 = new TabMiniPanel(name,path);
+		tabPane.addTab("", tab.panel);
+		int index = tabPane.indexOfComponent(tab.panel);
+		tabPane.setTabComponentAt(index, mp1);
+		
+		
+		
+		
+		
 	}
 
 	public void updateContents(int caret, String added) {
@@ -174,6 +190,11 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		default:
 			break;
 		}
+	}
+
+	public void CloseTab(String path) {
+		this.tabPane.remove(tabPane.indexOfComponent(tabCollection.get(path).panel));
+		
 	}
 
 }

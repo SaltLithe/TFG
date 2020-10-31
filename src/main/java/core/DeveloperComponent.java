@@ -296,4 +296,9 @@ public class DeveloperComponent extends Observable {
 
 	}
 
+	public void closeTab(String path) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
