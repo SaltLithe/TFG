@@ -137,6 +137,10 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		
 		
 	}
+	
+	public void setFullText(String path , String contents) {
+		this.tabCollection.get(path).setTextEditorCode(contents);
+	}
 
 	public void updateContents(int caret, String added) {
 
@@ -165,7 +169,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			enableEditor();
 			results = (ArrayList<Object>) evt.getNewValue();
 			boolean adding = (boolean) results.get(2);
-			
+			//tiene que llegar con el path del archivo , uughhhh
 			//TO-DO PREPARAR ESTRUCTURA DE TABS
 			//messageWrite = true;
 			if (adding) {
@@ -180,9 +184,12 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			break;
 		case SET_TEXT_CONTENT:
 			results = (ArrayList<Object>) evt.getNewValue();
-			String newcontents = (String) results.get(0);
+			String contents = (String) results.get(0);
 			String filename = (String) results.get(1);
-
+			String path = (String) results.get(2);
+			this.addTab(filename, path);
+			this.setFullText(path, contents);
+			//tiene que llegar con el path tambien por dios 
 			//TO-DO PREPARAR ESTRUCTURA MISMO PROBLEMA
 			//setTextEditorCode(newcontents, filename);
 			DEBUG.debugmessage("Jamas cambieis vuestra arquitectura lo ultimo");

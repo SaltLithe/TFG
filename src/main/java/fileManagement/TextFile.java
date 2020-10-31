@@ -11,13 +11,15 @@ public class TextFile {
 	private String content;
 	private FileType type;
 	private String name;
+	private String path; 
 
-	public TextFile(String name, FileType type) {
+	public TextFile(String name, String path,  FileType type) {
 		DEBUG.debugmessage("SE HA INVOCADO EL CONSTRUCTOR DE TEXTFILE");
 		this.content = null;
 		this.type = type;
 		this.name = name;
-
+		this.path = path;
+		
 		if (type == FileType.CLASS) {
 			content = "public class " + name + " {" + "" + "" + "}";
 
@@ -52,6 +54,14 @@ public class TextFile {
 	public void saveFile(String content) {
 
 		this.content = content;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 }

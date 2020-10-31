@@ -93,7 +93,7 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 						String nombrerecibido = textbox.getText();
 						if (nombrerecibido != null) {
 							d.dispose();
-							uiController.run(() -> developerComponent.createNewClassFile(nombrerecibido, null));
+						//	uiController.run(() -> developerComponent.createNewClassFile(nombrerecibido, null));
 							// HARDCODING
 							createFileButton(nombrerecibido, ".java");
 

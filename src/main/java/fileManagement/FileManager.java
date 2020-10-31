@@ -126,7 +126,7 @@ public class FileManager {
 		for (int i = 0; i < ficheros.length; i++) {
 			String name = ficheros[i].getName();
 			// String key = name.replace(".java", "");
-			String key = name;
+			String key = ficheros[i].getAbsolutePath();
 			String contents = null;
 			try {
 				contents = new String(Files.readAllBytes(Paths.get(ficheros[i].getAbsolutePath())));
@@ -136,7 +136,7 @@ public class FileManager {
 			}
 
 			if (!editorFiles.containsKey(key)) {
-				TextFile newfile = new TextFile(key, FileType.CLASS);
+				TextFile newfile = new TextFile(name ,key, FileType.CLASS);
 				newfile.setContent(contents);
 				editorFiles.put(key, newfile);
 			}
@@ -151,7 +151,7 @@ public class FileManager {
 
 		for (String k : editorFiles.keySet()) {
 			if (!names.contains(k)) {
-				this.createClassFile(k, editorFiles.get(k).getContent(), false);
+				this.createClassFile(k, editorFiles.get(k).getName() , editorFiles.get(k).getContent(), false);
 			}
 		}
 
@@ -159,26 +159,26 @@ public class FileManager {
 
 //Metodo para crear un fichero para una clase , crea tanto el fichero en la carpeta elegida del sistema como
 //Un objeto TextFile para el editor
-	public void createClassFile(String Name, String contents, Boolean isfromeditor) {
+	public void createClassFile(String name, String contents, String path , Boolean isfromeditor) {
 
 		DEBUG.debugmessage("SE HA LLAMADO A CREATECLASSFILE EN FILEMANAGER");
-		String nameandpath = currentPath + "/" + Name + extension;
+		String nameandpath = path + "/" + name + extension;
 		File newFile = new File(nameandpath);
 		try {
 			FileWriter fw = new FileWriter(newFile);
 			if (!isfromeditor) {
 				fw.write(contents);
 			} else {
-				fw.write(returnBase(Name));
+				fw.write(returnBase(name));
 			}
 			fw.close();
-			TextFile newfile = new TextFile(Name, FileType.CLASS);
+			TextFile newfile = new TextFile(name, path , FileType.CLASS);
 			if (contents == null && isfromeditor) {
-				newfile.setContent(returnBase(Name));
+				newfile.setContent(returnBase(name));
 			} else {
 				newfile.setContent(contents);
 			}
-			editorFiles.put(Name, newfile);
+			editorFiles.put(newfile.getPath(), newfile);
 		} catch (IOException e) {
 			DEBUG.debugmessage("NO SE HA PODIDO CREAR EL FICHERO DE LA CLASE");
 			e.printStackTrace();
@@ -317,6 +317,7 @@ public class FileManager {
 			support.notify(ObserverActions.ENABLE_TEXT_EDITOR, null, list);
 			list.add(returningcontents);
 			list.add(name);
+			list.add(editorFiles.get(name).getPath());
 			support.notify(ObserverActions.SET_TEXT_CONTENT, null, list);
 			return returningcontents;
 		} catch (NullPointerException e) {

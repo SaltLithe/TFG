@@ -36,7 +36,7 @@ public class TextEditorTab  {
 	private DeveloperComponent developerComponent; 
 	
 	
-	protected String setTextEditorCode(String code, String filename) {
+	public void setTextEditorCode(String code) {
 
 		linenum = 1;
 		columnnum = 1;
@@ -45,7 +45,6 @@ public class TextEditorTab  {
 		textEditorArea.setText(code);
 		
 		isFocus = true; 
-		return filename;
 		
 
 	}
