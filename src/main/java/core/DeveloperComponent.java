@@ -16,6 +16,7 @@ import java.util.Observable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import fileManagement.FileManager;
@@ -50,6 +51,7 @@ public class DeveloperComponent extends Observable {
 	public void setAsClient(String serverAddress, String ownAddress, int serverPort, int clientPort,
 			boolean autoConnect) {
 
+		
 		ClientHandler handler = new ClientHandler();
 		client = new AsynchronousClient(serverAddress, ownAddress, serverPort, clientPort, handler);
 		if (ownAddress == null) {
@@ -208,10 +210,10 @@ public class DeveloperComponent extends Observable {
 	// Metodo que gestiona abrir un archivo en la aplicacion dado su nombre , recibe
 	// los contenidos actuales
 	// del editor para poder guardar los cambios
-	public String openFile(String name, String contents) {
+	public String openFile(String name, String path , String contents) {
 		DEBUG.debugmessage("SE HA LLAMADO A OPENFILE EN DEVELOPERCOMPONENT CON UNA LAMBDA DE MIERDA");
 
-		return fileManager.openTextFile(name, contents);
+		return fileManager.openTextFile(name, path , contents);
 
 	}
 
@@ -225,10 +227,10 @@ public class DeveloperComponent extends Observable {
 
 	// Metodo que gestiona el guardado del archivo abierto actualmente en la
 	// aplicacion
-	public void saveCurrentFile(String editorContents) throws IOException {
+	public void saveCurrentFile(String editorContents , String path) throws IOException {
 		DEBUG.debugmessage("SE HA LLAMADO A SAVECURRENTFILE EN DEVELOPERCOMPONENT");
 
-		fileManager.saveCurrentFile(editorContents);
+		fileManager.saveCurrentFile(editorContents,path);
 
 	}
 
@@ -239,7 +241,7 @@ public class DeveloperComponent extends Observable {
 		DEBUG.debugmessage("SE HA LLAMADO A RUNLOCAL EN DEVELOPERCOMPONENT CON CONTENIDOS " + editorContents);
 
 		try {
-			fileManager.saveCurrentFile(editorContents);
+			fileManager.saveCurrentFile(editorContents , null);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -296,7 +298,42 @@ public class DeveloperComponent extends Observable {
 
 	}
 
-	public void closeTab(String path) {
+	public void closeTab(String path, boolean unsavedChanges, String contents) {
+		
+		
+		if(unsavedChanges) {
+			
+
+			
+			Object[] options = {"Save and close",
+                    "Close without saving" , "Cancel"};
+int n = JOptionPane.showOptionDialog(this.developerMainFrame,
+ "The file at : " + path + " has unsaved changes.",
+    "Unsaved changes",
+    JOptionPane.YES_NO_CANCEL_OPTION,
+    JOptionPane.QUESTION_MESSAGE,
+    null,
+    options,
+    options[1]);
+if(n == JOptionPane.OK_OPTION) {
+	
+	try {
+		this.fileManager.saveCurrentFile(contents,path);
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} 
+
+	
+}else if (n != JOptionPane.CANCEL_OPTION ) {
+	
+	ArrayList<Object> list = new ArrayList<Object>();
+	list.add(path);
+	support.notify(ObserverActions.CLOSE_TAB, null , list);
+}
+			
+		}
+	
 		// TODO Auto-generated method stub
 		
 	}

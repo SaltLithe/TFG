@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import javax.swing.JFileChooser;
 
@@ -136,7 +137,7 @@ public class FileManager {
 			}
 
 			if (!editorFiles.containsKey(key)) {
-				TextFile newfile = new TextFile(name ,key, FileType.CLASS);
+				TextFile newfile = new TextFile(name ,key,contents, FileType.CLASS);
 				newfile.setContent(contents);
 				editorFiles.put(key, newfile);
 			}
@@ -172,7 +173,7 @@ public class FileManager {
 				fw.write(returnBase(name));
 			}
 			fw.close();
-			TextFile newfile = new TextFile(name, path , FileType.CLASS);
+			TextFile newfile = new TextFile(name, path , null , FileType.CLASS);
 			if (contents == null && isfromeditor) {
 				newfile.setContent(returnBase(name));
 			} else {
@@ -302,22 +303,27 @@ public class FileManager {
 	// significa que hay un fichero abierto en el editor , se guardarán antes los
 	// cambios en su correspondiente
 	// textfile
-	public String openTextFile(String name, String contents) {
+	public String openTextFile(String name , String path, String contents) {
 
 		DEBUG.debugmessage("SE HA LLAMADO A OPENTEXTFILE EN FILEMANAGER");
 		if (currentFocus != null) {
 			editorFiles.get(currentFocus).setContent(contents);
 
 		}
-		currentFocus = name;
-
+		currentFocus = path;
+		if(!editorFiles.containsKey(path)) {
+			TextFile tf = new TextFile(name , path , contents , FileType.CLASS);
+			editorFiles.put(path, tf);
+			
+		}
+		
 		try {
-			String returningcontents = editorFiles.get(name).getContent();
+			String returningcontents = editorFiles.get(path).getContent();
 			ArrayList<Object> list = new ArrayList<Object>();
 			support.notify(ObserverActions.ENABLE_TEXT_EDITOR, null, list);
 			list.add(returningcontents);
-			list.add(name);
-			list.add(editorFiles.get(name).getPath());
+			list.add(editorFiles.get(path).getName());
+			list.add(editorFiles.get(path).getPath());
 			support.notify(ObserverActions.SET_TEXT_CONTENT, null, list);
 			return returningcontents;
 		} catch (NullPointerException e) {
@@ -331,10 +337,29 @@ public class FileManager {
 
 	}
 
+	
+	public void saveAllOpen(String[] contents , String[] paths) {
+		
+		if(contents.length == paths.length) {
+			for(int i = 0 ; i < contents.length ; i ++) {
+				try {
+					saveCurrentFile(contents[i],paths[i]);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			
+		}
+		
+	}
+	
 	// Metodo para guardar todos los ficheros del editor
-	public void saveAll(String editorContents) throws IOException {
+	public void saveAll(String editorContents ) throws IOException {
 		DEBUG.debugmessage("SE HA LLAMADO A SAVEALL EN FILEMANAGER");
-		saveCurrentFile(editorContents);
+		
+		saveCurrentFile(editorContents , null);
 
 		File[] files = this.returnAllFiles();
 
@@ -352,14 +377,17 @@ public class FileManager {
 	}
 
 //Metodo para guardar unicamente el fichero en el focus 
-	public void saveCurrentFile(String editorcontents) throws IOException {
+	public void saveCurrentFile(String editorcontents, String path) throws IOException {
 		DEBUG.debugmessage("SE HA LLAMADO A SAVECURRENTFILE EN FILEMANAGER");
 		File file = this.returnSingleFile(currentFocus);
 		if (file != null) {
-			editorFiles.get(currentFocus).setContent(editorcontents);
+			editorFiles.get(path).setContent(editorcontents);
 			FileWriter fw = new FileWriter(file);
 			fw.write(editorcontents);
 			fw.close();
+			LinkedList<Object> list = new LinkedList<Object>();
+			list.add(path);
+			support.notify(ObserverActions.SAVED_SINGLE_FILE, null, list);
 
 		}
 

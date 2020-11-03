@@ -34,12 +34,14 @@ public class ServerHandler implements ServerMessageHandler {
 				messages.add(incoming.caret);
 				messages.add(incoming.added);
 				messages.add(incoming.adding);
+				messages.add(incoming.path);
 				support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, null, messages);
 			} else if (!incoming.adding) {
 
 				messages.add(incoming.caret);
 				messages.add(incoming.lenght);
 				messages.add(incoming.adding);
+				messages.add(incoming.path);
 				support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, null, messages);
 
 			}

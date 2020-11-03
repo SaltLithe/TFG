@@ -26,56 +26,47 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import core.DEBUG;
+import core.DeveloperComponent;
+
 
 
 public class ProjectTree extends JPanel {
 	
 	private JTree tree; 
+	private UIController uiController;
+	private DeveloperComponent developerComponent;
 
   public ProjectTree(File dir) {
+	  
+	  uiController = UIController.getInstance();
+	  developerComponent = uiController.getDeveloperComponent(); 
+	  
     setLayout(new BorderLayout());
 
-    // Make a tree list with all the nodes, and make it a JTree
      tree = new JTree(scanAndAdd(null, dir,true));
 
-    // Add a listener
+     
     tree.addTreeSelectionListener(new TreeSelectionListener() {
       public void valueChanged(TreeSelectionEvent e) {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) e
+       CustomTreeNode node = (CustomTreeNode) e
             .getPath().getLastPathComponent();
-        System.out.println("You selected " + node);
+            if(node.isFile){
+       
+            	uiController.run(()-> developerComponent.openFile(node.name , node.path, null));
+            	//TODO abrir archivo y poner una jodida tab
+            	
+        }
       }
     });
+    
 
-    // Lastly, put the JTree into a JScrollPane.
     JScrollPane scrollpane = new JScrollPane();
     scrollpane.getViewport().add(tree);
     add(BorderLayout.CENTER, scrollpane);
     this.setVisible(true);
     
-    tree.addMouseListener ( new MouseAdapter ()
-    {
-        public void mouseClicked ( MouseEvent e )
-        {
-            if ( SwingUtilities.isLeftMouseButton ( e ) )
-            {
-                TreePath path = tree.getPathForLocation ( e.getX (), e.getY () );
-                Rectangle pathBounds = tree.getUI ().getPathBounds ( tree, path );
-                if ( pathBounds != null && pathBounds.contains ( e.getX (), e.getY () ) )
-                {
-                	
-                	CustomTreeNode clickedNode = (CustomTreeNode) path.getPathComponent(0);
-                	
-                //	if(!clickedNode.isFile)
-                	/*
-                    JPopupMenu menu = new JPopupMenu ();
-                    menu.add ( new JMenuItem ( "Test" ) );
-                    menu.show ( tree, pathBounds.x, pathBounds.y + pathBounds.height );
-                    */
-                }
-            }
-        }
-    } );
+    
     
     
   }
@@ -85,7 +76,9 @@ public class ProjectTree extends JPanel {
   CustomTreeNode scanAndAdd(CustomTreeNode currentRootNode, File dir , boolean isStart) {
 	  	String path = dir.getPath();
 	  	String name = path.substring(path.lastIndexOf("\\")+1,path.length());
-	  	CustomTreeNode currentNode = new CustomTreeNode(path,name,false);
+	  	boolean isDir = true;
+	  	if(dir.isDirectory()) {isDir = false;}
+	  	CustomTreeNode currentNode = new CustomTreeNode(path,name,isDir);
 	  	if(!isStart) {
 	  		//Si no estamos empezando podemos añadir la ruta al nodo anterior 
 	  		//Esto es para que el project no se añada a sí mismo
@@ -112,16 +105,14 @@ public class ProjectTree extends JPanel {
 	  			addLater.add(f);
 	  		}
 
-
-	  	
-	  
-
 	  	}
 	  	//No puedes iterar y añadir no se por que
 	  	for(File g : addLater) {
 	  		String filepath = g.getAbsolutePath();
 	  		String filename = filepath.substring(filepath.lastIndexOf("\\")+1,filepath.length());
-	  		currentNode.add(new CustomTreeNode(g.getAbsolutePath(),filename,true));
+	  		boolean isFile= true; 
+	  		if(g.isDirectory()) {isFile = false;}
+	  		currentNode.add(new CustomTreeNode(g.getAbsolutePath(),filename,isFile));
 	  		
 	  		
 		

@@ -172,7 +172,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 		String contents = developerMainFrame.getEditorPanelContents();
 		uiController.run(() -> {
 			try {
-				developerComponent.saveCurrentFile(contents);
+				developerComponent.saveCurrentFile(contents, null);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

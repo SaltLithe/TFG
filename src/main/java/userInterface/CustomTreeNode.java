@@ -27,7 +27,6 @@ public class CustomTreeNode extends DefaultMutableTreeNode  {
 		this.isFile = isFile; 
 		this.path = path;
 		this.name = name; 
-		this.parent = parent; 
 		
 		
 

@@ -137,7 +137,7 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 
 					String contents = developerMainFrame.getEditorPanelContents();
 					String fullName = newbutton.fullName;
-					uiController.run(() -> developerComponent.openFile(name, contents));
+					uiController.run(() -> developerComponent.openFile(name, null , contents));
 
 				}
 

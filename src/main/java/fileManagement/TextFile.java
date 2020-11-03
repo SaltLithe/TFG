@@ -13,14 +13,15 @@ public class TextFile {
 	private String name;
 	private String path; 
 
-	public TextFile(String name, String path,  FileType type) {
+	public TextFile(String name ,String path, String content,  FileType type) {
 		DEBUG.debugmessage("SE HA INVOCADO EL CONSTRUCTOR DE TEXTFILE");
 		this.content = null;
 		this.type = type;
 		this.name = name;
 		this.path = path;
+		this.content = content; 
 		
-		if (type == FileType.CLASS) {
+		if (type == FileType.CLASS && content == null) {
 			content = "public class " + name + " {" + "" + "" + "}";
 
 		}

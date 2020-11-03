@@ -21,5 +21,6 @@ public class WriteMessage implements Serializable {
 	public int caret;
 
 	public String added;
+	public Object path;
 
 }

@@ -125,12 +125,12 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	
 	public void addTab(String name , String path) {
 		
-        TextEditorTab tab = new TextEditorTab();
-		
 		TabMiniPanel mp1 = new TabMiniPanel(name,path);
+        TextEditorTab tab = new TextEditorTab(path,mp1);
 		tabPane.addTab("", tab.panel);
 		int index = tabPane.indexOfComponent(tab.panel);
 		tabPane.setTabComponentAt(index, mp1);
+		this.tabCollection.put(path, tab);
 		
 		
 		
@@ -142,18 +142,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		this.tabCollection.get(path).setTextEditorCode(contents);
 	}
 
-	public void updateContents(int caret, String added) {
-
-		textEditorArea.insert(added, caret);
-
-	}
-
-	public void updateContents(int caret, int lenght) {
-
-		DEBUG.debugmessage("DELETED THE FOLLOWING : " + textEditorArea.getText().substring(caret, caret + lenght));
-		textEditorArea.replaceRange(null, caret, caret + lenght);
-
-	}
+	
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -163,37 +152,49 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		switch (action) {
 
 		case ENABLE_TEXT_EDITOR:
-			enableEditor();
+		//	enableEditor();
 			break;
 		case UPDATE_PANEL_CONTENTS:
-			enableEditor();
+		//	enableEditor();
 			results = (ArrayList<Object>) evt.getNewValue();
 			boolean adding = (boolean) results.get(2);
-			//tiene que llegar con el path del archivo , uughhhh
-			//TO-DO PREPARAR ESTRUCTURA DE TABS
-			//messageWrite = true;
-			if (adding) {
-				int caret = (int) results.get(0);
-				String added = (String) results.get(1);
-				updateContents(caret, added);
-			} else if (!adding) {
-				int caret = (int) results.get(0);
-				int lenght = (int) results.get(1);
-				updateContents(caret, lenght);
-			}
+			String editingpath = (String) results.get(3);
+			this.tabCollection.get(editingpath);
 			break;
 		case SET_TEXT_CONTENT:
 			results = (ArrayList<Object>) evt.getNewValue();
+			String path = (String) results.get(2);
+
+			if(!tabCollection.containsKey(path)) {
 			String contents = (String) results.get(0);
 			String filename = (String) results.get(1);
-			String path = (String) results.get(2);
+			
 			this.addTab(filename, path);
 			this.setFullText(path, contents);
 			//tiene que llegar con el path tambien por dios 
 			//TO-DO PREPARAR ESTRUCTURA MISMO PROBLEMA
 			//setTextEditorCode(newcontents, filename);
-			DEBUG.debugmessage("Jamas cambieis vuestra arquitectura lo ultimo");
+			}
 			break;
+		case CLOSE_TAB:
+			results = (ArrayList<Object>) evt.getNewValue();
+			String closingpath = (String) results.get(0);
+			if(this.tabCollection.containsKey(closingpath)) {
+				TextEditorTab removing = tabCollection.get(closingpath);
+				int closingindex = tabPane.indexOfComponent(removing.panel);
+				tabPane.remove(closingindex);
+				this.tabCollection.remove(closingpath);
+				
+			}
+			break;
+		case SAVED_SINGLE_FILE:
+			
+			results = (ArrayList<Object>) evt.getNewValue();
+			String savingpath = (String) results.get(0);
+			if(tabCollection.containsKey(savingpath)) {
+			tabCollection.get(savingpath).miniPanel.setAsSaved();			
+			}
+			break; 
 		default:
 			break;
 		}

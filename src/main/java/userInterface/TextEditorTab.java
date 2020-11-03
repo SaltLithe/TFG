@@ -2,6 +2,7 @@ package userInterface;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.event.CaretEvent;
@@ -34,6 +35,9 @@ public class TextEditorTab  {
 	private boolean isFocus = false; 
 	private UIController uiController; 
 	private DeveloperComponent developerComponent; 
+	private String path; 
+	boolean unsavedChanges; 
+	public TabMiniPanel miniPanel; 
 	
 	
 	public void setTextEditorCode(String code) {
@@ -49,9 +53,25 @@ public class TextEditorTab  {
 
 	}
 
-	public void updateContents(int caret, String added) {
+	public void updateContents(ArrayList<Object> results) {
+		
+		
+		boolean adding = (boolean) results.get(2);
 
-		textEditorArea.insert(added, caret);
+		messageWrite = true;
+		if (adding) {
+			int caret = (int) results.get(0);
+			String added = (String) results.get(1);
+			textEditorArea.insert(added, caret);
+
+		} else if (!adding) {
+			int caret = (int) results.get(0);
+			int lenght = (int) results.get(1);
+			textEditorArea.replaceRange(null, caret, caret + lenght);
+
+			
+		}
+
 
 	}
 	
@@ -63,8 +83,10 @@ public class TextEditorTab  {
 
 	}
 	
-	public TextEditorTab() {
-		
+	public TextEditorTab(String path , TabMiniPanel miniPanel) {
+		this.miniPanel = miniPanel; 
+		unsavedChanges = false; 
+		this.path = path; 
 		uiController = UIController.getInstance(); 
 		developerComponent = uiController.getDeveloperComponent();
 		
@@ -79,7 +101,7 @@ public class TextEditorTab  {
 
 	textEditorArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 	textEditorArea.setCodeFoldingEnabled(true);
-	textEditorArea.setEnabled(false);
+	//textEditorArea.setEnabled(false);
 
 	
 	try {
@@ -131,7 +153,9 @@ public class TextEditorTab  {
 
 		@Override
 		public void insertUpdate(DocumentEvent e) {
-
+			
+			unsavedChanges = true;
+			miniPanel.setAsUnsaved(); 
 			newLenght = textEditorArea.getText().length();
 
 			if (!messageWrite) {
@@ -143,13 +167,15 @@ public class TextEditorTab  {
 					int caret = textEditorArea.getCaretPosition();
 					message.caret = caret;
 					message.lenght = e.getLength();
+					message.path = path; 
 
 					int lenght = caret + e.getLength();
 					String changes = textEditorArea.getText().substring(caret, lenght);
 					System.out.println("What changed " + changes);
 					message.adding = true;
 					message.added = changes;
-
+					message.path = path; 
+					
 					uiController.run(() -> developerComponent.sendMessageToEveryone(message));
 				}
 			}
@@ -160,6 +186,9 @@ public class TextEditorTab  {
 	
 		@Override
 		public void removeUpdate(DocumentEvent e) {
+
+			unsavedChanges = true;
+			miniPanel.setAsUnsaved(); 
 
 			newLenght = textEditorArea.getText().length();
 
@@ -198,6 +227,11 @@ public class TextEditorTab  {
 	
 	
 	panel.setVisible(true);
+	}
+
+	public String getContents() {
+		// TODO Auto-generated method stub
+		return this.textEditorArea.getText();
 	}
 
 }
