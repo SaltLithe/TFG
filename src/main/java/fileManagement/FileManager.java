@@ -1,11 +1,13 @@
 package fileManagement;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -318,9 +320,16 @@ public class FileManager {
 		}
 		
 		try {
-			String returningcontents = editorFiles.get(path).getContent();
+			File file = new File(path);
+			 byte[] encoded = null;
+			try {
+				encoded = Files.readAllBytes(Paths.get(path));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 String returningcontents = new String(encoded,StandardCharsets.UTF_8);
 			ArrayList<Object> list = new ArrayList<Object>();
-			support.notify(ObserverActions.ENABLE_TEXT_EDITOR, null, list);
 			list.add(returningcontents);
 			list.add(editorFiles.get(path).getName());
 			list.add(editorFiles.get(path).getPath());
@@ -379,13 +388,14 @@ public class FileManager {
 //Metodo para guardar unicamente el fichero en el focus 
 	public void saveCurrentFile(String editorcontents, String path) throws IOException {
 		DEBUG.debugmessage("SE HA LLAMADO A SAVECURRENTFILE EN FILEMANAGER");
-		File file = this.returnSingleFile(currentFocus);
+		//File file = this.returnSingleFile(currentFocus);
+		File file = new File(path);
 		if (file != null) {
 			editorFiles.get(path).setContent(editorcontents);
 			FileWriter fw = new FileWriter(file);
 			fw.write(editorcontents);
 			fw.close();
-			LinkedList<Object> list = new LinkedList<Object>();
+			ArrayList<Object> list = new ArrayList<Object>();
 			list.add(path);
 			support.notify(ObserverActions.SAVED_SINGLE_FILE, null, list);
 

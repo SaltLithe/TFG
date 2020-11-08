@@ -11,6 +11,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -127,6 +128,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		
 		TabMiniPanel mp1 = new TabMiniPanel(name,path);
         TextEditorTab tab = new TextEditorTab(path,mp1);
+        mp1.setParent(tab);
 		tabPane.addTab("", tab.panel);
 		int index = tabPane.indexOfComponent(tab.panel);
 		tabPane.setTabComponentAt(index, mp1);
@@ -157,9 +159,11 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		case UPDATE_PANEL_CONTENTS:
 		//	enableEditor();
 			results = (ArrayList<Object>) evt.getNewValue();
-			boolean adding = (boolean) results.get(2);
 			String editingpath = (String) results.get(3);
-			this.tabCollection.get(editingpath);
+			
+			this.tabCollection.get(editingpath).updateContents(results);
+			
+		
 			break;
 		case SET_TEXT_CONTENT:
 			results = (ArrayList<Object>) evt.getNewValue();
@@ -192,6 +196,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			results = (ArrayList<Object>) evt.getNewValue();
 			String savingpath = (String) results.get(0);
 			if(tabCollection.containsKey(savingpath)) {
+			tabCollection.get(savingpath).setAsSaved(); 
 			tabCollection.get(savingpath).miniPanel.setAsSaved();			
 			}
 			break; 

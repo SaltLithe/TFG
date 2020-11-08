@@ -23,7 +23,7 @@ public class TabMiniPanel extends JPanel{
 	private TextEditorTab parent; 
 	
 	
-	public void setTab(TextEditorTab parent) {
+	public void setParent(TextEditorTab parent ) {
 		this.parent = parent; 
 	}
 	
@@ -65,9 +65,8 @@ public class TabMiniPanel extends JPanel{
 	}
 	
 	public void setAsSaved() {
-		parent.unsavedChanges = true; 
 		nameLabel.setText(name);
-		updateUI();
+		updateUI(); 
 	}
 
 	public void setAsUnsaved() {

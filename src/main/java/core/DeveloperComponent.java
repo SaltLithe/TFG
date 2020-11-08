@@ -72,6 +72,8 @@ public class DeveloperComponent extends Observable {
 
 	public void setAsServer(String name, String ip, int maxClients, int port, int clientPort, int queueSize,
 			boolean autoConnect) {
+		
+		DEBUG.debugmessage("Setting as server");
 		ServerHandler handler = new ServerHandler();
 		if (queueSize == -1) {
 			queueSize = defaultQueueSize;
@@ -325,12 +327,17 @@ if(n == JOptionPane.OK_OPTION) {
 	} 
 
 	
-}else if (n != JOptionPane.CANCEL_OPTION ) {
+}if (n != JOptionPane.CANCEL_OPTION ) {
 	
 	ArrayList<Object> list = new ArrayList<Object>();
 	list.add(path);
 	support.notify(ObserverActions.CLOSE_TAB, null , list);
 }
+			
+		}else {
+			ArrayList<Object> list = new ArrayList<Object>();
+			list.add(path);
+			support.notify(ObserverActions.CLOSE_TAB, null , list);
 			
 		}
 	

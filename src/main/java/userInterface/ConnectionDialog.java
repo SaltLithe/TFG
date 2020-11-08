@@ -289,7 +289,7 @@ public class ConnectionDialog extends JDialog {
 			}
 			{
 				ipField_S = new JTextField();
-				ipField_S.setText("192.168.1.124");
+				ipField_S.setText("192.168.1.15");
 				GridBagConstraints gbc_ipField_S = new GridBagConstraints();
 				gbc_ipField_S.insets = new Insets(0, 0, 5, 0);
 				gbc_ipField_S.fill = GridBagConstraints.HORIZONTAL;
@@ -415,7 +415,7 @@ public class ConnectionDialog extends JDialog {
 			}
 			{
 				clientIPField_C = new JTextField();
-				clientIPField_C.setText("192.168.1.124");
+				clientIPField_C.setText("192.168.1.15");
 				GridBagConstraints gbc_clientIPField_C = new GridBagConstraints();
 				gbc_clientIPField_C.insets = new Insets(0, 0, 5, 0);
 				gbc_clientIPField_C.fill = GridBagConstraints.HORIZONTAL;
