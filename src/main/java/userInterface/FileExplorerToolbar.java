@@ -63,6 +63,7 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 		// Al botón de añadir clase se le asocia con la creación de un diálogo con los
 		// elementos necesarios
 		// para crear una nueva clase , de momento se queda en esta misma clase
+		/*
 		addClass.addActionListener(new ActionListener() {
 
 			@Override
@@ -90,6 +91,7 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 				d.add(textbox, BorderLayout.CENTER);
 				d.add(ok, BorderLayout.SOUTH);
 
+				
 				ok.addActionListener(new ActionListener() {
 
 					@Override
@@ -122,12 +124,14 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 			}
 
 		});
+		*/
 
 	}
 
 	// Método que añade un botón al FileExplorerPanel si no existe de antemano ,
 	// este método además se encarga
 	// de darle su comportamiento al bóton antes de añadirlo
+	/*
 	public void createFileButton(String name, String extension) {
 
 		if (!fileExplorerPanel.containsButton(name)) {
@@ -146,7 +150,8 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 				}
 
 			});
-
+*/
+	/*
 			fileExplorerPanel.addButton(newbutton);
 			this.updateUI();
 		}
@@ -174,11 +179,12 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 		}
 
 	}
-
+*/
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
 		switch (action) {
+		/*
 		case UPDATE_FILE_EXPLORER_PANEL_BUTTONS:
 			DEBUG.debugmessage("PERO POR QUE PONE 4 BOTONES ");
 			@SuppressWarnings("unchecked")
@@ -190,6 +196,7 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 			}
 
 			break;
+			*/
 			
 		case ADD_PROJECT_TREE:
 			DEBUG.debugmessage("ADDING TREE");

@@ -37,7 +37,7 @@ public class DeveloperMainFrame extends JFrame {
 	// cuando se haya abierto una carpeta
 	public void enableFileExplorerToolbar() {
 
-		fileExplorerToolbar.enableToolbarButtons();
+		//fileExplorerToolbar.enableToolbarButtons();
 
 	}
 

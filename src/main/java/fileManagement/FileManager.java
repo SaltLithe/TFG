@@ -67,6 +67,7 @@ public class FileManager {
 		return base;
 	}
 
+	/*
 	// Metodo que busca todos los ficheros .java en el directorio actual
 	public File[] returnAllFiles() {
 		DEBUG.debugmessage("SE HA LLAMADO A RETURNALLFILES EN FILEMANAGER");
@@ -89,10 +90,12 @@ public class FileManager {
 		return files;
 
 	}
+	*/
 
 	// Método que recupera todos los archivos de la carpeta actual y devuelve la
 	// primera instancia que encuentre
 	// del archivo que se llame igual que el nombre especificado
+	/*
 	public File returnSingleFile(String filename) {
 
 		DEBUG.debugmessage("SE HA LLAMADO A RETURN SINGLEFILE EN FILEMANAGER");
@@ -111,6 +114,7 @@ public class FileManager {
 		return null;
 
 	}
+	*/
 
 	// Metodo que dado un nombre devuelve el TextFile que esté guardado con ese
 	// nombre
@@ -121,6 +125,7 @@ public class FileManager {
 
 	// Metodo que refresca los archivos a los que puede acceder el editor
 	// De la carpeta seleccionada , si un archivo no se encuentra en el mapa lo crea
+	/*
 	@SuppressWarnings("unlikely-arg-type")
 	public void updateAllFiles() {
 		DEBUG.debugmessage("SE HA LLAMADO A UPDATEALLFILES EN FILEMANAGER");
@@ -159,7 +164,7 @@ public class FileManager {
 		}
 
 	}
-
+*/
 //Metodo para crear un fichero para una clase , crea tanto el fichero en la carpeta elegida del sistema como
 //Un objeto TextFile para el editor
 	public void createClassFile(String name, String path , String project ,  Boolean isfromeditor) {
@@ -373,7 +378,8 @@ public class FileManager {
 		
 		saveCurrentFile(editorContents , null);
 
-		File[] files = this.returnAllFiles();
+		//File[] files = this.returnAllFiles();
+		File[] files = this.workspaceFullSearch();
 
 		for (int i = 0; i < files.length; i++) {
 			String name = files[i].getName();
@@ -386,6 +392,11 @@ public class FileManager {
 			}
 		}
 
+	}
+
+private File[] workspaceFullSearch() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 //Metodo para guardar unicamente el fichero en el focus 
