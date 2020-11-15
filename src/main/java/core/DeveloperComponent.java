@@ -203,14 +203,13 @@ public class DeveloperComponent extends Observable {
 
 	// Metodo para recuperar todos los archivos de la aplicacion
 	
-	/*
+	
 	public File[] getAllFiles() {
 		DEBUG.debugmessage("SE HA LLAMADO A GETALLFILES EN DEVELOPERCOMPONENT");
 
-		return fileManager.returnAllFiles();
-
+		return null;
 	}
-*/
+
 	// Metodo que gestiona abrir un archivo en la aplicacion dado su nombre , recibe
 	// los contenidos actuales
 	// del editor para poder guardar los cambios

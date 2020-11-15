@@ -11,6 +11,10 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
+import userInterface.fileNavigation.FileExplorerToolbar;
+import userInterface.textEditing.TextEditorPanel;
+import userInterface.textEditing.TextEditorToolbar;
+
 /*Clase que contiene todos los elementos necesarios para la interfaz principal de la aplicacion
  * Consiste en un frame que contiene todos los componentes necesarios y sus correspondientes separaciones
  * por motivos de flexibilidad y orden los componentes se declaran en su mayoría en sus propias clases

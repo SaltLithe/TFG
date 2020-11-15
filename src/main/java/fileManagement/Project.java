@@ -14,9 +14,9 @@ import java.util.HashMap;
 import javax.swing.JPanel;
 
 import core.DEBUG;
-import userInterface.FileTree;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
+import userInterface.fileNavigation.FileTree;
 
 import javax.swing.JMenu;
 import java.awt.FlowLayout;

@@ -18,7 +18,6 @@ import java.util.LinkedList;
 
 import javax.swing.JFileChooser;
 
-
 import core.DEBUG;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
@@ -32,14 +31,13 @@ public class FileManager {
 
 	private JFileChooser fileChooser;
 	private HashMap<String, TextFile> editorFiles;
-	
-	private HashMap<String, Project> editorProjects; 
+
+	private HashMap<String, Project> editorProjects;
 	private String currentPath;
 	private String currentFocus = null;
 	private String extension = ".java";
 	private PropertyChangeMessenger support;
-	
-	
+
 	public final String projectProperty = "pairleap.projectfolder";
 
 	public String getCurrentFolder() {
@@ -54,7 +52,7 @@ public class FileManager {
 		support = PropertyChangeMessenger.getInstance();
 		fileChooser = new JFileChooser();
 		editorFiles = new HashMap<String, TextFile>();
-		editorProjects = new HashMap<String,Project>(); 
+		editorProjects = new HashMap<String, Project>();
 		currentPath = null;
 
 	}
@@ -67,55 +65,6 @@ public class FileManager {
 		return base;
 	}
 
-	/*
-	// Metodo que busca todos los ficheros .java en el directorio actual
-	public File[] returnAllFiles() {
-		DEBUG.debugmessage("SE HA LLAMADO A RETURNALLFILES EN FILEMANAGER");
-		File dir = new File(currentPath);
-		File[] files;
-
-		files = dir.listFiles(new FilenameFilter() {
-			public boolean accept(File dir, String filename) {
-				DEBUG.debugmessage("Found file with name : " + filename);
-				return filename.endsWith(extension);
-			}
-		});
-		ArrayList<Object> list = new ArrayList<Object>();
-		list.add(files);
-		support.notify(ObserverActions.ENABLE_TEXTEDITORTOOLBAR_BUTTONS, null, list);
-		support.notify(ObserverActions.ENABLE_SAVE_BUTTONS, null, null);
-		list.clear();
-		list.add(files);
-		support.notify(ObserverActions.UPDATE_FILE_EXPLORER_PANEL_BUTTONS, null, list);
-		return files;
-
-	}
-	*/
-
-	// Método que recupera todos los archivos de la carpeta actual y devuelve la
-	// primera instancia que encuentre
-	// del archivo que se llame igual que el nombre especificado
-	/*
-	public File returnSingleFile(String filename) {
-
-		DEBUG.debugmessage("SE HA LLAMADO A RETURN SINGLEFILE EN FILEMANAGER");
-		File[] allFiles = returnAllFiles();
-		for (int i = 0; i < allFiles.length; i++) {
-			String name = allFiles[i].getName();
-			// name = name.replace(extension, "");
-			if (name.equals(filename)) {
-
-				return allFiles[i];
-
-			}
-
-		}
-
-		return null;
-
-	}
-	*/
-
 	// Metodo que dado un nombre devuelve el TextFile que esté guardado con ese
 	// nombre
 	public TextFile getTextFile(String filename) {
@@ -123,73 +72,31 @@ public class FileManager {
 		return editorFiles.get(filename);
 	}
 
-	// Metodo que refresca los archivos a los que puede acceder el editor
-	// De la carpeta seleccionada , si un archivo no se encuentra en el mapa lo crea
-	/*
-	@SuppressWarnings("unlikely-arg-type")
-	public void updateAllFiles() {
-		DEBUG.debugmessage("SE HA LLAMADO A UPDATEALLFILES EN FILEMANAGER");
-		File[] ficheros = returnAllFiles();
-
-		for (int i = 0; i < ficheros.length; i++) {
-			String name = ficheros[i].getName();
-			// String key = name.replace(".java", "");
-			String key = ficheros[i].getAbsolutePath();
-			String contents = null;
-			try {
-				contents = new String(Files.readAllBytes(Paths.get(ficheros[i].getAbsolutePath())));
-
-			} catch (IOException e) {
-				contents = null;
-			}
-
-			if (!editorFiles.containsKey(key)) {
-				TextFile newfile = new TextFile(name ,key,contents, FileType.CLASS);
-				newfile.setContent(contents);
-				editorFiles.put(key, newfile);
-			}
-
-		}
-
-		ArrayList<String> names = new ArrayList<String>(ficheros.length);
-		for (int j = 0; j < ficheros.length; j++) {
-
-			names.add(ficheros[j].getName());
-		}
-
-		for (String k : editorFiles.keySet()) {
-			if (!names.contains(k)) {
-			//	this.createClassFile(k, editorFiles.get(k).getName() , editorFiles.get(k).getContent(), false);
-			}
-		}
-
-	}
-*/
 //Metodo para crear un fichero para una clase , crea tanto el fichero en la carpeta elegida del sistema como
 //Un objeto TextFile para el editor
-	public void createClassFile(String name, String path , String project ,  Boolean isfromeditor) {
+	public void createClassFile(String name, String path, String project, Boolean isfromeditor) {
 
 		DEBUG.debugmessage("SE HA LLAMADO A CREATECLASSFILE EN FILEMANAGER");
-		
+
 		String nameandpath = path + "/" + name + extension;
 		File newFile = new File(nameandpath);
 		try {
 			FileWriter fw = new FileWriter(newFile);
-		
-				fw.write(returnBase(name));
-			
+
+			fw.write(returnBase(name));
+
 			fw.close();
-			TextFile newfile = new TextFile(name, path , null , FileType.CLASS);
-		
+			TextFile newfile = new TextFile(name, path, null, FileType.CLASS);
+
 			editorFiles.put(newfile.getPath(), newfile);
-			
+
 			ArrayList<Object> list = new ArrayList<Object>();
 			list.add(path);
 			list.add(name + extension);
-			list.add(true); 
+			list.add(true);
 			list.add(project);
-			
-			support.notify(ObserverActions.UPDATE_PROJECT_TREE, null , list);
+
+			support.notify(ObserverActions.UPDATE_PROJECT_TREE, null, list);
 		} catch (IOException e) {
 			DEBUG.debugmessage("NO SE HA PODIDO CREAR EL FICHERO DE LA CLASE");
 			e.printStackTrace();
@@ -197,87 +104,80 @@ public class FileManager {
 
 	}
 
-	public void newProject(String name , WorkSpace workSpace ) {
-		
-		String newpath = workSpace.getPath()+"\\"+ name;
-		
-		File f = new File(newpath); 
+	public void newProject(String name, WorkSpace workSpace) {
+
+		String newpath = workSpace.getPath() + "\\" + name;
+
+		File f = new File(newpath);
 		f.mkdir();
-		   final Path file = Paths.get(f.getAbsolutePath());
+		final Path file = Paths.get(f.getAbsolutePath());
 
-		    final UserDefinedFileAttributeView view = Files.getFileAttributeView(file, UserDefinedFileAttributeView.class);
+		final UserDefinedFileAttributeView view = Files.getFileAttributeView(file, UserDefinedFileAttributeView.class);
 
-		    /* The file attribute */
-		    final String projectProperty = "pairleap.projectfolder";
-		    /* Write the properties */
-		    byte[] bytes = null;
+		/* The file attribute */
+		final String projectProperty = "pairleap.projectfolder";
+		/* Write the properties */
+		byte[] bytes = null;
+		try {
+			bytes = projectProperty.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		final ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);
+		writeBuffer.put(bytes);
+		writeBuffer.flip();
+		try {
+			view.write(projectProperty, writeBuffer);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		DEBUG.debugmessage("PROYECTO CREADO");
+
+	}
+
+	public void scanWorkSpace(WorkSpace workspace) {
+
+		File path = new File(workspace.getPath());
+
+		File[] files;
+
+		files = path.listFiles();
+		for (File dir : files) {
+			final Path file = Paths.get(dir.getAbsolutePath());
+			final UserDefinedFileAttributeView view = Files.getFileAttributeView(file,
+					UserDefinedFileAttributeView.class);
+			ByteBuffer readBuffer = null;
 			try {
-				bytes = projectProperty.getBytes("UTF-8");
-			} catch (UnsupportedEncodingException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		    final ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);
-		    writeBuffer.put(bytes);
-		    writeBuffer.flip();
-		    try {
-				view.write(projectProperty, writeBuffer);
+				readBuffer = ByteBuffer.allocate(view.size(projectProperty));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-		    
-		    
-		    DEBUG.debugmessage("PROYECTO CREADO");
-		
-	}
-	
-	
-	public void scanWorkSpace(WorkSpace workspace) {
-		
-		File path = new File(workspace.getPath());
-		
-	
-		File[] files;
-
-		files = path.listFiles();
-			for(File dir : files) {
-				final Path file = Paths.get(dir.getAbsolutePath());
-				final UserDefinedFileAttributeView view = Files.getFileAttributeView(file, UserDefinedFileAttributeView.class);
-				 ByteBuffer readBuffer = null;
-				try {
-					readBuffer = ByteBuffer.allocate(view.size(projectProperty));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				    try {
-						view.read(projectProperty, readBuffer);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				    readBuffer.flip();
-				    try {
-						final String valueFromAttributes = new String(readBuffer.array(), "UTF-8");
-						if(valueFromAttributes.equals(this.projectProperty) ) {
-							DEBUG.debugmessage("FOUND A PROJECT");
-							this.editorProjects.put(dir.getAbsolutePath(), new Project(dir.getAbsolutePath(),dir.getName()));
-						}
-					} catch (UnsupportedEncodingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				
-				
+			try {
+				view.read(projectProperty, readBuffer);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-	
-		
-		
-		
+			readBuffer.flip();
+			try {
+				final String valueFromAttributes = new String(readBuffer.array(), "UTF-8");
+				if (valueFromAttributes.equals(this.projectProperty)) {
+					DEBUG.debugmessage("FOUND A PROJECT");
+					this.editorProjects.put(dir.getAbsolutePath(), new Project(dir.getAbsolutePath(), dir.getName()));
+				}
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
 	}
-	
+
 	// Metodo que abre un dialogo para elegir la carpeta actual
 	private String openFolder() {
 
@@ -313,7 +213,7 @@ public class FileManager {
 	// significa que hay un fichero abierto en el editor , se guardarán antes los
 	// cambios en su correspondiente
 	// textfile
-	public String openTextFile(String name , String path, String contents) {
+	public String openTextFile(String name, String path, String contents) {
 
 		DEBUG.debugmessage("SE HA LLAMADO A OPENTEXTFILE EN FILEMANAGER");
 		if (currentFocus != null) {
@@ -321,22 +221,22 @@ public class FileManager {
 
 		}
 		currentFocus = path;
-		if(!editorFiles.containsKey(path)) {
-			TextFile tf = new TextFile(name , path , contents , FileType.CLASS);
+		if (!editorFiles.containsKey(path)) {
+			TextFile tf = new TextFile(name, path, contents, FileType.CLASS);
 			editorFiles.put(path, tf);
-			
+
 		}
-		
+
 		try {
 			File file = new File(path);
-			 byte[] encoded = null;
+			byte[] encoded = null;
 			try {
 				encoded = Files.readAllBytes(Paths.get(path));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			 String returningcontents = new String(encoded,StandardCharsets.UTF_8);
+			String returningcontents = new String(encoded, StandardCharsets.UTF_8);
 			ArrayList<Object> list = new ArrayList<Object>();
 			list.add(returningcontents);
 			list.add(editorFiles.get(path).getName());
@@ -354,31 +254,29 @@ public class FileManager {
 
 	}
 
-	
-	public void saveAllOpen(String[] contents , String[] paths) {
-		
-		if(contents.length == paths.length) {
-			for(int i = 0 ; i < contents.length ; i ++) {
+	public void saveAllOpen(String[] contents, String[] paths) {
+
+		if (contents.length == paths.length) {
+			for (int i = 0; i < contents.length; i++) {
 				try {
-					saveCurrentFile(contents[i],paths[i]);
+					saveCurrentFile(contents[i], paths[i]);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			
-			
-		}
-		
-	}
-	
-	// Metodo para guardar todos los ficheros del editor
-	public void saveAll(String editorContents ) throws IOException {
-		DEBUG.debugmessage("SE HA LLAMADO A SAVEALL EN FILEMANAGER");
-		
-		saveCurrentFile(editorContents , null);
 
-		//File[] files = this.returnAllFiles();
+		}
+
+	}
+
+	// Metodo para guardar todos los ficheros del editor
+	public void saveAll(String editorContents) throws IOException {
+		DEBUG.debugmessage("SE HA LLAMADO A SAVEALL EN FILEMANAGER");
+
+		saveCurrentFile(editorContents, null);
+
+		// File[] files = this.returnAllFiles();
 		File[] files = this.workspaceFullSearch();
 
 		for (int i = 0; i < files.length; i++) {
@@ -394,7 +292,7 @@ public class FileManager {
 
 	}
 
-private File[] workspaceFullSearch() {
+	private File[] workspaceFullSearch() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -402,7 +300,7 @@ private File[] workspaceFullSearch() {
 //Metodo para guardar unicamente el fichero en el focus 
 	public void saveCurrentFile(String editorcontents, String path) throws IOException {
 		DEBUG.debugmessage("SE HA LLAMADO A SAVECURRENTFILE EN FILEMANAGER");
-		//File file = this.returnSingleFile(currentFocus);
+		// File file = this.returnSingleFile(currentFocus);
 		File file = new File(path);
 		if (file != null) {
 			editorFiles.get(path).setContent(editorcontents);

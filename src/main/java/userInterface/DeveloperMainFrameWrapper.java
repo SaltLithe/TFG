@@ -1,6 +1,10 @@
 package userInterface;
 
 import core.DEBUG;
+import userInterface.fileNavigation.FileExplorerToolbar;
+import userInterface.textEditing.TextEditorPanel;
+import userInterface.textEditing.TextEditorToolbar;
+import userInterface.fileNavigation.FileExplorerPanel;
 
 public class DeveloperMainFrameWrapper implements Runnable {
 
