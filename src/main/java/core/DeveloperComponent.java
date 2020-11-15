@@ -186,11 +186,11 @@ public class DeveloperComponent extends Observable {
 	 * 
 	 * @param args args[0] : String Name , args[1] : String Contents
 	 */
-	public void createNewClassFile(String name, String contents, String path) {
+	public void createNewClassFile(String name, String path , String project) {
 		DEBUG.debugmessage("SE HA LLAMADO A CREATENEWCLASSFILE EN DEVELOPERCOMPONENT");
 
-		fileManager.createClassFile(name, path , contents, true);
-		fileManager.updateAllFiles();
+		fileManager.createClassFile(name, path ,project,  true);
+		//fileManager.updateAllFiles();
 
 	}
 

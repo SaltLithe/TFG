@@ -154,7 +154,7 @@ public class FileManager {
 
 		for (String k : editorFiles.keySet()) {
 			if (!names.contains(k)) {
-				this.createClassFile(k, editorFiles.get(k).getName() , editorFiles.get(k).getContent(), false);
+			//	this.createClassFile(k, editorFiles.get(k).getName() , editorFiles.get(k).getContent(), false);
 			}
 		}
 
@@ -162,26 +162,29 @@ public class FileManager {
 
 //Metodo para crear un fichero para una clase , crea tanto el fichero en la carpeta elegida del sistema como
 //Un objeto TextFile para el editor
-	public void createClassFile(String name, String contents, String path , Boolean isfromeditor) {
+	public void createClassFile(String name, String path , String project ,  Boolean isfromeditor) {
 
 		DEBUG.debugmessage("SE HA LLAMADO A CREATECLASSFILE EN FILEMANAGER");
+		
 		String nameandpath = path + "/" + name + extension;
 		File newFile = new File(nameandpath);
 		try {
 			FileWriter fw = new FileWriter(newFile);
-			if (!isfromeditor) {
-				fw.write(contents);
-			} else {
+		
 				fw.write(returnBase(name));
-			}
+			
 			fw.close();
 			TextFile newfile = new TextFile(name, path , null , FileType.CLASS);
-			if (contents == null && isfromeditor) {
-				newfile.setContent(returnBase(name));
-			} else {
-				newfile.setContent(contents);
-			}
+		
 			editorFiles.put(newfile.getPath(), newfile);
+			
+			ArrayList<Object> list = new ArrayList<Object>();
+			list.add(path);
+			list.add(name + extension);
+			list.add(true); 
+			list.add(project);
+			
+			support.notify(ObserverActions.UPDATE_PROJECT_TREE, null , list);
 		} catch (IOException e) {
 			DEBUG.debugmessage("NO SE HA PODIDO CREAR EL FICHERO DE LA CLASE");
 			e.printStackTrace();

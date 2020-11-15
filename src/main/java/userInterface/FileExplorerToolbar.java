@@ -10,6 +10,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -33,9 +34,12 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 	private UIController uiController;
 	private DeveloperMainFrame developerMainFrame;
 
+	private HashMap<String,ProjectTree> trees; 
+	
 	public FileExplorerToolbar(DeveloperMainFrame developerMainFrame) {
 
 		DEBUG.debugmessage("SE HA INVOCADO AL CONSTRUCTOR DE FILEEXPLORERTOOLBAR");
+		trees = new HashMap<String,ProjectTree>(); 
 		fileExplorerPanel = new FileExplorerPanel();
 		this.developerMainFrame = developerMainFrame;
 		uiController = UIController.getInstance();
@@ -191,13 +195,32 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 			DEBUG.debugmessage("ADDING TREE");
 			ArrayList<Object> eventList2 = (ArrayList<Object>)evt.getNewValue();
 			File newProject = (File)eventList2.get(0);
-			fileExplorerPanel.add(new ProjectTree(newProject));
+			ProjectTree tree = new ProjectTree(newProject , newProject.getPath());
+			trees.put(newProject.getPath(),tree);
+			fileExplorerPanel.add(tree);
 			fileExplorerPanel.updateUI();
 			
 			
 			
 			
 			break;
+		case UPDATE_PROJECT_TREE:
+			ArrayList<Object> eventList3 = (ArrayList<Object>)evt.getNewValue();
+			String path = (String) eventList3.get(0);
+			String name = (String) eventList3.get(1);
+			boolean adding = (boolean) eventList3.get(2);
+			String projectPath = (String)eventList3.get(3);
+			
+			
+			if(adding) {
+				
+				trees.get(projectPath).insertTreeNode(name, path);; 
+				
+			}else {
+				
+			}
+			
+			break; 
 		default:
 			break;
 		}
