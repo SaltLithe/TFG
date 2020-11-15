@@ -37,12 +37,12 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 	private UIController uiController;
 	private DeveloperMainFrame developerMainFrame;
 
-	private HashMap<String,ProjectTree> trees; 
-	
+	private HashMap<String, ProjectTree> trees;
+
 	public FileExplorerToolbar(DeveloperMainFrame developerMainFrame) {
 
 		DEBUG.debugmessage("SE HA INVOCADO AL CONSTRUCTOR DE FILEEXPLORERTOOLBAR");
-		trees = new HashMap<String,ProjectTree>(); 
+		trees = new HashMap<String, ProjectTree>();
 		fileExplorerPanel = new FileExplorerPanel();
 		this.developerMainFrame = developerMainFrame;
 		uiController = UIController.getInstance();
@@ -66,52 +66,50 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 		// Al botón de añadir clase se le asocia con la creación de un diálogo con los
 		// elementos necesarios
 		// para crear una nueva clase , de momento se queda en esta misma clase
-		
-	
 
 	}
 
 	// Método que añade un botón al FileExplorerPanel si no existe de antemano ,
 	// este método además se encarga
 	// de darle su comportamiento al bóton antes de añadirlo
-	
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
 		switch (action) {
-		
-			
+
 		case ADD_PROJECT_TREE:
 			DEBUG.debugmessage("ADDING TREE");
-			ArrayList<Object> eventList2 = (ArrayList<Object>)evt.getNewValue();
-			File newProject = (File)eventList2.get(0);
-			ProjectTree tree = new ProjectTree(newProject , newProject.getPath());
-			trees.put(newProject.getPath(),tree);
+			ArrayList<Object> eventList2 = (ArrayList<Object>) evt.getNewValue();
+			File newProject = (File) eventList2.get(0);
+			ProjectTree tree = new ProjectTree(newProject, newProject.getPath());
+			trees.put(newProject.getPath(), tree);
 			fileExplorerPanel.add(tree);
 			fileExplorerPanel.updateUI();
-			
-			
-			
-			
+
 			break;
-		case UPDATE_PROJECT_TREE:
-			ArrayList<Object> eventList3 = (ArrayList<Object>)evt.getNewValue();
+		case UPDATE_PROJECT_TREE_ADD:
+			ArrayList<Object> eventList3 = (ArrayList<Object>) evt.getNewValue();
 			String path = (String) eventList3.get(0);
 			String name = (String) eventList3.get(1);
-			boolean adding = (boolean) eventList3.get(2);
-			String projectPath = (String)eventList3.get(3);
+			String projectPath = (String) eventList3.get(2);
+
 			
+
+				trees.get(projectPath).insertTreeNode(name, path);
+				
+
 			
-			if(adding) {
-				
-				trees.get(projectPath).insertTreeNode(name, path);; 
-				
-			}else {
-				
-			}
-			
-			break; 
+			break;
+		case UPDATE_PROJECT_TREE_REMOVE:
+
+			ArrayList<Object> eventList4 = (ArrayList<Object>) evt.getNewValue();
+			String projectPathDeleting = (String) eventList4.get(0);
+			CustomTreeNode node = (CustomTreeNode) eventList4.get(1);
+
+			trees.get(projectPathDeleting).deleteTreeNode(node);
+
+			break;
 		default:
 			break;
 		}

@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import core.DEBUG;
-import userInterface.workSpaceSelect;
+import userInterface.fileNavigation.workSpaceSelect;
 
 import java.awt.Component;
 

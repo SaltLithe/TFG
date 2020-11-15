@@ -1,4 +1,4 @@
-package userInterface;
+package userInterface.fileEditing;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

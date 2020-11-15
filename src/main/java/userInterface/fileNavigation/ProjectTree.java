@@ -29,6 +29,7 @@ import javax.swing.tree.TreePath;
 
 import core.DEBUG;
 import core.DeveloperComponent;
+import userInterface.DeveloperMainFrame;
 import userInterface.UIController;
 
 public class ProjectTree extends JPanel implements TreeSelectionListener {
@@ -38,6 +39,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 	private DeveloperComponent developerComponent;
 	private CustomTreeNode lastParent = null;
 	private String project; 
+	private DeveloperMainFrame frame; 
 
 	public void valueChanged(TreeSelectionEvent e) {
 		TreePath path = e.getNewLeadSelectionPath();
@@ -47,10 +49,11 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 
 	public ProjectTree(File dir , String project) {
 
+		
 		this.project = project;
 		uiController = UIController.getInstance();
 		developerComponent = uiController.getDeveloperComponent();
-
+		frame = uiController.getFrame(); 
 		setLayout(new BorderLayout());
 
 		tree = new JTree(scanAndAdd(null, dir,  project , true));
@@ -84,7 +87,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 						tree.setSelectionRow(selRow);
 					}
 					if (node != null) {
-						NodePopupMenu menu = new NodePopupMenu(node.isFile, false , node);
+						NodePopupMenu menu = new NodePopupMenu(node.isFile, false , node , frame , uiController , developerComponent);
 						TreePath path = tree.getPathForLocation(me.getX(), me.getY());
 						Rectangle bounds = tree.getPathBounds(path);
 						menu.show(me.getComponent(), (int) bounds.getMaxX(), (int) bounds.getMinY());
@@ -112,7 +115,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 		if (dir.isDirectory()) {
 			isDir = false;
 		}
-		CustomTreeNode currentNode = new CustomTreeNode(path, name, project , isDir);
+		CustomTreeNode currentNode = new CustomTreeNode(path, name, project , isDir , true);
 		if (!isStart) {
 			// Si no estamos empezando podemos añadir la ruta al nodo anterior
 			// Esto es para que el project no se añada a sí mismo
@@ -146,7 +149,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 			if (g.isDirectory()) {
 				isFile = false;
 			}
-			currentNode.add(new CustomTreeNode(g.getAbsolutePath(), filename, project,  isFile));
+			currentNode.add(new CustomTreeNode(g.getAbsolutePath(), filename, project,  isFile , false));
 
 		}
 		return currentNode;
@@ -172,7 +175,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 	}
 
 	public void insertTreeNode(String name, String path) {
-		CustomTreeNode newchild = new CustomTreeNode( path+"\\"+name, name,  project,  true);
+		CustomTreeNode newchild = new CustomTreeNode( path+"\\"+name, name,  project,  true, false);
 		String parentpath = newchild.getParentPath();
 		findParent(parentpath, (CustomTreeNode) tree.getModel().getRoot());
 		if (parentpath != null && lastParent != null) {
@@ -194,6 +197,21 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 
 	public Dimension getPreferredSize() {
 		return new Dimension(200, 400);
+	}
+
+	public void deleteTreeNode( CustomTreeNode node) {
+		
+	
+					DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+					model.removeNodeFromParent(node);
+					model.reload();
+					tree.setModel(model);
+					tree.updateUI();
+			
+			
+		
+		// TODO Auto-generated method stub
+		
 	}
 
 	/** Main: make a Frame, add a FileTree */

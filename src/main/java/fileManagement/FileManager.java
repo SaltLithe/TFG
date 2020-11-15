@@ -21,6 +21,7 @@ import javax.swing.JFileChooser;
 import core.DEBUG;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
+import userInterface.fileNavigation.CustomTreeNode;
 
 /*Clase que maneja todos los archivos sobre los que trabaja la aplicación , contiene un hashmap en el que
  * guarda objetos de la clase TextFile que se corresponden a ficheros en la carpeta actual que se guarda en 
@@ -93,15 +94,37 @@ public class FileManager {
 			ArrayList<Object> list = new ArrayList<Object>();
 			list.add(path);
 			list.add(name + extension);
-			list.add(true);
 			list.add(project);
 
-			support.notify(ObserverActions.UPDATE_PROJECT_TREE, null, list);
+			support.notify(ObserverActions.UPDATE_PROJECT_TREE_ADD, null, list);
 		} catch (IOException e) {
 			DEBUG.debugmessage("NO SE HA PODIDO CREAR EL FICHERO DE LA CLASE");
 			e.printStackTrace();
 		}
 
+	}
+	
+	public void deleteFile(String name , String path , boolean isFolder , String project , CustomTreeNode node) {
+		
+		if(this.editorFiles.containsKey(path) && !isFolder) {
+			editorFiles.remove(path);
+		}
+		
+        try {
+			Files.deleteIfExists(Paths.get(path));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+        
+
+		ArrayList<Object> list = new ArrayList<Object>();
+	;
+		list.add(project);
+		list.add(node);
+
+		support.notify(ObserverActions.UPDATE_PROJECT_TREE_REMOVE, null, list);
+		
 	}
 
 	public void newProject(String name, WorkSpace workSpace) {

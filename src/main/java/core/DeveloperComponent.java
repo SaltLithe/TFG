@@ -21,6 +21,7 @@ import javax.swing.SwingUtilities;
 
 import fileManagement.FileManager;
 import fileManagement.FileType;
+import fileManagement.Project;
 import fileManagement.TextFile;
 import fileManagement.WorkSpace;
 import javaMiniSockets.clientSide.AsynchronousClient;
@@ -33,6 +34,7 @@ import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
+import userInterface.fileNavigation.CustomTreeNode;
 
 public class DeveloperComponent extends Observable {
 
@@ -344,6 +346,11 @@ if(n == JOptionPane.OK_OPTION) {
 	
 		// TODO Auto-generated method stub
 		
+	}
+
+	public Object deleteFile(String name, String path , boolean isFolder , String project , CustomTreeNode node) {
+		fileManager.deleteFile(name, path, isFolder, project,node);
+		return null;
 	}
 
 }

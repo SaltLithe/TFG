@@ -12,7 +12,12 @@ public class UIController {
 	private int actionsSaved = 100;
 	private static UIController instance;
 	private DeveloperComponent developerComponent;
-	public DeveloperMainFrame developerMainFrame;
+	public static DeveloperMainFrame developerMainFrame;
+	
+	
+	public static DeveloperMainFrame getFrame() {
+		return developerMainFrame;
+	}
 
 	public static UIController getInstance() {
 

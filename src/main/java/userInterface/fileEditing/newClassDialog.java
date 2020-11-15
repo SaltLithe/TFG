@@ -1,4 +1,4 @@
-package userInterface;
+package userInterface.fileEditing;
 
 import javax.swing.JDialog;
 import java.awt.FlowLayout;
@@ -7,6 +7,7 @@ import javax.swing.JTextField;
 
 import core.DEBUG;
 import core.DeveloperComponent;
+import userInterface.UIController;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;

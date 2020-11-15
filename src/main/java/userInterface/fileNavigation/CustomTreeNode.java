@@ -23,6 +23,7 @@ public class CustomTreeNode extends DefaultMutableTreeNode   {
 	public String name;
 	public String project; 
 	public boolean isFile;
+	public boolean isProject; 
 	
 	
 	private static String folderPath =  "Icons/warning_icon.png";
@@ -33,12 +34,12 @@ public class CustomTreeNode extends DefaultMutableTreeNode   {
 
 	
 	
-	public CustomTreeNode(String path, String name , String project , boolean isFile) {
+	public CustomTreeNode(String path, String name , String project , boolean isFile , boolean isProject ) {
 		
 		
 		
 		super();
-		
+		this.isProject = isProject; 
 		this.isFile = isFile; 
 		this.path = path;
 		this.name = name; 

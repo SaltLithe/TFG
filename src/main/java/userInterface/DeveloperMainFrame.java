@@ -12,6 +12,7 @@ import javax.swing.UIManager;
 import com.formdev.flatlaf.FlatDarkLaf;
 
 import userInterface.fileNavigation.FileExplorerToolbar;
+import userInterface.networkManagement.UsersPanel;
 import userInterface.textEditing.TextEditorPanel;
 import userInterface.textEditing.TextEditorToolbar;
 
@@ -42,7 +43,7 @@ public class DeveloperMainFrame extends JFrame {
 	public void enableFileExplorerToolbar() {
 
 		//fileExplorerToolbar.enableToolbarButtons();
-
+		
 	}
 
 	DeveloperMainFrame() {
