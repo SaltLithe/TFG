@@ -7,11 +7,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -35,32 +37,28 @@ public class PersonalCompiler {
 	PrintStream stderr = System.err;
 	InputStream stdin = System.in;
 
+	ConcurrentHashMap <String, URLClassLoader> loaders; 
+	
 	public PersonalCompiler() {
 
 		support = PropertyChangeMessenger.getInstance();
 		console = new ConsoleWrapper();
 	}
 
-	public String run(String source, String className, String currentpath) {
+	public String run(String className, String[] added ) {
 
-		File folder = new File(currentpath + "/");
-		// String path = folder.getPath() + "/" + className + ".java";
-		String path = folder.getPath() + "/" + className;
-		className = className.replace(".java", "");
-
-		File sourceFile = new File(path);
-
-		/*
-		 * out2.flush(); out3.flush(); outbaos.reset(); errbaos.reset();
-		 */
-
-		try {
-			Files.write(sourceFile.toPath(), source.getBytes(StandardCharsets.UTF_8));
-		} catch (IOException e) {
-			e.printStackTrace();
+			
+		URL[] addedURLS = new URL[added.length];
+		for(int i = 0 ; i < added.length ; i ++) {
+			try {
+				addedURLS[i] = new File(added[i]).toURI().toURL();
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-
-		DEBUG.debugmessage("SE VA A INTENTAR COMPILAR EL FICHERO EN EL DIRECTORIO " + sourceFile.getPath());
+			
+		URLClassLoader classLoader = new URLClassLoader(addedURLS);
 
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		if (compiler == null) {
@@ -73,20 +71,14 @@ public class PersonalCompiler {
 
 		}
 
-		// despues de darle a run se crea un archivo .class que habria que eliminar
-
-		// System.setOut(out2);
-		// System.setErr(out3);
 		DEBUG.setExecuting();
 		System.setOut(console.outPrint);
 		System.setErr(console.errPrint);
 		System.setIn(console.inStream);
-		int compilationResult = compiler.run(null, null, null, sourceFile.getPath());
-		if (compilationResult == 0) {
+		
 
 			try {
 
-				URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { folder.toURI().toURL() });
 				Class<?> cls = Class.forName(className, true, classLoader);
 				Object instance = cls.newInstance();
 				@SuppressWarnings("rawtypes")
@@ -109,40 +101,13 @@ public class PersonalCompiler {
 				DEBUG.debugmessage("HA OCURRIDO UN ERROR A LA HORA DE COMPILAR EXTERNO AL CODIGO");
 			}
 
-		} else {
-
-			System.setOut(stdout);
-			System.setErr(stderr);
-			System.setIn(stdin);
-
-			System.err.println("HA OCURRIDO UN ERROR A LA HORA DE COMPILAR DEBIDO AL CODIGO");
-		}
-
-		/*
-		 * 
-		 * String results = null;
-		 * 
-		 * String porque = errbaos.toString(); String señorporque = outbaos.toString();
-		 * if (!errbaos.toString().equals("")) { results = errbaos.toString(); } else {
-		 * 
-		 * results = outbaos.toString(); }
-		 * 
-		 */
-
 		DEBUG.unsetExecuting();
 		System.setOut(stdout);
 		System.setErr(stderr);
 		System.setIn(stdin);
 
 		DEBUG.debugmessage("SE HA ACABADO LA EJECUCION");
-		String resultspath = folder.getPath() + "/" + className + ".class";
-		File resultsFile = new File(resultspath);
-		resultsFile.delete();
 
-		/*
-		 * ArrayList<Object> list = new ArrayList<Object>(); list.add(results);
-		 * support.notify(ObserverActions.CONSOLE_PANEL_CONTENTS, null, list);
-		 */
 		return null;
 	}
 

@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -32,6 +34,8 @@ public class TextEditorToolbar extends JPanel implements PropertyChangeListener 
 	private JButton terminate;
 	private JSplitPane consoleDivision;
 	public ConsolePanel consolePanel;
+	String currentTabName = null;
+	String currentProject = null; 
 
 	private UIController uiController;
 	private DeveloperComponent developerComponent;
@@ -50,7 +54,6 @@ public class TextEditorToolbar extends JPanel implements PropertyChangeListener 
 		terminate = new JButton("Terminate Process");
 		terminate.setEnabled(false);
 		runLocal.setEnabled(false);
-		runGlobal.setEnabled(false);
 		JPanel toolbarArea = new JPanel();
 		toolbarArea.setLayout(new FlowLayout(FlowLayout.LEFT));
 		toolbarArea.add(runLocal);
@@ -80,8 +83,16 @@ public class TextEditorToolbar extends JPanel implements PropertyChangeListener 
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// Mandar codigo al dueño para que ejecute codigo de compilacion global
-				// Con todo lo que eso conlleva
+				
+				
+				uiController.run(()->{
+					try {
+						developerComponent.run(currentTabName, currentProject);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				});
 
 			}
 
@@ -139,6 +150,13 @@ public class TextEditorToolbar extends JPanel implements PropertyChangeListener 
 		case ENABLE_TEXTEDITORTOOLBAR_BUTTONS:
 			enableButtons();
 			break;
+			
+		case CHANGE_TAB_FOCUS:
+			DEBUG.debugmessage("CHANGING FOCUS");
+			ArrayList<Object> list = (ArrayList<Object>) evt.getNewValue();
+			currentTabName = (String)list.get(0);
+			currentProject = (String)list.get(1);
+			break; 
 		default:
 			break;
 		}

@@ -38,8 +38,9 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 	private UIController uiController;
 	private DeveloperComponent developerComponent;
 	private CustomTreeNode lastParent = null;
-	private String project; 
-	private DeveloperMainFrame frame; 
+	private String project;
+	private DeveloperMainFrame frame;
+	private ArrayList<String> baseClassPath;
 
 	public void valueChanged(TreeSelectionEvent e) {
 		TreePath path = e.getNewLeadSelectionPath();
@@ -47,16 +48,21 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 		System.out.println("path = " + path + "\n" + "lspc = " + lspc);
 	}
 
-	public ProjectTree(File dir , String project) {
+	public ProjectTree(File dir, String project) {
 
-		
+		baseClassPath = new ArrayList<String>();
 		this.project = project;
 		uiController = UIController.getInstance();
 		developerComponent = uiController.getDeveloperComponent();
-		frame = uiController.getFrame(); 
+		frame = uiController.getFrame();
 		setLayout(new BorderLayout());
 
-		tree = new JTree(scanAndAdd(null, dir,  project , true));
+		tree = new JTree(scanAndAdd(null, dir, project, true));
+		String[] baseClassPathArray = new String[baseClassPath.size()];
+		for(int i = 0 ; i < baseClassPath.size() ; i ++) {
+			baseClassPathArray[i] = baseClassPath.get(i);
+		}
+		developerComponent.loadClassPath(baseClassPathArray, project);
 
 		tree.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent me) {
@@ -65,20 +71,18 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 				TreePath selPath = tree.getPathForLocation(me.getX(), me.getY());
 				tree.setSelectionPath(selPath);
 				try {
-				node = (CustomTreeNode) tree.getSelectionPath().getLastPathComponent();
+					node = (CustomTreeNode) tree.getSelectionPath().getLastPathComponent();
+				} catch (Exception e) {
 				}
-				catch (Exception e) {}
-
 
 				if (SwingUtilities.isLeftMouseButton(me)) {
 
 					if (node != null) {
-						String name = node.name; 
-						String path = node.path; 
-						
+						String name = node.name;
+						String path = node.path;
 
 						if (node.isFile) {
-							uiController.run(() -> developerComponent.openFile(name, path, null));
+							uiController.run(() -> developerComponent.openFile(name, path, null, project));
 						}
 					}
 				} else if (SwingUtilities.isRightMouseButton(me)) {
@@ -87,7 +91,8 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 						tree.setSelectionRow(selRow);
 					}
 					if (node != null) {
-						NodePopupMenu menu = new NodePopupMenu(node.isFile, false , node , frame , uiController , developerComponent);
+						NodePopupMenu menu = new NodePopupMenu(node.isFile, false, node, frame, uiController,
+								developerComponent);
 						TreePath path = tree.getPathForLocation(me.getX(), me.getY());
 						Rectangle bounds = tree.getPathBounds(path);
 						menu.show(me.getComponent(), (int) bounds.getMaxX(), (int) bounds.getMinY());
@@ -108,14 +113,14 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 
 	}
 
-	CustomTreeNode scanAndAdd(CustomTreeNode currentRootNode, File dir, String project , boolean isStart) {
+	CustomTreeNode scanAndAdd(CustomTreeNode currentRootNode, File dir, String project, boolean isStart) {
 		String path = dir.getPath();
 		String name = path.substring(path.lastIndexOf("\\") + 1, path.length());
 		boolean isDir = true;
 		if (dir.isDirectory()) {
 			isDir = false;
 		}
-		CustomTreeNode currentNode = new CustomTreeNode(path, name, project , isDir , true);
+		CustomTreeNode currentNode = new CustomTreeNode(path, name, project, isDir, true);
 		if (!isStart) {
 			// Si no estamos empezando podemos añadir la ruta al nodo anterior
 			// Esto es para que el project no se añada a sí mismo
@@ -134,7 +139,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 		for (File f : files) {
 
 			if (f.isDirectory()) {
-				scanAndAdd(currentNode, f, project ,  false);
+				scanAndAdd(currentNode, f, project, false);
 			} else {
 
 				addLater.add(f);
@@ -149,7 +154,8 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 			if (g.isDirectory()) {
 				isFile = false;
 			}
-			currentNode.add(new CustomTreeNode(g.getAbsolutePath(), filename, project,  isFile , false));
+			currentNode.add(new CustomTreeNode(g.getAbsolutePath(), filename, project, isFile, false));
+			baseClassPath.add(g.getAbsolutePath());
 
 		}
 		return currentNode;
@@ -175,7 +181,10 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 	}
 
 	public void insertTreeNode(String name, String path) {
-		CustomTreeNode newchild = new CustomTreeNode( path+"\\"+name, name,  project,  true, false);
+		CustomTreeNode newchild = new CustomTreeNode(path + "\\" + name, name, project, true, false);
+		String[] newpath = { path + "\\" + name };
+		developerComponent.loadClassPath(newpath, project);
+
 		String parentpath = newchild.getParentPath();
 		findParent(parentpath, (CustomTreeNode) tree.getModel().getRoot());
 		if (parentpath != null && lastParent != null) {
@@ -199,19 +208,18 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 		return new Dimension(200, 400);
 	}
 
-	public void deleteTreeNode( CustomTreeNode node) {
-		
-	
-					DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-					model.removeNodeFromParent(node);
-					model.reload();
-					tree.setModel(model);
-					tree.updateUI();
-			
-			
-		
+	public void deleteTreeNode(CustomTreeNode node) {
+
+		String[] removepath = { node.path };
+		developerComponent.loadClassPath(removepath, project);
+		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+		model.removeNodeFromParent(node);
+		model.reload();
+		tree.setModel(model);
+		tree.updateUI();
+
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/** Main: make a Frame, add a FileTree */

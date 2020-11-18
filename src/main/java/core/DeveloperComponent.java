@@ -12,6 +12,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Observable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -49,7 +51,9 @@ public class DeveloperComponent extends Observable {
 	private int defaultQueueSize = 100;
 	
 	private WorkSpace workSpace; 
-
+	private HashMap<String,ClassPath> classpaths; 
+	
+	
 	public void setAsClient(String serverAddress, String ownAddress, int serverPort, int clientPort,
 			boolean autoConnect) {
 
@@ -96,6 +100,7 @@ public class DeveloperComponent extends Observable {
 	{
 		DEBUG.debugmessage("SE HA CREADO UNA INSTANCIA DE DEVELOPERCOMPONENT");
 
+		classpaths = new HashMap<String,ClassPath>();
 		support = PropertyChangeMessenger.getInstance();
 		this.workSpace = workSpace; 
 		UIController controller = UIController.getInstance();
@@ -126,7 +131,7 @@ public class DeveloperComponent extends Observable {
 
 	// Metodo publico para ejecutar código que maneja solo si ejecutar clase o
 	// script
-	public String run() throws IOException {
+	public String run(String className, String project) throws IOException {
 
 		DEBUG.debugmessage("SE HA LLAMADO A RUN EN DEVELOPERCOMPONENT");
 
@@ -134,7 +139,8 @@ public class DeveloperComponent extends Observable {
 		String name = fileManager.getCurrentFocus();
 
 		if (file.getType() == FileType.CLASS) {
-			String results = compile(file.getContent(), name);
+			String[] files = classpaths.get(project).getClassPath();
+			String results = compile(files , className);
 			ArrayList<Object> observations = new ArrayList<Object>();
 			observations.add(ObserverActions.CONSOLE_PANEL_CONTENTS);
 			observations.add(results);
@@ -150,11 +156,12 @@ public class DeveloperComponent extends Observable {
 	}
 
 	// Metodo privado para llamar al compilador
-	private String compile(String code, String className) {
+	private String compile(String[] files, String className) {
 		DEBUG.debugmessage("SE HA LLAMADO A COMPILE EN DEVELOPERCOMPONENT");
 
-		return compiler.run(code, className, fileManager.getCurrentFolder());
+		return compiler.run(className,files);
 
+		
 	}
 
 	// Metodo privado para llamar al interpete
@@ -166,8 +173,23 @@ public class DeveloperComponent extends Observable {
 
 	}
 	
+	public void loadClassPath(String[] classes, String project) {
+		
+		ClassPath newclasspath = new ClassPath(project, classes);
+		classpaths.put(project, newclasspath);
+		
+		
+	}
+	
+	
+	public void editClassPath(String[] adding , String[] removing , String project) {
+		
+		classpaths.get(project).edit(adding , removing);
+		
+	}
 	
 
+	
 	// Metodo que es llamado para seleccionar y abrir la carpeta donde se va a
 	// trabajar con la aplicacion
 	public void selectFocusedFolder() {
@@ -215,10 +237,10 @@ public class DeveloperComponent extends Observable {
 	// Metodo que gestiona abrir un archivo en la aplicacion dado su nombre , recibe
 	// los contenidos actuales
 	// del editor para poder guardar los cambios
-	public String openFile(String name, String path , String contents) {
+	public String openFile(String name, String path , String contents , String project) {
 		DEBUG.debugmessage("SE HA LLAMADO A OPENFILE EN DEVELOPERCOMPONENT CON UNA LAMBDA DE MIERDA");
 
-		return fileManager.openTextFile(name, path , contents);
+		return fileManager.openTextFile(name, path , contents, project );
 
 	}
 
@@ -259,8 +281,8 @@ public class DeveloperComponent extends Observable {
 		 * future.get(); } catch (InterruptedException e) { e.printStackTrace(); } catch
 		 * (ExecutionException e) { e.printStackTrace(); }
 		 */
-		Thread t = new Thread(() -> executor.submit(() -> run()));
-		t.start();
+	//	Thread t = new Thread(() -> executor.submit(() -> run()));
+		//t.start();
 
 		return null;
 
@@ -352,5 +374,7 @@ if(n == JOptionPane.OK_OPTION) {
 		fileManager.deleteFile(name, path, isFolder, project,node);
 		return null;
 	}
+
+
 
 }

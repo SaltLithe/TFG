@@ -126,13 +126,14 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 	}
 	
-	public void addTab(String name , String path) {
+	public void addTab(String name , String path , String project) {
 		
-		TabMiniPanel mp1 = new TabMiniPanel(name,path);
-        TextEditorTab tab = new TextEditorTab(path,mp1);
+		TabMiniPanel mp1 = new TabMiniPanel(name,path,project);
+        TextEditorTab tab = new TextEditorTab(path,mp1, project);
         mp1.setParent(tab);
 		tabPane.addTab("", tab.panel);
 		int index = tabPane.indexOfComponent(tab.panel);
+		
 		tabPane.setTabComponentAt(index, mp1);
 		this.tabCollection.put(path, tab);
 		
@@ -174,8 +175,9 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			if(!tabCollection.containsKey(path)) {
 			String contents = (String) results.get(0);
 			String filename = (String) results.get(1);
+			String project = (String) results.get(3);
 			
-			this.addTab(filename, path);
+			this.addTab(filename, path , project);
 			this.setFullText(path, contents);
 		
 			}
@@ -209,5 +211,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		this.tabPane.remove(tabPane.indexOfComponent(tabCollection.get(path).panel));
 		
 	}
+
+	
 
 }

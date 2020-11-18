@@ -19,8 +19,10 @@ import java.util.LinkedList;
 import javax.swing.JFileChooser;
 
 import core.DEBUG;
+import core.DeveloperComponent;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
+import userInterface.UIController;
 import userInterface.fileNavigation.CustomTreeNode;
 
 /*Clase que maneja todos los archivos sobre los que trabaja la aplicación , contiene un hashmap en el que
@@ -38,6 +40,8 @@ public class FileManager {
 	private String currentFocus = null;
 	private String extension = ".java";
 	private PropertyChangeMessenger support;
+	private UIController uiController;
+	private DeveloperComponent developerComponent; 
 
 	public final String projectProperty = "pairleap.projectfolder";
 
@@ -48,6 +52,8 @@ public class FileManager {
 	public FileManager() {
 		DEBUG.debugmessage("SE HA INVOCADO AL CONSTRUCTOR DE FILEMANAGER");
 
+		uiController = UIController.getInstance();
+		developerComponent = uiController.getDeveloperComponent();
 		// Inicializa los objetos necesarios y variables necesarias
 
 		support = PropertyChangeMessenger.getInstance();
@@ -236,7 +242,7 @@ public class FileManager {
 	// significa que hay un fichero abierto en el editor , se guardarán antes los
 	// cambios en su correspondiente
 	// textfile
-	public String openTextFile(String name, String path, String contents) {
+	public String openTextFile(String name, String path, String contents , String project) {
 
 		DEBUG.debugmessage("SE HA LLAMADO A OPENTEXTFILE EN FILEMANAGER");
 		if (currentFocus != null) {
@@ -264,6 +270,7 @@ public class FileManager {
 			list.add(returningcontents);
 			list.add(editorFiles.get(path).getName());
 			list.add(editorFiles.get(path).getPath());
+			list.add(project);
 			support.notify(ObserverActions.SET_TEXT_CONTENT, null, list);
 			return returningcontents;
 		} catch (NullPointerException e) {

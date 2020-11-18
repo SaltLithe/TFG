@@ -1,6 +1,7 @@
 package userInterface.textEditing;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -22,7 +23,7 @@ import userInterface.UIController;
 
 
 
-public class TextEditorTab  {
+public class TextEditorTab    {
 	public JPanel panel;
 	public RSyntaxTextArea textEditorArea;
 	private RTextScrollPane textEditorScrollPane;
@@ -40,10 +41,13 @@ public class TextEditorTab  {
 	public boolean unsavedChanges; 
 	public TabMiniPanel miniPanel; 
 	public boolean notConsideredChanges; 
+	private String project; 
+	public String name;
 	
 	
 	public void setTextEditorCode(String code) {
 
+		
 		linenum = 1;
 		columnnum = 1;
 		lastCaretPos = 1;
@@ -88,8 +92,10 @@ public class TextEditorTab  {
 
 	}
 	
-	public TextEditorTab(String path , TabMiniPanel miniPanel) {
+	public TextEditorTab(String path , TabMiniPanel miniPanel, String project) {
 		DEBUG.debugmessage("Se ha creado un tab para el fichero en la direccion : " + path);
+		this.project = project; 
+
 		notConsideredChanges = false; 
 		this.miniPanel = miniPanel; 
 		unsavedChanges = false; 
@@ -258,6 +264,15 @@ public class TextEditorTab  {
 			this.miniPanel.setAsSaved();
 			
 			
+		}
+		
+		public void setProject(String project) {
+			this.project = project; 
+		}
+
+		public String getProject() {
+			// TODO Auto-generated method stub
+			return project;
 		}
 
 }
