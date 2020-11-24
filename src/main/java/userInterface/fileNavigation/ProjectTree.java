@@ -34,7 +34,7 @@ import userInterface.UIController;
 
 public class ProjectTree extends JPanel implements TreeSelectionListener {
 
-	private JTree tree;
+	public JTree internalTree;
 	private UIController uiController;
 	private DeveloperComponent developerComponent;
 	private CustomTreeNode lastParent = null;
@@ -44,7 +44,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 
 	public void valueChanged(TreeSelectionEvent e) {
 		TreePath path = e.getNewLeadSelectionPath();
-		Object lspc = tree.getLastSelectedPathComponent();
+		Object lspc = internalTree.getLastSelectedPathComponent();
 		System.out.println("path = " + path + "\n" + "lspc = " + lspc);
 	}
 
@@ -57,21 +57,21 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 		frame = uiController.getFrame();
 		setLayout(new BorderLayout());
 
-		tree = new JTree(scanAndAdd(null, dir, project, true));
+		internalTree = new JTree(scanAndAdd(null, dir, project, true));
 		String[] baseClassPathArray = new String[baseClassPath.size()];
 		for(int i = 0 ; i < baseClassPath.size() ; i ++) {
 			baseClassPathArray[i] = baseClassPath.get(i);
 		}
 		developerComponent.loadClassPath(baseClassPathArray, project);
 
-		tree.addMouseListener(new MouseAdapter() {
+		internalTree.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent me) {
 				CustomTreeNode node = null;
-				int selRow = tree.getRowForLocation(me.getX(), me.getY());
-				TreePath selPath = tree.getPathForLocation(me.getX(), me.getY());
-				tree.setSelectionPath(selPath);
+				int selRow = internalTree.getRowForLocation(me.getX(), me.getY());
+				TreePath selPath = internalTree.getPathForLocation(me.getX(), me.getY());
+				internalTree.setSelectionPath(selPath);
 				try {
-					node = (CustomTreeNode) tree.getSelectionPath().getLastPathComponent();
+					node = (CustomTreeNode) internalTree.getSelectionPath().getLastPathComponent();
 				} catch (Exception e) {
 				}
 
@@ -88,13 +88,13 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 				} else if (SwingUtilities.isRightMouseButton(me)) {
 
 					if (selRow > -1) {
-						tree.setSelectionRow(selRow);
+						internalTree.setSelectionRow(selRow);
 					}
 					if (node != null) {
 						NodePopupMenu menu = new NodePopupMenu(node.isFile, false, node, frame, uiController,
 								developerComponent);
-						TreePath path = tree.getPathForLocation(me.getX(), me.getY());
-						Rectangle bounds = tree.getPathBounds(path);
+						TreePath path = internalTree.getPathForLocation(me.getX(), me.getY());
+						Rectangle bounds = internalTree.getPathBounds(path);
 						menu.show(me.getComponent(), (int) bounds.getMaxX(), (int) bounds.getMinY());
 					}
 				}
@@ -104,10 +104,10 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 
 		CustomTreeCellRenderer rend = new CustomTreeCellRenderer();
 
-		tree.setCellRenderer(rend);
+		internalTree.setCellRenderer(rend);
 
 		JScrollPane scrollpane = new JScrollPane();
-		scrollpane.getViewport().add(tree);
+		scrollpane.getViewport().add(internalTree);
 		add(BorderLayout.CENTER, scrollpane);
 		this.setVisible(true);
 
@@ -181,19 +181,20 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 	}
 
 	public void insertTreeNode(String name, String path) {
+		
 		CustomTreeNode newchild = new CustomTreeNode(path + "\\" + name, name, project, true, false);
 		String[] newpath = { path + "\\" + name };
 		developerComponent.loadClassPath(newpath, project);
 
 		String parentpath = newchild.getParentPath();
-		findParent(parentpath, (CustomTreeNode) tree.getModel().getRoot());
+		findParent(parentpath, (CustomTreeNode) internalTree.getModel().getRoot());
 		if (parentpath != null && lastParent != null) {
 
-			DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+			DefaultTreeModel model = (DefaultTreeModel) internalTree.getModel();
 			model.insertNodeInto(newchild, lastParent, lastParent.getChildCount());
 			model.reload();
-			tree.setModel(model);
-			tree.updateUI();
+			internalTree.setModel(model);
+			internalTree.updateUI();
 
 		}
 		lastParent = null;
@@ -212,14 +213,19 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 
 		String[] removepath = { node.path };
 		developerComponent.loadClassPath(removepath, project);
-		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+		DefaultTreeModel model = (DefaultTreeModel) internalTree.getModel();
 		model.removeNodeFromParent(node);
 		model.reload();
-		tree.setModel(model);
-		tree.updateUI();
+		internalTree.setModel(model);
+		internalTree.updateUI();
 
 		// TODO Auto-generated method stub
 
+	}
+
+	public JTree getTree() {
+		// TODO Auto-generated method stub
+		return internalTree;
 	}
 
 	/** Main: make a Frame, add a FileTree */

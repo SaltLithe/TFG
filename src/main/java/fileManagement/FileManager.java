@@ -41,9 +41,14 @@ public class FileManager {
 	private String extension = ".java";
 	private PropertyChangeMessenger support;
 	private UIController uiController;
-	private DeveloperComponent developerComponent; 
+	private DeveloperComponent developerComponent;
 
-	public final String projectProperty = "pairleap.projectfolder";
+
+
+
+	
+	
+	
 
 	public String getCurrentFolder() {
 		return currentPath;
@@ -79,10 +84,13 @@ public class FileManager {
 		return editorFiles.get(filename);
 	}
 
+	
 //Metodo para crear un fichero para una clase , crea tanto el fichero en la carpeta elegida del sistema como
 //Un objeto TextFile para el editor
 	public void createClassFile(String name, String path, String project, Boolean isfromeditor) {
 
+		
+		
 		DEBUG.debugmessage("SE HA LLAMADO A CREATECLASSFILE EN FILEMANAGER");
 
 		String nameandpath = path + "/" + name + extension;
@@ -109,61 +117,93 @@ public class FileManager {
 		}
 
 	}
-	
-	public void deleteFile(String name , String path , boolean isFolder , String project , CustomTreeNode node) {
-		
-		if(this.editorFiles.containsKey(path) && !isFolder) {
+
+	public void deleteFile(String name, String path, boolean isFolder, String project, CustomTreeNode node) {
+
+		if (this.editorFiles.containsKey(path) && !isFolder) {
 			editorFiles.remove(path);
 		}
-		
-        try {
+
+		try {
 			Files.deleteIfExists(Paths.get(path));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
-        
+		}
 
 		ArrayList<Object> list = new ArrayList<Object>();
-	;
+		;
 		list.add(project);
 		list.add(node);
 
 		support.notify(ObserverActions.UPDATE_PROJECT_TREE_REMOVE, null, list);
+
+	}
+
+	public void  writeFolder(String path, FILE_TYPE foldertype) {
+
+		File f = new File(path);
+		f.mkdir();
+		final Path file = Paths.get(f.getAbsolutePath());
+		final UserDefinedFileAttributeView view = Files.getFileAttributeView(file, UserDefinedFileAttributeView.class);
+
+		String property = null; 
+		switch (foldertype) {
 		
+		case PROJECT_FOLDER:
+			property = FILE_PROPERTIES.projectProperty;
+			break; 
+		case SRC_FOLDER:
+			property = FILE_PROPERTIES.srcProperty;
+			break;
+		case BIN_FOLDER:
+			property = FILE_PROPERTIES.binProperty;
+			break;
+			default:
+				break;
+		
+		}
+		byte[] bytes = null;
+
+		try {
+			bytes = property.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		final ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);
+		writeBuffer.put(bytes);
+		writeBuffer.flip();
+		try {
+			view.write(property, writeBuffer);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	public void newProject(String name, WorkSpace workSpace) {
 
 		String newpath = workSpace.getPath() + "\\" + name;
-
-		File f = new File(newpath);
-		f.mkdir();
-		final Path file = Paths.get(f.getAbsolutePath());
-
-		final UserDefinedFileAttributeView view = Files.getFileAttributeView(file, UserDefinedFileAttributeView.class);
-
-		/* The file attribute */
-		final String projectProperty = "pairleap.projectfolder";
-		/* Write the properties */
-		byte[] bytes = null;
-		try {
-			bytes = projectProperty.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		final ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);
-		writeBuffer.put(bytes);
-		writeBuffer.flip();
-		try {
-			view.write(projectProperty, writeBuffer);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		writeFolder(newpath, FILE_TYPE.PROJECT_FOLDER);
+		
+		String srcpath = newpath + "\\"+ "src";
+		
+		writeFolder(srcpath , FILE_TYPE.SRC_FOLDER);
+		
+		String binpath = newpath + "\\" + "bin";
+		
+		writeFolder(binpath, FILE_TYPE.BIN_FOLDER);
+		this.editorProjects.put(newpath, new Project(newpath, name));
 
 		DEBUG.debugmessage("PROYECTO CREADO");
+		
+
+		
+		
 
 	}
 
@@ -180,13 +220,13 @@ public class FileManager {
 					UserDefinedFileAttributeView.class);
 			ByteBuffer readBuffer = null;
 			try {
-				readBuffer = ByteBuffer.allocate(view.size(projectProperty));
+				readBuffer = ByteBuffer.allocate(view.size(FILE_PROPERTIES.projectProperty));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			try {
-				view.read(projectProperty, readBuffer);
+				view.read(FILE_PROPERTIES.projectProperty, readBuffer);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -194,7 +234,7 @@ public class FileManager {
 			readBuffer.flip();
 			try {
 				final String valueFromAttributes = new String(readBuffer.array(), "UTF-8");
-				if (valueFromAttributes.equals(this.projectProperty)) {
+				if (valueFromAttributes.equals(FILE_PROPERTIES.projectProperty)) {
 					DEBUG.debugmessage("FOUND A PROJECT");
 					this.editorProjects.put(dir.getAbsolutePath(), new Project(dir.getAbsolutePath(), dir.getName()));
 				}
@@ -242,7 +282,7 @@ public class FileManager {
 	// significa que hay un fichero abierto en el editor , se guardarán antes los
 	// cambios en su correspondiente
 	// textfile
-	public String openTextFile(String name, String path, String contents , String project) {
+	public String openTextFile(String name, String path, String contents, String project) {
 
 		DEBUG.debugmessage("SE HA LLAMADO A OPENTEXTFILE EN FILEMANAGER");
 		if (currentFocus != null) {

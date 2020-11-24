@@ -84,7 +84,7 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 			File newProject = (File) eventList2.get(0);
 			ProjectTree tree = new ProjectTree(newProject, newProject.getPath());
 			trees.put(newProject.getPath(), tree);
-			fileExplorerPanel.add(tree);
+			fileExplorerPanel.addProjectTree(tree);
 			fileExplorerPanel.updateUI();
 
 			break;

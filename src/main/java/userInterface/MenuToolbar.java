@@ -13,6 +13,9 @@ import javax.swing.JPanel;
 
 import core.DEBUG;
 import core.DeveloperComponent;
+import fileManagement.WorkSpace;
+import userInterface.fileEditing.newProjectDialog;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -95,9 +98,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				DEBUG.debugmessage("SE HA PULSADO EL BOTON FOLDER");
-				uiController.run(() -> developerComponent.selectFocusedFolder());
-				// uiController.run(() -> developerComponent.getAllFiles());
+				newProjectDialog d = new newProjectDialog(uiController , developerComponent);
 
 			}
 

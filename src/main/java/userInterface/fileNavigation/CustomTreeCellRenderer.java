@@ -1,9 +1,12 @@
 package userInterface.fileNavigation;
 
 import java.awt.Component;
+import java.awt.Dimension;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
+
+import fileManagement.FILE_TYPE;
 
 public class CustomTreeCellRenderer extends DefaultTreeCellRenderer{
 	
@@ -19,7 +22,9 @@ public class CustomTreeCellRenderer extends DefaultTreeCellRenderer{
 		
 		CustomTreeNode thisnode = (CustomTreeNode)value; 
 		
-		NodeMiniPanel returning = new NodeMiniPanel(thisnode.name , "Icons/warning_icon.png", sel , hasFocus , leaf);
+		
+		NodeMiniPanel returning = new NodeMiniPanel(thisnode.name , sel , hasFocus , leaf , thisnode.path);
+		
 		return returning; 
 	}
 	

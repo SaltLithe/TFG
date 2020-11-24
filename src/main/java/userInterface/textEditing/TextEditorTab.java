@@ -1,7 +1,6 @@
 package userInterface.textEditing;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -15,15 +14,13 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
-
+import org.fife.ui.autocomplete.*;
 import core.DEBUG;
 import core.DeveloperComponent;
 import network.WriteMessage;
 import userInterface.UIController;
 
-
-
-public class TextEditorTab    {
+public class TextEditorTab {
 	public JPanel panel;
 	public RSyntaxTextArea textEditorArea;
 	private RTextScrollPane textEditorScrollPane;
@@ -34,37 +31,34 @@ public class TextEditorTab    {
 	private int columnnum;
 	private int lastCaretPos;
 	private int newCaretPos;
-	private boolean isFocus = false; 
-	private UIController uiController; 
-	private DeveloperComponent developerComponent; 
-	private String path; 
-	public boolean unsavedChanges; 
-	public TabMiniPanel miniPanel; 
-	public boolean notConsideredChanges; 
-	private String project; 
+	private boolean isFocus = false;
+	private UIController uiController;
+	private DeveloperComponent developerComponent;
+	private String path;
+	public boolean unsavedChanges;
+	public TabMiniPanel miniPanel;
+	public boolean notConsideredChanges;
+	private String project;
 	public String name;
-	
-	
+	private CompletionProvider provider;
+	private AutoCompletion ac;
+
 	public void setTextEditorCode(String code) {
 
-		
 		linenum = 1;
 		columnnum = 1;
 		lastCaretPos = 1;
 		newCaretPos = 1;
-		notConsideredChanges = true; 
+		notConsideredChanges = true;
 
 		textEditorArea.setText(code);
-		
-		
-		isFocus = true; 
-		
+
+		isFocus = true;
 
 	}
 
 	public void updateContents(ArrayList<Object> results) {
-		
-		
+
 		boolean adding = (boolean) results.get(2);
 
 		messageWrite = true;
@@ -78,12 +72,10 @@ public class TextEditorTab    {
 			int lenght = (int) results.get(1);
 			textEditorArea.replaceRange(null, caret, caret + lenght);
 
-			
 		}
 
-
 	}
-	
+
 	protected void updateStatus(int linenum, int columnnum, int caretpos) {
 		this.linenum = linenum;
 		this.columnnum = columnnum;
@@ -91,31 +83,35 @@ public class TextEditorTab    {
 		newCaretPos = caretpos;
 
 	}
-	
-	public TextEditorTab(String path , TabMiniPanel miniPanel, String project) {
-		DEBUG.debugmessage("Se ha creado un tab para el fichero en la direccion : " + path);
-		this.project = project; 
 
-		notConsideredChanges = false; 
-		this.miniPanel = miniPanel; 
-		unsavedChanges = false; 
-		this.path = path; 
-		uiController = UIController.getInstance(); 
+	public TextEditorTab(String path, TabMiniPanel miniPanel, String project) {
+		DEBUG.debugmessage("Se ha creado un tab para el fichero en la direccion : " + path);
+		this.project = project;
+
+		notConsideredChanges = false;
+		this.miniPanel = miniPanel;
+		unsavedChanges = false;
+		this.path = path;
+		uiController = UIController.getInstance();
 		developerComponent = uiController.getDeveloperComponent();
-		
+
 		lastLenght = 0;
 		newLenght = 0;
 		messageWrite = false;
 
-		panel = new JPanel(); 
+		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
-		
+
 		textEditorArea = new RSyntaxTextArea();
-	
+
 		textEditorArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 		textEditorArea.setCodeFoldingEnabled(true);
-	
-		
+
+		provider = createCompletionProvider();
+
+		ac = new AutoCompletion(provider);
+		ac.install(textEditorArea);
+
 		try {
 			Theme theme = Theme.load(getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/dark.xml"));
 			theme.apply(textEditorArea);
@@ -124,114 +120,108 @@ public class TextEditorTab    {
 		}
 		textEditorScrollPane = new RTextScrollPane(textEditorArea);
 		panel.add(textEditorScrollPane, BorderLayout.CENTER);
-		
-		
+
 		textEditorArea.addCaretListener(new CaretListener() {
 			public void caretUpdate(CaretEvent e) {
-	
+
 				int linenum = 0;
 				int columnnum = 0;
 				int caretpos = 0;
 				lastLenght = textEditorArea.getText().length();
 				try {
-	
+
 					caretpos = textEditorArea.getCaretPosition();
 					linenum = textEditorArea.getLineOfOffset(caretpos);
 					columnnum = caretpos - textEditorArea.getLineStartOffset(linenum);
 					linenum += 1;
-	
+
 				}
-	
+
 				catch (Exception ex) {
 				}
 				updateStatus(linenum, columnnum, caretpos);
-	
+
 			}
-	
+
 		});
 		
+		
+
 		textEditorArea.getDocument().addDocumentListener(new DocumentListener() {
-	
+
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				
-				
+
 				DEBUG.debugmessage("Pero saltas o no saltas");
 				newLenght = textEditorArea.getText().length();
-	
-				if(notConsideredChanges) {
-					
+
+				if (notConsideredChanges) {
+
 					notConsideredChanges = false;
-				}else {
-					
-					unsavedChanges = true; 
+				} else {
+
+					unsavedChanges = true;
 					miniPanel.setAsUnsaved();
 
 				}
-				
-				
-				
+
 				if (!messageWrite) {
 
 					if (newLenght > lastLenght) {
 
 						// Mas o menos detecta bastante bien lo que se añade al documento
-	
+
 						WriteMessage message = new WriteMessage();
-	
+
 						int caret = textEditorArea.getCaretPosition();
 						message.caret = caret;
 						message.lenght = e.getLength();
-						message.path = path; 
-	
+						message.path = path;
+
 						int lenght = caret + e.getLength();
 						String changes = textEditorArea.getText().substring(caret, lenght);
 						System.out.println("What changed " + changes);
 						message.adding = true;
 						message.added = changes;
-						message.path = path; 
-						
+						message.path = path;
+
 						uiController.run(() -> developerComponent.sendMessageToEveryone(message));
 					}
 				}
 				messageWrite = false;
-	
+
 			}
-			
-		
+
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-	
-	
+
 				newLenght = textEditorArea.getText().length();
-				
-				if(notConsideredChanges) {
-					
+
+				if (notConsideredChanges) {
+
 					notConsideredChanges = false;
-				}else {
-					
-					unsavedChanges = true; 
+				} else {
+
+					unsavedChanges = true;
 					miniPanel.setAsUnsaved();
 				}
-				
-	
+
 				if (!messageWrite) {
 
 					if (newLenght < lastLenght) {
 
-	
 						System.out.println("Last caret " + lastCaretPos + "New caret " + newCaretPos);
 						int changelenght = lastCaretPos - newCaretPos;
 						if (changelenght < 0) {
 							DEBUG.debugmessage("ESTO NO TENDRA QUE PASAR");
 						}
 						DEBUG.debugmessage("DIFFERENCE IS : " + changelenght);
-	
+
 						/*
 						 * DEBUG.debugmessage("DELETED THE FOLLOWING : " +
 						 * textEditorArea.getText().substring(newCaretPos, newCaretPos + changelenght));
 						 */
-	
+
 						WriteMessage message = new WriteMessage();
 						message.adding = false;
 						// message.caret = newCaretPos - 1;
@@ -242,37 +232,70 @@ public class TextEditorTab    {
 				}
 				messageWrite = false;
 			}
+
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				// TODO Auto-generated method stub
-	
+
 			}
-	
+
 		});
-		
-		
+
 		panel.setVisible(true);
-		}
+	}
+
+	public String getContents() {
+		// TODO Auto-generated method stub
+		return this.textEditorArea.getText();
+	}
+
+	public void setAsSaved() {
+		this.unsavedChanges = false;
+		this.miniPanel.setAsSaved();
+
+	}
+
+	public void setProject(String project) {
+		this.project = project;
+	}
+
+	public String getProject() {
+		// TODO Auto-generated method stub
+		return project;
+	}
 	
-		public String getContents() {
-			// TODO Auto-generated method stub
-			return this.textEditorArea.getText();
-		}
+	   private CompletionProvider createCompletionProvider() {
 
-		public void setAsSaved() {
-			this.unsavedChanges = false;
-			this.miniPanel.setAsSaved();
-			
-			
-		}
-		
-		public void setProject(String project) {
-			this.project = project; 
-		}
+		      // A DefaultCompletionProvider is the simplest concrete implementation
+		      // of CompletionProvider. This provider has no understanding of
+		      // language semantics. It simply checks the text entered up to the
+		      // caret position for a match against known completions. This is all
+		      // that is needed in the majority of cases.
+		      DefaultCompletionProvider provider = new DefaultCompletionProvider();
 
-		public String getProject() {
-			// TODO Auto-generated method stub
-			return project;
-		}
+		      // Add completions for all Java keywords. A BasicCompletion is just
+		      // a straightforward word completion.
+		      provider.addCompletion(new BasicCompletion(provider, "abstract"));
+		      provider.addCompletion(new BasicCompletion(provider, "assert"));
+		      provider.addCompletion(new BasicCompletion(provider, "break"));
+		      provider.addCompletion(new BasicCompletion(provider, "case"));
+		      // ... etc ...
+		      provider.addCompletion(new BasicCompletion(provider, "transient"));
+		      provider.addCompletion(new BasicCompletion(provider, "try"));
+		      provider.addCompletion(new BasicCompletion(provider, "void"));
+		      provider.addCompletion(new BasicCompletion(provider, "volatile"));
+		      provider.addCompletion(new BasicCompletion(provider, "while"));
+
+		      // Add a couple of "shorthand" completions. These completions don't
+		      // require the input text to be the same thing as the replacement text.
+		      provider.addCompletion(new ShorthandCompletion(provider, "sysout",
+		            "System.out.println(", "System.out.println("));
+		      provider.addCompletion(new ShorthandCompletion(provider, "syserr",
+		            "System.err.println(", "System.err.println("));
+
+		      return provider;
+
+		   }
+
 
 }

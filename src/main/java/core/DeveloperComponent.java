@@ -139,7 +139,7 @@ public class DeveloperComponent extends Observable {
 		String name = fileManager.getCurrentFocus();
 
 		if (file.getType() == FileType.CLASS) {
-			String[] files = classpaths.get(project).getClassPath();
+			URLData[] files = classpaths.get(project).getClassPath();
 			String results = compile(files , className);
 			ArrayList<Object> observations = new ArrayList<Object>();
 			observations.add(ObserverActions.CONSOLE_PANEL_CONTENTS);
@@ -156,7 +156,7 @@ public class DeveloperComponent extends Observable {
 	}
 
 	// Metodo privado para llamar al compilador
-	private String compile(String[] files, String className) {
+	private String compile(URLData[] files, String className) {
 		DEBUG.debugmessage("SE HA LLAMADO A COMPILE EN DEVELOPERCOMPONENT");
 
 		return compiler.run(className,files);
@@ -210,6 +210,9 @@ public class DeveloperComponent extends Observable {
 	 * 
 	 * @param args args[0] : String Name , args[1] : String Contents
 	 */
+	
+
+	
 	public void createNewClassFile(String name, String path , String project) {
 		DEBUG.debugmessage("SE HA LLAMADO A CREATENEWCLASSFILE EN DEVELOPERCOMPONENT");
 
@@ -217,7 +220,12 @@ public class DeveloperComponent extends Observable {
 		//fileManager.updateAllFiles();
 
 	}
-
+	
+	
+	public void createNewProject(String name) {
+		fileManager.newProject(name, workSpace);
+		
+	}
 	// Metodo para recuperar un archivo dado su nombre
 	public void getFile(String name) {
 		DEBUG.debugmessage("SE HA LLAMADO A GETFILE EN DEVELOPERCOMPONENT");
