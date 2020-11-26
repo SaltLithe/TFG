@@ -47,58 +47,14 @@ public class TabMiniPanel extends JPanel{
 		this.developerComponent = uiController.getDeveloperComponent(); 
 		
 		FlowLayout flowLayout = (FlowLayout) getLayout();
-		flowLayout.setAlignment(FlowLayout.LEFT);
-		
-		
-		
+		flowLayout.setAlignment(FlowLayout.LEFT);		
+			
 		nameLabel = new JLabel(name);
 		add(nameLabel);
 		
 		JButton closeButton = new JButton("X");
 		closeButton.setOpaque(false);
-		
-		
-		this.addMouseListener(new MouseListener() {
 			
-			@Override
-			public void mouseClicked(MouseEvent evt) {
-				
-				
-				DEBUG.debugmessage("Clicked on minitab , project is " + project);
-				ArrayList<Object> list = new ArrayList<Object>();
-				list.add(name);
-				list.add(project);
-				support.notify(ObserverActions.CHANGE_TAB_FOCUS, null, list);
-				
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			
-		});
-		
 		closeButton.addActionListener(new ActionListener() {
 
 			@Override

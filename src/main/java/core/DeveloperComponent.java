@@ -36,6 +36,7 @@ import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
+import userInterface.runConfigDialog;
 import userInterface.fileNavigation.CustomTreeNode;
 
 public class DeveloperComponent extends Observable {
@@ -49,6 +50,12 @@ public class DeveloperComponent extends Observable {
 	private AsynchronousServer server;
 	private AsynchronousClient client;
 	private int defaultQueueSize = 100;
+	
+	
+	private String focusedProject;
+	private HashMap<String , String> projectFocusPairs;
+	
+	
 	
 	private WorkSpace workSpace; 
 	private HashMap<String,ClassPath> classpaths; 
@@ -100,6 +107,9 @@ public class DeveloperComponent extends Observable {
 	{
 		DEBUG.debugmessage("SE HA CREADO UNA INSTANCIA DE DEVELOPERCOMPONENT");
 
+		focusedProject = null; 
+		projectFocusPairs = new HashMap<String,String>(); 
+		
 		classpaths = new HashMap<String,ClassPath>();
 		support = PropertyChangeMessenger.getInstance();
 		this.workSpace = workSpace; 
@@ -129,28 +139,42 @@ public class DeveloperComponent extends Observable {
 		
 		fileManager.scanWorkSpace(workSpace);	}
 
+	
+	private boolean stillExists(String name) {
+		
+		File f = new File(name);
+		
+		
+		return f.exists();
+	}
+	
 	// Metodo publico para ejecutar código que maneja solo si ejecutar clase o
 	// script
-	public String run(String className, String project) throws IOException {
+	public void run( String focusedClassName) throws IOException {
 
 		DEBUG.debugmessage("SE HA LLAMADO A RUN EN DEVELOPERCOMPONENT");
 
-		TextFile file = fileManager.getCurrentTextFile();
-		String name = fileManager.getCurrentFocus();
+		if(focusedProject == null ||focusedProject == "" || !stillExists(focusedProject)) {
+			JOptionPane.showMessageDialog(this.developerMainFrame,
+				    "There is no project selected or the project you are trying to run does not exist, choose a tab from a project to run.",
+				    "Run error",
+				    JOptionPane.ERROR_MESSAGE);
+		}else {
 
-		if (file.getType() == FileType.CLASS) {
-			URLData[] files = classpaths.get(project).getClassPath();
-			String results = compile(files , className);
+			URLData[] files = classpaths.get(focusedProject).getClassPath();
+
+	if(focusedClassName != null && focusedClassName != "" && stillExists(focusedClassName)) {
+		
+			String results = compile(files , focusedClassName);
 			ArrayList<Object> observations = new ArrayList<Object>();
 			observations.add(ObserverActions.CONSOLE_PANEL_CONTENTS);
 			observations.add(results);
 			notifyObservers(observations);
-			return results;
-		} else if (file.getType() == FileType.SCRIPT) {
-			return interpret(file.getContent());
-
-		} else {
-			return null;
+		}else {
+			
+			runConfigDialog d = new runConfigDialog(this,files);
+			
+		}
 		}
 
 	}
@@ -383,6 +407,23 @@ if(n == JOptionPane.OK_OPTION) {
 		return null;
 	}
 
+	public void setProjectFocus(String project) {
+
+		DEBUG.debugmessage("SETTING PROJECT FOCUS TO" + project);
+		this.focusedProject = project; 
+	}
+
+	public void updateFocusedPair(String name) {
+		try {
+		projectFocusPairs.put(this.focusedProject, name);
+		}
+		catch(Exception e) {
+			
+		}
+		
+	}
+
+	
 
 
 }

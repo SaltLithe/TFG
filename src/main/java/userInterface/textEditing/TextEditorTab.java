@@ -1,12 +1,16 @@
 package userInterface.textEditing;
 
 import java.awt.BorderLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -20,8 +24,7 @@ import core.DeveloperComponent;
 import network.WriteMessage;
 import userInterface.UIController;
 
-public class TextEditorTab {
-	public JPanel panel;
+public class TextEditorTab extends JPanel {
 	public RSyntaxTextArea textEditorArea;
 	private RTextScrollPane textEditorScrollPane;
 	private int lastLenght;
@@ -40,8 +43,7 @@ public class TextEditorTab {
 	public boolean notConsideredChanges;
 	private String project;
 	public String name;
-	private CompletionProvider provider;
-	private AutoCompletion ac;
+
 
 	public void setTextEditorCode(String code) {
 
@@ -99,18 +101,12 @@ public class TextEditorTab {
 		newLenght = 0;
 		messageWrite = false;
 
-		panel = new JPanel();
-		panel.setLayout(new BorderLayout());
+		setLayout(new BorderLayout());
 
 		textEditorArea = new RSyntaxTextArea();
 
 		textEditorArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 		textEditorArea.setCodeFoldingEnabled(true);
-
-		provider = createCompletionProvider();
-
-		ac = new AutoCompletion(provider);
-		ac.install(textEditorArea);
 
 		try {
 			Theme theme = Theme.load(getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/dark.xml"));
@@ -119,8 +115,9 @@ public class TextEditorTab {
 			ioe.printStackTrace();
 		}
 		textEditorScrollPane = new RTextScrollPane(textEditorArea);
-		panel.add(textEditorScrollPane, BorderLayout.CENTER);
-
+		add(textEditorScrollPane, BorderLayout.CENTER);
+		
+		
 		textEditorArea.addCaretListener(new CaretListener() {
 			public void caretUpdate(CaretEvent e) {
 
@@ -241,7 +238,7 @@ public class TextEditorTab {
 
 		});
 
-		panel.setVisible(true);
+		setVisible(true);
 	}
 
 	public String getContents() {
@@ -264,38 +261,7 @@ public class TextEditorTab {
 		return project;
 	}
 	
-	   private CompletionProvider createCompletionProvider() {
-
-		      // A DefaultCompletionProvider is the simplest concrete implementation
-		      // of CompletionProvider. This provider has no understanding of
-		      // language semantics. It simply checks the text entered up to the
-		      // caret position for a match against known completions. This is all
-		      // that is needed in the majority of cases.
-		      DefaultCompletionProvider provider = new DefaultCompletionProvider();
-
-		      // Add completions for all Java keywords. A BasicCompletion is just
-		      // a straightforward word completion.
-		      provider.addCompletion(new BasicCompletion(provider, "abstract"));
-		      provider.addCompletion(new BasicCompletion(provider, "assert"));
-		      provider.addCompletion(new BasicCompletion(provider, "break"));
-		      provider.addCompletion(new BasicCompletion(provider, "case"));
-		      // ... etc ...
-		      provider.addCompletion(new BasicCompletion(provider, "transient"));
-		      provider.addCompletion(new BasicCompletion(provider, "try"));
-		      provider.addCompletion(new BasicCompletion(provider, "void"));
-		      provider.addCompletion(new BasicCompletion(provider, "volatile"));
-		      provider.addCompletion(new BasicCompletion(provider, "while"));
-
-		      // Add a couple of "shorthand" completions. These completions don't
-		      // require the input text to be the same thing as the replacement text.
-		      provider.addCompletion(new ShorthandCompletion(provider, "sysout",
-		            "System.out.println(", "System.out.println("));
-		      provider.addCompletion(new ShorthandCompletion(provider, "syserr",
-		            "System.err.println(", "System.err.println("));
-
-		      return provider;
-
-		   }
+	
 
 
 }

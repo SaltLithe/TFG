@@ -1,34 +1,25 @@
 package userInterface.textEditing;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.TextArea;
 import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
-import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import core.DEBUG;
 import core.DeveloperComponent;
-import network.WriteMessage;
 import userInterface.ObserverActions;
 import userInterface.UIController;
 
@@ -38,7 +29,7 @@ import userInterface.UIController;
  * 
  */
 @SuppressWarnings("serial")
-public class TextEditorPanel extends JPanel implements PropertyChangeListener {
+public class TextEditorPanel extends JPanel implements PropertyChangeListener{
 
 	
 	
@@ -54,6 +45,8 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	private UIController uicontroller;
 	private DeveloperComponent developerComponent;
 	private HashMap <String,TextEditorTab> tabCollection;
+	
+	
 
 	private Color dark = new Color(70, 70, 70);
 
@@ -92,6 +85,8 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 		this.toolbar = toolbar;
 		tabPane = new JTabbedPane();
+		
+		
 		tabPane.setTabLayoutPolicy(1);
 		
 		
@@ -128,11 +123,39 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	
 	public void addTab(String name , String path , String project) {
 		
+		
+		this.developerComponent.setProjectFocus(project);
 		TabMiniPanel mp1 = new TabMiniPanel(name,path,project);
         TextEditorTab tab = new TextEditorTab(path,mp1, project);
         mp1.setParent(tab);
-		tabPane.addTab("", tab.panel);
-		int index = tabPane.indexOfComponent(tab.panel);
+        
+      
+        
+       
+		tabPane.addTab("", tab);
+		tabPane.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+
+				
+				DEBUG.debugmessage("CAMBIA CAMBIA");
+				try {
+					
+					 JTabbedPane tabbedPane = (JTabbedPane) e.getSource();
+				        TextEditorTab selected = (TextEditorTab) tabbedPane.getSelectedComponent();
+				       developerComponent.setProjectFocus(selected.getProject());
+				        
+				        
+				        
+				}
+				catch(Exception excp) {}
+			}
+			
+			
+			
+		});
+		int index = tabPane.indexOfComponent(tab);
 		
 		tabPane.setTabComponentAt(index, mp1);
 		this.tabCollection.put(path, tab);
@@ -178,6 +201,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			String project = (String) results.get(3);
 			
 			this.addTab(filename, path , project);
+			
 			this.setFullText(path, contents);
 		
 			}
@@ -187,7 +211,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			String closingpath = (String) results.get(0);
 			if(this.tabCollection.containsKey(closingpath)) {
 				TextEditorTab removing = tabCollection.get(closingpath);
-				int closingindex = tabPane.indexOfComponent(removing.panel);
+				int closingindex = tabPane.indexOfComponent(removing);
 				tabPane.remove(closingindex);
 				this.tabCollection.remove(closingpath);
 				
@@ -208,9 +232,10 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	}
 
 	public void CloseTab(String path) {
-		this.tabPane.remove(tabPane.indexOfComponent(tabCollection.get(path).panel));
+		this.tabPane.remove(tabPane.indexOfComponent(tabCollection.get(path)));
 		
 	}
+
 
 	
 

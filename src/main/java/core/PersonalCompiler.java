@@ -36,7 +36,6 @@ public class PersonalCompiler {
 	PrintStream out2 = new PrintStream(outbaos);
 	private PropertyChangeMessenger support;
 	ConsoleWrapper console;
-
 	PrintStream stdout = System.out;
 	PrintStream stderr = System.err;
 	InputStream stdin = System.in;
