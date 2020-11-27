@@ -1,63 +1,75 @@
 package core;
 
 import java.awt.Color;
-import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import userInterface.runConfigDialog;
-import userInterface.runConfigDialog;
 
 public class customRunConfigSelector  extends JPanel{
 	
-	private customRunConfigSelector  instance = this; 
 	public String name;
+	public runConfigDialog parent; 
+	
+	JLabel nameLabel;
 	
 	
  public	customRunConfigSelector(String name, runConfigDialog parent) {
+	 this.parent = parent; 
+ 	FlowLayout flowLayout = (FlowLayout) getLayout();
+ 	flowLayout.setAlignment(FlowLayout.LEFT);
  	
 	 
 	 
 	 this.name = name; 
- 	JLabel nameLabel = new JLabel(name);
+ 	nameLabel = new JLabel(name);
+ 	nameLabel.setForeground(Color.white);
  	add(nameLabel);
 	 
- 	setPreferredSize(this.getPreferredSize());
-	setOpaque(false);
-	setBackground(Color.blue);
+ 	
+ 
+ 	setMinimumSize(new Dimension(parent.getWidth(), 25));
+ 	setPreferredSize(new Dimension(parent.getWidth(), 25));
+ 	setMaximumSize(new Dimension(parent.getWidth(),25));
+
+ 	setOpaque(false);
 	 
 	addMouseListener(new MouseListener() {
 
 		@Override
-		public void mouseClicked(java.awt.event.MouseEvent arg0) {
-			
-			parent.clickedOption(name);
+		public void mouseClicked(MouseEvent arg0) {
+			DEBUG.debugmessage("CLICKED ON RUN CONFIG SELECTOR");
+			customRunConfigSelector component = (customRunConfigSelector) arg0.getComponent();
+			component.parent.clickedOption(name);
 		
 			
 		}
 
 		@Override
-		public void mouseEntered(java.awt.event.MouseEvent arg0) {
+		public void mouseEntered(MouseEvent arg0) {
 			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
-		public void mouseExited(java.awt.event.MouseEvent arg0) {
+		public void mouseExited(MouseEvent arg0) {
 			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
-		public void mousePressed(java.awt.event.MouseEvent arg0) {
+		public void mousePressed(MouseEvent arg0) {
 			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
-		public void mouseReleased(java.awt.event.MouseEvent arg0) {
+		public void mouseReleased(MouseEvent arg0) {
 			// TODO Auto-generated method stub
 			
 		}
@@ -72,13 +84,23 @@ public class customRunConfigSelector  extends JPanel{
 
 
 public void setUnselected() {
+	DEBUG.debugmessage("SETTING DESELECTED");
 
-	this.setOpaque(true);
+	setOpaque(false);
+	nameLabel.setForeground(Color.white);
+
+	updateUI();
 	
 } 
 
 public void setSelected() {
-	this.setOpaque(false);
+	DEBUG.debugmessage("SETTING SELECTED");
+	setOpaque(true);
+	setBackground(Color.lightGray);
+	nameLabel.setForeground(Color.black);
+	
+	updateUI(); 
+
 }
 
 

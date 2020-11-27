@@ -87,7 +87,7 @@ public class TextEditorToolbar extends JPanel implements PropertyChangeListener 
 				
 				uiController.run(()->{
 					try {
-						developerComponent.run(currentTabName);
+						developerComponent.run();
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();

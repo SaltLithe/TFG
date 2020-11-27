@@ -150,7 +150,7 @@ public class DeveloperComponent extends Observable {
 	
 	// Metodo publico para ejecutar código que maneja solo si ejecutar clase o
 	// script
-	public void run( String focusedClassName) throws IOException {
+	public void run( ) throws IOException {
 
 		DEBUG.debugmessage("SE HA LLAMADO A RUN EN DEVELOPERCOMPONENT");
 
@@ -163,9 +163,11 @@ public class DeveloperComponent extends Observable {
 
 			URLData[] files = classpaths.get(focusedProject).getClassPath();
 
+		String focusedClassName = projectFocusPairs.get(focusedProject);
 	if(focusedClassName != null && focusedClassName != "" && stillExists(focusedClassName)) {
 		
-			String results = compile(files , focusedClassName);
+			String subname = focusedClassName.substring(focusedClassName.lastIndexOf("\\")+1,focusedClassName.length());
+			String results = compile(files , subname);
 			ArrayList<Object> observations = new ArrayList<Object>();
 			observations.add(ObserverActions.CONSOLE_PANEL_CONTENTS);
 			observations.add(results);
