@@ -102,7 +102,10 @@ public class runConfigDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				
+				if(lastSelected != null) {
+					developerComponent.updateFocusedPair(lastSelected.name); 
+					//developerComponent.run();
+					}
 			
 
 			}

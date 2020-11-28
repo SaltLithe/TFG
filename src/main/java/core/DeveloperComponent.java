@@ -150,7 +150,7 @@ public class DeveloperComponent extends Observable {
 	
 	// Metodo publico para ejecutar código que maneja solo si ejecutar clase o
 	// script
-	public void run( ) throws IOException {
+	private void run( ) throws IOException {
 
 		DEBUG.debugmessage("SE HA LLAMADO A RUN EN DEVELOPERCOMPONENT");
 
@@ -297,16 +297,13 @@ public class DeveloperComponent extends Observable {
 
 	// Metodo que gestiona una unica ejecucion local del archivo abierto actualmente
 	// en el editor
-	public String runLocal(String editorContents) {
+	public void run (boolean global) {
 
-		DEBUG.debugmessage("SE HA LLAMADO A RUNLOCAL EN DEVELOPERCOMPONENT CON CONTENIDOS " + editorContents);
 
-		try {
-			fileManager.saveCurrentFile(editorContents , null);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
+		
+		
+		
+		
 		/*
 		 * Usamos un future para que devuelva el resultado del codigo de una forma mas
 		 * limpia , ademas de que la ejecucion se hace en otro hilo
@@ -318,7 +315,6 @@ public class DeveloperComponent extends Observable {
 	//	Thread t = new Thread(() -> executor.submit(() -> run()));
 		//t.start();
 
-		return null;
 
 	}
 

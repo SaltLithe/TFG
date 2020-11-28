@@ -26,6 +26,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JMenu;
 import javax.swing.JToolBar;
 import java.awt.Component;
+import javax.swing.ImageIcon;
 
 /*Clase que contiene todos los botones del menu superior de la aplicacion y que implementa sus 
  * comportamientos
@@ -43,6 +44,9 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 	JButton save;
 	JButton saveAll;
 	JMenuItem newProjectMenuItem;
+	private JButton runGlobalButton;
+	private JButton terminateProcessButton;
+	private JButton runLocalButton;
 	private void enableSaveButtons() {
 
 		save.setEnabled(true);
@@ -88,10 +92,24 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 		add(toolBar);
 		
 		 save = new JButton("Save");
+		 save.setIcon(new ImageIcon("Icons\\save_icon.png"));
 		toolBar.add(save);
 		
 		 saveAll = new JButton("Save All");
+		 saveAll.setIcon(new ImageIcon("Icons\\saveAll_icon.png"));
 		toolBar.add(saveAll);
+		
+		runLocalButton = new JButton("Run Locally");
+		runLocalButton.setIcon(new ImageIcon("Icons\\runLocal_icon.png"));
+		toolBar.add(runLocalButton);
+		
+		runGlobalButton = new JButton("Run Globally");
+		runGlobalButton.setIcon(new ImageIcon("Icons\\runGlobal_icon.png"));
+		toolBar.add(runGlobalButton);
+		
+		terminateProcessButton = new JButton("Terminate Run");
+		terminateProcessButton.setIcon(new ImageIcon("Icons\\terminateProcess_icon.png"));
+		toolBar.add(terminateProcessButton);
 		
 		
 		newProjectMenuItem.addActionListener(new ActionListener() {

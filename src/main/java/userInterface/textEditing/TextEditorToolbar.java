@@ -86,12 +86,7 @@ public class TextEditorToolbar extends JPanel implements PropertyChangeListener 
 				
 				
 				uiController.run(()->{
-					try {
-						developerComponent.run();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+					developerComponent.run(false);
 				});
 
 			}
@@ -119,7 +114,7 @@ public class TextEditorToolbar extends JPanel implements PropertyChangeListener 
 	private void runLocal() {
 		DEBUG.debugmessage("SE HA LLAMADO A RUNLOCAL EN TEXTEDITORTOOLBAR");
 		String contents = developerMainFrame.getEditorPanelContents();
-		uiController.run(() -> developerComponent.runLocal(contents));
+		//uiController.run(() -> developerComponent.runLocal(contents));
 
 	}
 
