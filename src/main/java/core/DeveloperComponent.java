@@ -280,10 +280,10 @@ public class DeveloperComponent extends Observable {
 
 	// Metodo que gestiona el guardao de todos los archivos de la aplicacion
 	// actuales
-	public void saveAllFiles(String editorContents) throws IOException {
+	public void saveAllFiles(String[] names, String[] contents) throws IOException {
 		DEBUG.debugmessage("SE HA LLAMADO A SAVEALLFILES EN DEVELOPERCOMPONENT");
 
-		fileManager.saveAll(editorContents);
+		fileManager.saveAllOpen(names , contents);
 	}
 
 	// Metodo que gestiona el guardado del archivo abierto actualmente en la

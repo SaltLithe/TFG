@@ -324,12 +324,12 @@ public class FileManager {
 
 	}
 
-	public void saveAllOpen(String[] contents, String[] paths) {
+	public void saveAllOpen(String[] paths, String[] contents) {
 
 		if (contents.length == paths.length) {
 			for (int i = 0; i < contents.length; i++) {
 				try {
-					saveCurrentFile(contents[i], paths[i]);
+					saveCurrentFile( paths[i], contents[i]);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

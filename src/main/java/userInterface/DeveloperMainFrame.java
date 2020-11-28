@@ -123,9 +123,6 @@ public class DeveloperMainFrame extends JFrame {
 		usersPanel.setIpIndicator(remoteaddr);
 	}
 
-	public String getEditorPanelContents() {
-		return textEditorContainer.getContents();
-
-	}
+	
 
 }

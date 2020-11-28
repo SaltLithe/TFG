@@ -245,6 +245,28 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener{
 		
 	}
 
+	public String[] getAllContents() {
+		String[] returning = new String[tabCollection.size()];
+		int count = 0 ; 
+		for ( String key : tabCollection.keySet()) {
+			returning[count] = tabCollection.get(key).getContents();
+			
+			count++;
+		}
+		return returning;
+	}
+
+	public String[] getAllNames() {
+		String[] returning = new String[tabCollection.size()];
+		int count = 0 ; 
+		for ( String key : tabCollection.keySet()) {
+			returning[count] = tabCollection.get(key).getPath();
+			
+			count++;
+		}
+		return returning;
+	}
+
 
 	
 

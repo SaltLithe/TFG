@@ -125,8 +125,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-			
-				save(textEditorContainer.getCurrentTabName(), textEditorContainer.getContents()); 
+			save();
 
 			}
 
@@ -159,7 +158,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 			
-					save(textEditorContainer.getCurrentTabName(), textEditorContainer.getContents()); 
+				save(); 
 			}
 
 		});
@@ -168,7 +167,9 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				DEBUG.debugmessage("SE HA PULSADO EL BOTON RUNLOCAL");
+				saveAll();
+				
+				
 
 			}
 
@@ -220,27 +221,35 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 	}
 	
-	private void save(String name, String contents) {
-		uiController.run(() -> {
-			try {
-				developerComponent.saveCurrentFile(name,contents);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		});
+
+	
+	private void save() {
+		
+
+		if(textEditorContainer.getCurrentTabName() != null && textEditorContainer.getContents() != null) {
+		try {
+			developerComponent.saveCurrentFile(textEditorContainer.getCurrentTabName(), textEditorContainer.getContents());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		
+		}
+		
 	}
 	
-	public void saveAll() {
+	private void saveAll() {
 		DEBUG.debugmessage("SE HA PULSADO EL BOTON SAVEALL");
-		String contents = developerMainFrame.getEditorPanelContents();
-		uiController.run(() -> {
-			try {
-				developerComponent.saveAllFiles(contents);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		});
+		String[] contents = textEditorContainer.getAllContents(); 
+		String[] names = textEditorContainer.getAllNames(); 
+		if(names.length != 0 && contents.length != 0) {
+		
+				try {
+					developerComponent.saveAllFiles(names,contents);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		
+		
+	}
 	}
 }

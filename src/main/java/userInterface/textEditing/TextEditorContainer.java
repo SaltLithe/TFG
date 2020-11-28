@@ -70,12 +70,6 @@ public class TextEditorContainer extends JPanel implements PropertyChangeListene
 	// y recupera los resultados
 	// devueltos tras la ejecucion que son mostrados en el panel de consola
 	// ARQUITECTURA A CONTROLLER CAMBIADA
-	private void runLocal() {
-		DEBUG.debugmessage("SE HA LLAMADO A RUNLOCAL EN TEXTEDITORTOOLBAR");
-		String contents = developerMainFrame.getEditorPanelContents();
-		//uiController.run(() -> developerComponent.runLocal(contents));
-
-	}
 
 
 	// Metodo que sirve para recuperar los contenidos del editor
@@ -115,4 +109,12 @@ public class TextEditorContainer extends JPanel implements PropertyChangeListene
 		return currentTabName;
 	}
 
+	public String[] getAllContents() {
+		return  textEditorPanel.getAllContents(); 
+		
+	}
+
+	public String[] getAllNames() {
+		return textEditorPanel.getAllNames();
+	}
 }
