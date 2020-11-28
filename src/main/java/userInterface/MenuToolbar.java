@@ -200,7 +200,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 				if(runningThread != null) {
 					if(runningThread.isAlive()) {
-						runningThread.interrupt();
+						runningThread.stop();
 					}
 				}
 

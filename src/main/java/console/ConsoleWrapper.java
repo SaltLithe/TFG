@@ -30,6 +30,14 @@ public class ConsoleWrapper {
 		errPrint = new OutStreamWrapper(this);
 
 	}
+	
+	public void reset() {
+		inStream = new InStreamWrapper(this);
+
+		outPrint = new OutStreamWrapper(this);
+		errPrint = new OutStreamWrapper(this);
+		
+	}
 
 	public void releaseSemaphore() {
 		inStream.releaseSemaphore();
