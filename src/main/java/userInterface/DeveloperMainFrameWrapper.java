@@ -3,7 +3,7 @@ package userInterface;
 import core.DEBUG;
 import userInterface.fileNavigation.FileExplorerToolbar;
 import userInterface.textEditing.TextEditorPanel;
-import userInterface.textEditing.TextEditorToolbar;
+import userInterface.textEditing.TextEditorContainer;
 import userInterface.fileNavigation.FileExplorerPanel;
 
 public class DeveloperMainFrameWrapper implements Runnable {
@@ -23,16 +23,16 @@ public class DeveloperMainFrameWrapper implements Runnable {
 
 	public static TextEditorPanel getTextEditorPanel() {
 		DEBUG.debugmessage(" por aqui si pasa bbbbb");
-		return instance.textEditorToolbar.textEditorPanel;
+		return instance.textEditorContainer.textEditorPanel;
 	}
 
-	public static TextEditorToolbar getTextEditorToolbar() {
-		return instance.textEditorToolbar;
+	public static TextEditorContainer getTextEditorToolbar() {
+		return instance.textEditorContainer;
 	}
 
 	public static ConsolePanel getConsolePanel() {
 		DEBUG.debugmessage("ME cago n la leche");
-		return instance.textEditorToolbar.consolePanel;
+		return instance.textEditorContainer.consolePanel;
 	}
 
 	public static FileExplorerPanel getFileExplorerPanel() {

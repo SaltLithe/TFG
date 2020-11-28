@@ -85,6 +85,12 @@ public class TextEditorTab extends JPanel {
 		newCaretPos = caretpos;
 
 	}
+	
+	public String getPath() {
+		
+		return path; 
+	}
+	
 
 	public TextEditorTab(String path, TabMiniPanel miniPanel, String project) {
 		DEBUG.debugmessage("Se ha creado un tab para el fichero en la direccion : " + path);

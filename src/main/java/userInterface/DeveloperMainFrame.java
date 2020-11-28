@@ -14,7 +14,7 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import userInterface.fileNavigation.FileExplorerToolbar;
 import userInterface.networkManagement.UsersPanel;
 import userInterface.textEditing.TextEditorPanel;
-import userInterface.textEditing.TextEditorToolbar;
+import userInterface.textEditing.TextEditorContainer;
 
 /*Clase que contiene todos los elementos necesarios para la interfaz principal de la aplicacion
  * Consiste en un frame que contiene todos los componentes necesarios y sus correspondientes separaciones
@@ -26,7 +26,7 @@ import userInterface.textEditing.TextEditorToolbar;
 @SuppressWarnings("serial")
 public class DeveloperMainFrame extends JFrame {
 
-	TextEditorToolbar textEditorToolbar;
+	TextEditorContainer textEditorContainer;
 	private Dimension screenSize;
 	FileExplorerToolbar fileExplorerToolbar;
 	UsersPanel usersPanel;
@@ -67,16 +67,16 @@ public class DeveloperMainFrame extends JFrame {
 		// Creo y configuro todos los elementos de mi interfaz
 
 		// Cambiar esto por dios
-		textEditorToolbar = new TextEditorToolbar(this);
+		textEditorContainer = new TextEditorContainer(this);
 
 		fileExplorerToolbar = new FileExplorerToolbar(this);
-		textEditorPanel = textEditorToolbar.textEditorPanel;
+		textEditorPanel = textEditorContainer.textEditorPanel;
 		fileExplorerToolbar.setPreferredSize(new Dimension(ImageObserver.HEIGHT, 500));
-		menuToolbar = new MenuToolbar(this);
+		menuToolbar = new MenuToolbar(this,textEditorContainer);
 
 		usersPanel = new UsersPanel();
 
-		explorerDivision = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, fileExplorerToolbar, textEditorToolbar);
+		explorerDivision = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, fileExplorerToolbar, textEditorContainer);
 		explorerDivision.setDividerLocation(200);
 
 		usersDivision = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, explorerDivision, usersPanel);
@@ -124,7 +124,7 @@ public class DeveloperMainFrame extends JFrame {
 	}
 
 	public String getEditorPanelContents() {
-		return textEditorToolbar.getContents();
+		return textEditorContainer.getContents();
 
 	}
 

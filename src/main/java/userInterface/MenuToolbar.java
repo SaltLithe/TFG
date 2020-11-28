@@ -1,6 +1,6 @@
 package userInterface;
 
-import java.awt.FlowLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -8,25 +8,19 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
 import core.DEBUG;
 import core.DeveloperComponent;
-import fileManagement.WorkSpace;
 import userInterface.fileEditing.newProjectDialog;
-
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import java.awt.BorderLayout;
-import javax.swing.BoxLayout;
-import javax.swing.JMenu;
-import javax.swing.JToolBar;
-import java.awt.Component;
-import javax.swing.ImageIcon;
+import userInterface.textEditing.TextEditorContainer;
 
 /*Clase que contiene todos los botones del menu superior de la aplicacion y que implementa sus 
  * comportamientos
@@ -37,16 +31,19 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 	private DeveloperComponent developerComponent;
 	private DeveloperMainFrame developerMainFrame;
 	private JMenuBar menuBar;
-
 	JMenuItem saveMenuItem;
 	JMenuItem saveAllMenuItem;
-	
 	JButton save;
 	JButton saveAll;
 	JMenuItem newProjectMenuItem;
 	private JButton runGlobalButton;
 	private JButton terminateProcessButton;
 	private JButton runLocalButton;
+	
+	private TextEditorContainer textEditorContainer;
+	
+	
+
 	private void enableSaveButtons() {
 
 		save.setEnabled(true);
@@ -56,7 +53,8 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 		saveAllMenuItem.setEnabled(true);
 	}
 
-	public MenuToolbar(DeveloperMainFrame developerMainFrame) {
+	public MenuToolbar(DeveloperMainFrame developerMainFrame , TextEditorContainer textEditorContainer) {
+		this.textEditorContainer = textEditorContainer;
 		setAlignmentY(Component.TOP_ALIGNMENT);
 		setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -128,7 +126,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 			
-				save(); 
+				save(textEditorContainer.getCurrentTabName(), textEditorContainer.getContents()); 
 
 			}
 
@@ -161,11 +159,46 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 			
-					save(); 
+					save(textEditorContainer.getCurrentTabName(), textEditorContainer.getContents()); 
 			}
 
 		});
 		
+		runLocalButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DEBUG.debugmessage("SE HA PULSADO EL BOTON RUNLOCAL");
+
+			}
+
+		});
+		
+		runGlobalButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				
+				uiController.run(()->{
+					developerComponent.run(false);
+				});
+
+			}
+
+		});
+		terminateProcessButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				// Si se esta ejecutando codigo local se activa este boton
+				// Matar al hilo de ejecucion de codigo local
+
+			}
+
+		});
+
 	menuBar.setVisible(true);
 		//this.setSize(this.getPreferredSize());
 		this.setVisible(true);
@@ -187,11 +220,10 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 	}
 	
-	private void save() {
-		String contents = developerMainFrame.getEditorPanelContents();
+	private void save(String name, String contents) {
 		uiController.run(() -> {
 			try {
-				developerComponent.saveCurrentFile(contents, null);
+				developerComponent.saveCurrentFile(name,contents);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

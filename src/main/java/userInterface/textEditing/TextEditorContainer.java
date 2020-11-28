@@ -26,12 +26,10 @@ import userInterface.UIController;
  * Qedan por implementar las funciones de ejecucion global y detener la ejecucion
  */
 @SuppressWarnings("serial")
-public class TextEditorToolbar extends JPanel implements PropertyChangeListener {
+public class TextEditorContainer extends JPanel implements PropertyChangeListener {
 
 	public TextEditorPanel textEditorPanel;
-	private JButton runLocal;
-	private JButton runGlobal;
-	private JButton terminate;
+	
 	private JSplitPane consoleDivision;
 	public ConsolePanel consolePanel;
 	String currentTabName = null;
@@ -41,7 +39,7 @@ public class TextEditorToolbar extends JPanel implements PropertyChangeListener 
 	private DeveloperComponent developerComponent;
 	private DeveloperMainFrame developerMainFrame;
 
-	public TextEditorToolbar(DeveloperMainFrame developerMainFrame) {
+	public TextEditorContainer(DeveloperMainFrame developerMainFrame) {
 
 		DEBUG.debugmessage("SE HA INVOCADO EL CONSTRUCTOR DE TEXTEDITORTOOLBAR");
 		textEditorPanel = new TextEditorPanel(this);
@@ -49,17 +47,10 @@ public class TextEditorToolbar extends JPanel implements PropertyChangeListener 
 		uiController = UIController.getInstance();
 		developerComponent = uiController.getDeveloperComponent();
 		setLayout(new BorderLayout());
-		runLocal = new JButton("Run Locally");
-		runGlobal = new JButton("Run Globally");
-		terminate = new JButton("Terminate Process");
-		terminate.setEnabled(false);
-		runLocal.setEnabled(false);
+		
 		JPanel toolbarArea = new JPanel();
 		toolbarArea.setLayout(new FlowLayout(FlowLayout.LEFT));
-		toolbarArea.add(runLocal);
-		toolbarArea.add(runGlobal);
-		toolbarArea.add(terminate);
-
+		
 		consolePanel = new ConsolePanel();
 
 		add(toolbarArea, BorderLayout.NORTH);
@@ -68,43 +59,11 @@ public class TextEditorToolbar extends JPanel implements PropertyChangeListener 
 		add(toolbarArea, BorderLayout.NORTH);
 		add(consoleDivision, BorderLayout.CENTER);
 
-		runLocal.addActionListener(new ActionListener() {
+		
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				DEBUG.debugmessage("SE HA PULSADO EL BOTON RUNLOCAL");
-				runLocal();
+	
 
-			}
-
-		});
-
-		runGlobal.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-				
-				uiController.run(()->{
-					developerComponent.run(false);
-				});
-
-			}
-
-		});
-
-		terminate.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				// Si se esta ejecutando codigo local se activa este boton
-				// Matar al hilo de ejecucion de codigo local
-
-			}
-
-		});
-
+		
 	}
 
 	// Metodo que llama al metodo run de developer component para ejecutar el codigo
@@ -118,17 +77,11 @@ public class TextEditorToolbar extends JPanel implements PropertyChangeListener 
 
 	}
 
-	// Metodo para activar los botones de este toolbar
-	public void enableButtons() {
-		runLocal.setEnabled(true);
-		runGlobal.setEnabled(true);
-		terminate.setEnabled(true);
-	}
 
 	// Metodo que sirve para recuperar los contenidos del editor
 	public String getContents() {
 		DEBUG.debugmessage("SE HA LLAMADO A GETCONTENTS EN TEXTEDITORTOOLBAR");
-		return textEditorPanel.getContents();
+		return textEditorPanel.getContents(currentTabName);
 
 	}
 
@@ -143,7 +96,6 @@ public class TextEditorToolbar extends JPanel implements PropertyChangeListener 
 		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
 		switch (action) {
 		case ENABLE_TEXTEDITORTOOLBAR_BUTTONS:
-			enableButtons();
 			break;
 			
 		case CHANGE_TAB_FOCUS:
@@ -156,6 +108,11 @@ public class TextEditorToolbar extends JPanel implements PropertyChangeListener 
 			break;
 		}
 
+	}
+
+	public String getCurrentTabName() {
+
+		return currentTabName;
 	}
 
 }

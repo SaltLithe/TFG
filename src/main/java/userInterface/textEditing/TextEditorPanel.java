@@ -1,8 +1,6 @@
 package userInterface.textEditing;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeEvent;
@@ -15,12 +13,12 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import core.DEBUG;
 import core.DeveloperComponent;
 import userInterface.ObserverActions;
+import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
 
 /*Clase que contiene el editor de texto usando un elemento del tipo RSyntaxTextArea 
@@ -34,26 +32,24 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener{
 	
 	
 	
-	private RSyntaxTextArea textEditorArea;
 	private RTextScrollPane textEditorScrollPane;
 	private JTabbedPane tabPane;
 
 	private String focus = null;
 
 	private int newCaretPos;
-	private TextEditorToolbar toolbar;
+	private TextEditorContainer toolbar;
 	private UIController uicontroller;
 	private DeveloperComponent developerComponent;
 	private HashMap <String,TextEditorTab> tabCollection;
+	private PropertyChangeMessenger propertyChangeMessenger; 
 	
 	
 
-	private Color dark = new Color(70, 70, 70);
 
 	// Activa el editor de texto
 	public void enableTextEditorArea() {
 
-		textEditorArea.setEnabled(true);
 	}
 
 	// Metodo para poner el focus del editor
@@ -72,7 +68,8 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener{
 	// el focus actual
 
 
-	public TextEditorPanel(TextEditorToolbar toolbar) {
+	public TextEditorPanel(TextEditorContainer toolbar) {
+		propertyChangeMessenger = PropertyChangeMessenger.getInstance();
 
 		uicontroller = UIController.getInstance();
 		developerComponent = uicontroller.getDeveloperComponent();
@@ -90,7 +87,6 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener{
 		tabPane.setTabLayoutPolicy(1);
 		
 		
-		int numPruebas = 20 ; 
 
 		this.add(tabPane,BorderLayout.CENTER);
 		
@@ -109,17 +105,26 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener{
 	// Metodo que recupera los contenidos del editor de texto
 
 
+	private void updateContainer(String currentProject , String currentTab) {
+		
+		ArrayList<Object> list = new ArrayList<Object>(); 
+		list.add(currentTab);
+		list.add(currentProject);
+		
+		propertyChangeMessenger.notify(ObserverActions.CHANGE_TAB_FOCUS, null, list);
+		
+		
+		
+		
+	}
 
-	public String getContents() {
+	public String getContents(String name) {
 
-		return textEditorArea.getText();
+		return tabCollection.get(name).getContents();
 	}
 
 	// Metodo para activar el editor de texto
-	public void enableEditor() {
-		textEditorArea.setEnabled(true);
 
-	}
 	
 	public void addTab(String name , String path , String project) {
 		
@@ -135,6 +140,8 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener{
 		tabPane.addTab("", tab);
 		tabPane.addChangeListener(new ChangeListener() {
 
+			
+			
 			@Override
 			public void stateChanged(ChangeEvent e) {
 
@@ -145,7 +152,8 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener{
 					 JTabbedPane tabbedPane = (JTabbedPane) e.getSource();
 				        TextEditorTab selected = (TextEditorTab) tabbedPane.getSelectedComponent();
 				       developerComponent.setProjectFocus(selected.getProject());
-				        
+						updateContainer(tab.getProject(), tab.getPath());
+
 				        
 				        
 				}
@@ -158,8 +166,9 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener{
 		int index = tabPane.indexOfComponent(tab);
 		
 		tabPane.setTabComponentAt(index, mp1);
-		this.tabCollection.put(path, tab);
 		
+		this.tabCollection.put(path, tab);
+		updateContainer(tab.getProject(), tab.getPath());
 		
 		
 		

@@ -368,7 +368,7 @@ public class FileManager {
 	}
 
 //Metodo para guardar unicamente el fichero en el focus 
-	public void saveCurrentFile(String editorcontents, String path) throws IOException {
+	public void saveCurrentFile( String path,String editorcontents) throws IOException {
 		DEBUG.debugmessage("SE HA LLAMADO A SAVECURRENTFILE EN FILEMANAGER");
 		// File file = this.returnSingleFile(currentFocus);
 		File file = new File(path);
