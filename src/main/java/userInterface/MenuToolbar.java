@@ -41,7 +41,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 	private JButton runLocalButton;
 	
 	private TextEditorContainer textEditorContainer;
-	
+	private Thread runningThread;
 	
 
 	private void enableSaveButtons() {
@@ -163,13 +163,18 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 		});
 		
+		
+		
 		runLocalButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				saveAll();
+				runningThread = new Thread (()-> developerComponent.run(false));
+				runningThread.start();
 				
 				
+	
 
 			}
 
@@ -193,8 +198,11 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				// Si se esta ejecutando codigo local se activa este boton
-				// Matar al hilo de ejecucion de codigo local
+				if(runningThread != null) {
+					if(runningThread.isAlive()) {
+						runningThread.interrupt();
+					}
+				}
 
 			}
 

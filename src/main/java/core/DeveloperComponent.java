@@ -300,20 +300,22 @@ public class DeveloperComponent extends Observable {
 	public void run (boolean global) {
 
 
+		if(global) {
+			
+			
+		}else {
+			
+			try {
+				run();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+		}
+	
 		
 		
 		
-		
-		/*
-		 * Usamos un future para que devuelva el resultado del codigo de una forma mas
-		 * limpia , ademas de que la ejecucion se hace en otro hilo
-		 * 
-		 * Future<String> future = executor.submit(() -> run()); try { return
-		 * future.get(); } catch (InterruptedException e) { e.printStackTrace(); } catch
-		 * (ExecutionException e) { e.printStackTrace(); }
-		 */
-	//	Thread t = new Thread(() -> executor.submit(() -> run()));
-		//t.start();
 
 
 	}
