@@ -22,6 +22,8 @@ import org.fife.ui.autocomplete.*;
 import core.DEBUG;
 import core.DeveloperComponent;
 import network.WriteMessage;
+import userInterface.ObserverActions;
+import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
 
 public class TextEditorTab extends JPanel {
@@ -40,9 +42,11 @@ public class TextEditorTab extends JPanel {
 	private String path;
 	public boolean unsavedChanges;
 	public TabMiniPanel miniPanel;
+	boolean blockMessaging;
 	public boolean notConsideredChanges;
 	private String project;
 	public String name;
+	private PropertyChangeMessenger support;
 
 
 	public void setTextEditorCode(String code) {
@@ -56,6 +60,7 @@ public class TextEditorTab extends JPanel {
 		textEditorArea.setText(code);
 
 		isFocus = true;
+		blockMessaging= false; 
 
 	}
 
@@ -94,9 +99,12 @@ public class TextEditorTab extends JPanel {
 
 	public TextEditorTab(String path, TabMiniPanel miniPanel, String project) {
 		DEBUG.debugmessage("Se ha creado un tab para el fichero en la direccion : " + path);
+		
 		this.project = project;
+		blockMessaging = true; 
 
-		notConsideredChanges = false;
+		support = PropertyChangeMessenger.getInstance(); 
+		notConsideredChanges = true;
 		this.miniPanel = miniPanel;
 		unsavedChanges = false;
 		this.path = path;
@@ -165,9 +173,12 @@ public class TextEditorTab extends JPanel {
 
 					unsavedChanges = true;
 					miniPanel.setAsUnsaved();
+					support.notify( ObserverActions.SET_SAVE_FLAG_TRUE  , null , null );
+
 
 				}
 
+				
 				if (!messageWrite) {
 
 					if (newLenght > lastLenght) {
@@ -191,6 +202,7 @@ public class TextEditorTab extends JPanel {
 						uiController.run(() -> developerComponent.sendMessageToEveryone(message));
 					}
 				}
+				
 				messageWrite = false;
 
 			}
@@ -207,6 +219,9 @@ public class TextEditorTab extends JPanel {
 
 					unsavedChanges = true;
 					miniPanel.setAsUnsaved();
+					support.notify( ObserverActions.SET_SAVE_FLAG_TRUE, null , null );
+
+
 				}
 
 				if (!messageWrite) {
@@ -253,8 +268,10 @@ public class TextEditorTab extends JPanel {
 	}
 
 	public void setAsSaved() {
+		DEBUG.debugmessage("SET AS SAVED");
 		this.unsavedChanges = false;
 		this.miniPanel.setAsSaved();
+		support.notify( ObserverActions.SET_SAVE_FLAG_FALSE  , null , null );
 
 	}
 
@@ -265,6 +282,12 @@ public class TextEditorTab extends JPanel {
 	public String getProject() {
 		// TODO Auto-generated method stub
 		return project;
+	}
+
+	public void blockMessaging() {
+		blockMessaging = true;
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

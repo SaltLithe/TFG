@@ -36,6 +36,7 @@ public class ClientHandler implements ClientMessageHandler {
 				messages.add(incoming.caret);
 				messages.add(incoming.added);
 				messages.add(incoming.adding);
+				messages.add(incoming.path);
 				support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, null, messages);
 				// panel.updateContents(incoming.caret, incoming.added);
 			} else if (!incoming.adding) {
@@ -43,6 +44,8 @@ public class ClientHandler implements ClientMessageHandler {
 				messages.add(incoming.caret);
 				messages.add(incoming.lenght);
 				messages.add(incoming.adding);
+				messages.add(incoming.path);
+
 				support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, null, messages);
 
 			}
@@ -58,10 +61,13 @@ public class ClientHandler implements ClientMessageHandler {
 	public void onServerConnect(ServerInfo server) {
 		// TODO Auto-generated method stub
 
+		DEBUG.debugmessage("HANDSHAKE");
+
 	}
 
 	@Override
 	public void onConnect() {
+		DEBUG.debugmessage("CONNECTED TO SERVER");
 		// TODO Auto-generated method stub
 
 	}

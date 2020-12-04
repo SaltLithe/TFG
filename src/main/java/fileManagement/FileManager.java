@@ -1,9 +1,7 @@
 package fileManagement;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -14,7 +12,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JFileChooser;
 
@@ -42,6 +40,7 @@ public class FileManager {
 	private PropertyChangeMessenger support;
 	private UIController uiController;
 	private DeveloperComponent developerComponent;
+	private ReentrantLock saveWriteLock; 
 
 
 
@@ -57,6 +56,7 @@ public class FileManager {
 	public FileManager() {
 		DEBUG.debugmessage("SE HA INVOCADO AL CONSTRUCTOR DE FILEMANAGER");
 
+		saveWriteLock = new ReentrantLock(); 
 		uiController = UIController.getInstance();
 		developerComponent = uiController.getDeveloperComponent();
 		// Inicializa los objetos necesarios y variables necesarias
@@ -285,7 +285,7 @@ public class FileManager {
 	public String openTextFile(String name, String path, String contents, String project) {
 
 		DEBUG.debugmessage("SE HA LLAMADO A OPENTEXTFILE EN FILEMANAGER");
-		if (currentFocus != null) {
+		if (currentFocus != null && contents != null ) {
 			editorFiles.get(currentFocus).setContent(contents);
 
 		}
@@ -339,9 +339,70 @@ public class FileManager {
 		}
 
 	}
+	
+	public synchronized void writeOnClosed(String path , String content ) {
+		saveWriteLock.lock();
+		try {
+			
+			if(!editorFiles.containsKey(path)) {
+				String name = path.substring(path.lastIndexOf("\\"+1,0));
+				editorFiles.put(path , new TextFile(name, path, content, FileType.CLASS));
+				
+				
+			}
+			
+			editorFiles.get(path).setContent(content);
+			
+			
+		}catch (Exception e) {}
+		finally {
+			
+			
+			saveWriteLock.unlock(); 
+			
+		}
+		
+		
+		
+	}
+	
+	public void saveAllFull() {
+		
+		saveWriteLock.lock();
+		try {
+		for(String key : editorFiles.keySet()) {
+		
+			
+			File file = new File(editorFiles.get(key).getPath());
+			if (file != null) {
+				FileWriter fw = null;
+				try {
+					fw = new FileWriter(file);
+					fw.write(editorFiles.get(key).getContent());
+					fw.close();
+
+
+				} catch (IOException e) {
+				}
+				
+
+			}
+			
+			
+			
+		}
+		}catch (Exception e) {}
+		finally {
+			saveWriteLock.unlock(); 
+			
+		}
+		
+	}
 
 	// Metodo para guardar todos los ficheros del editor
 	public void saveAll(String editorContents) throws IOException {
+		saveWriteLock.lock();
+		try {
 		DEBUG.debugmessage("SE HA LLAMADO A SAVEALL EN FILEMANAGER");
 
 		saveCurrentFile(editorContents, null);
@@ -359,7 +420,11 @@ public class FileManager {
 				fw.close();
 			}
 		}
-
+		}
+		catch(Exception e) {}
+		finally {
+			saveWriteLock.unlock();
+		}
 	}
 
 	private File[] workspaceFullSearch() {
@@ -369,6 +434,8 @@ public class FileManager {
 
 //Metodo para guardar unicamente el fichero en el focus 
 	public void saveCurrentFile( String path,String editorcontents) throws IOException {
+		saveWriteLock.lock();
+		try {
 		DEBUG.debugmessage("SE HA LLAMADO A SAVECURRENTFILE EN FILEMANAGER");
 		// File file = this.returnSingleFile(currentFocus);
 		File file = new File(path);
@@ -381,6 +448,12 @@ public class FileManager {
 			list.add(path);
 			support.notify(ObserverActions.SAVED_SINGLE_FILE, null, list);
 
+		}
+		}catch(Exception e) {}
+		finally {
+			
+			saveWriteLock.unlock();
+			
 		}
 
 	}
@@ -396,6 +469,11 @@ public class FileManager {
 	public String getCurrentFocus() {
 		DEBUG.debugmessage("SE HA LLAMADO A GETCURRENTFOCUS EN FILEMANAGER");
 		return currentFocus;
+	}
+
+	public void updatePanelContents(String editingpath, ArrayList<Object> results) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

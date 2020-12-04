@@ -1,5 +1,7 @@
 package userInterface;
 
+import java.beans.PropertyChangeListener;
+
 import core.DEBUG;
 import userInterface.fileNavigation.FileExplorerToolbar;
 import userInterface.textEditing.TextEditorPanel;
@@ -17,7 +19,7 @@ public class DeveloperMainFrameWrapper implements Runnable {
 		return instance.fileExplorerToolbar;
 	}
 
-	public MenuToolbar getMenuToolbar() {
+	public static MenuToolbar getMenuToolbar() {
 		return instance.menuToolbar;
 	}
 
@@ -58,8 +60,11 @@ public class DeveloperMainFrameWrapper implements Runnable {
 		if (instance == null) {
 			instance = new DeveloperMainFrame();
 		}
-		// TODO Auto-generated method stub
 
+	}
+
+	public static DeveloperMainFrame getInstance() {
+		return instance;
 	}
 
 }

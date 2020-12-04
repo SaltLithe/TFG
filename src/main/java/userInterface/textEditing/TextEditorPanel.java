@@ -126,18 +126,20 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener{
 	// Metodo para activar el editor de texto
 
 	
-	public void addTab(String name , String path , String project) {
+	public void addTab(String name , String path , String project, String contents) {
 		
 		
 		this.developerComponent.setProjectFocus(project);
 		TabMiniPanel mp1 = new TabMiniPanel(name,path,project);
         TextEditorTab tab = new TextEditorTab(path,mp1, project);
+        tab.textEditorArea.setText(contents);
         mp1.setParent(tab);
         
       
         
        
 		tabPane.addTab("", tab);
+		tab.blockMessaging(); 
 		tabPane.addChangeListener(new ChangeListener() {
 
 			
@@ -209,9 +211,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener{
 			String filename = (String) results.get(1);
 			String project = (String) results.get(3);
 			
-			this.addTab(filename, path , project);
-			
-			this.setFullText(path, contents);
+			addTab(filename, path , project , contents);
 		
 			}
 			break;

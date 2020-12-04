@@ -41,7 +41,6 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 	private JButton runLocalButton;
 	
 	private TextEditorContainer textEditorContainer;
-	private Thread runningThread;
 	
 
 	private void enableSaveButtons() {
@@ -170,11 +169,10 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				saveAll();
-				runningThread = new Thread (()-> developerComponent.run(false));
-				runningThread.start();
-				
-				
-	
+				developerComponent.startLocalRunningThread(); 
+			
+
+			
 
 			}
 
@@ -185,10 +183,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				
-				uiController.run(()->{
-					developerComponent.run(false);
-				});
+		//TO-DO RUN GLOBAL 
 
 			}
 
@@ -198,30 +193,82 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				if(runningThread != null) {
-					if(runningThread.isAlive()) {
-						runningThread.stop();
-					}
-				}
+				developerComponent.terminateProcess();
 
 			}
 
 		});
 
-	menuBar.setVisible(true);
-		//this.setSize(this.getPreferredSize());
+		disableTerminate();
+		disableGlobalRun();
+		menuBar.setVisible(true);
 		this.setVisible(true);
 
 	}
+	
+	private void enableTerminate() {
+		
+		terminateProcessButton.setEnabled(true);
 
+		
+	}
+
+	private void disableTerminate() {
+		
+		terminateProcessButton.setEnabled(false);
+
+		
+	}
+	
+	private void enableLocalRun() {
+		
+		runLocalButton.setEnabled(true);
+		
+	}
+	
+	private void disableLocalRun() {
+		
+		runLocalButton.setEnabled(false);
+
+		
+	}
+	private void disableGlobalRun() {
+		runGlobalButton.setEnabled(false);
+	}
+	
+	private void enableGlobalRun() {
+		runGlobalButton.setEnabled(true);
+	}
+	
+	
+	private void terminateProcess() {
+		developerComponent.terminateProcess(); 
+	}
+	
+	
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		@SuppressWarnings("unchecked")
-		ArrayList<Object> eventlist = (ArrayList<Object>) evt.getNewValue();
-		ObserverActions action = (ObserverActions) eventlist.get(0);
+		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
 		switch (action) {
-		case ENABLE_SAVE_BUTTONS:
-			enableSaveButtons();
+		
+		case DISABLE_TERMINATE:
+			disableTerminate();
+			break;
+		case ENABLE_TERMINATE:
+			enableTerminate(); 
+			break;
+		case DISABLE_LOCAL_RUN:
+			DEBUG.debugmessage("Coming through");
+			disableLocalRun();
+			break;
+		case ENABLE_LOCAL_RUN:
+			enableLocalRun();
+			break;
+		case SAFETY_STOP:
+			terminateProcess(); 
+			break;
+		case SAFETY_SAVE:
+			saveAll(); 
 			break;
 		default:
 			break;

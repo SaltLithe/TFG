@@ -1,5 +1,7 @@
 package core;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -23,9 +25,10 @@ import javax.tools.ToolProvider;
 import org.apache.commons.io.FileUtils;
 
 import console.ConsoleWrapper;
+import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 
-public class PersonalCompiler {
+public class PersonalCompiler implements PropertyChangeListener {
 
 	public InputStream in;
 	public OutputStream out;
@@ -39,6 +42,7 @@ public class PersonalCompiler {
 	PrintStream stdout = System.out;
 	PrintStream stderr = System.err;
 	InputStream stdin = System.in;
+	private String[] compiling; 
 
 	public PersonalCompiler() {
 
@@ -76,7 +80,7 @@ public class PersonalCompiler {
 				DEBUG.debugmessage("SE PUEDE COMPILAR EL FICHERO");
 			}
 
-			String[] compiling = new String[copied.length];
+			compiling = new String[copied.length];
 			DEBUG.setExecuting();
 			System.setOut(console.outPrint);
 			System.setErr(console.errPrint);
@@ -117,12 +121,16 @@ public class PersonalCompiler {
 					Class<?> cls = Class.forName(rawname, true, classLoader);
 					Object instance = cls.newInstance();
 					Class[] argTypes = new Class[] { String[].class };
+					
+					
+
 					Method method = cls.getDeclaredMethod("main", argTypes);
 
 					String[] args = new String[0];
 
 					String[] mainArgs = Arrays.copyOfRange(args, 0, args.length);
 					try {
+						support.notify(ObserverActions.ENABLE_TERMINATE, null, null);
 						method.invoke(instance, (Object) mainArgs);
 					} catch (Exception e) {
 						console.reset();
@@ -138,15 +146,14 @@ public class PersonalCompiler {
 					DEBUG.debugmessage("HA OCURRIDO UN ERROR A LA HORA DE COMPILAR EXTERNO AL CODIGO");
 				}
 
-				for (String s : compiling) {
-					File f = new File(s);
-					f.delete();
-				}
+				
+				safetyDelete(); 
 
 				DEBUG.unsetExecuting();
 				System.setOut(stdout);
 				System.setErr(stderr);
 				System.setIn(stdin);
+
 
 				DEBUG.debugmessage("SE HA ACABADO LA EJECUCION");
 
@@ -167,6 +174,7 @@ public class PersonalCompiler {
 			System.setOut(stdout);
 			System.setErr(stderr);
 			System.setIn(stdin);
+
 			console.reset();
 			return null;
 
@@ -179,13 +187,29 @@ public class PersonalCompiler {
 
 	}
 
-	public void addPath(String s) throws Exception {
-		File f = new File(s);
-		URL u = f.toURL();
-		URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-		Class urlClass = URLClassLoader.class;
-		Method method = urlClass.getDeclaredMethod("addURL", new Class[] { URL.class });
-		method.setAccessible(true);
-		method.invoke(urlClassLoader, new Object[] { u });
+	public void safetyDelete() {
+		if(compiling != null ) {
+			
+			for (String s : compiling) {
+				File f = new File(s);
+				f.delete();
+			}
+
+		}
+		
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
+		switch(action) {
+		case SAFETY_DELETE:
+			
+			safetyDelete();
+		break; 
+		default:
+			break;
+		}
+		
 	}
 }

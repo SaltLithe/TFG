@@ -27,6 +27,7 @@
 	<classpathentry kind="src" path="Icons"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
+			<attribute name="module" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
@@ -47,15 +48,15 @@
 	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
 	<classpathentry kind="lib" path="WaifUPnP.jar"/>
 	<classpathentry kind="lib" path="flatlaf-0.42.jar"/>
-	<classpathentry kind="lib" path="MiniSockets.jar"/>
 	<classpathentry kind="src" output="target/test-classes" path="target/generated-test-sources/test-annotations">
 		<attributes>
+			<attribute name="ignore_optional_problems" value="true"/>
+			<attribute name="test" value="true"/>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="ignore_optional_problems" value="true"/>
 			<attribute name="m2e-apt" value="true"/>
-			<attribute name="test" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Desktop/MiniSockets2/JavaMiniSockets2.jar" sourcepath="C:/Users/Usuario/Desktop/JavaMiniSockets-master/src/javaMiniSockets/clientSide"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
