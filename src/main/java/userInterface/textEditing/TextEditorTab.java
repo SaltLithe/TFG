@@ -1,16 +1,14 @@
 package userInterface.textEditing;
 
 import java.awt.BorderLayout;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -18,7 +16,7 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
-import org.fife.ui.autocomplete.*;
+
 import core.DEBUG;
 import core.DeveloperComponent;
 import network.WriteMessage;
@@ -42,25 +40,24 @@ public class TextEditorTab extends JPanel {
 	private String path;
 	public boolean unsavedChanges;
 	public TabMiniPanel miniPanel;
-	boolean blockMessaging;
 	public boolean notConsideredChanges;
 	private String project;
 	public String name;
 	private PropertyChangeMessenger support;
-
+	private String keypath;
+	private boolean cantWrite; 
 
 	public void setTextEditorCode(String code) {
 
-		linenum = 1;
-		columnnum = 1;
-		lastCaretPos = 1;
-		newCaretPos = 1;
+		/*
+		 * linenum = 1; columnnum = 1; lastCaretPos = 1; newCaretPos = 1;
+		 */
 		notConsideredChanges = true;
+		messageWrite = true;
 
 		textEditorArea.setText(code);
 
 		isFocus = true;
-		blockMessaging= false; 
 
 	}
 
@@ -68,6 +65,7 @@ public class TextEditorTab extends JPanel {
 
 		boolean adding = (boolean) results.get(2);
 
+		DEBUG.debugmessage("UPDATED CONTENTS");
 		messageWrite = true;
 		if (adding) {
 			int caret = (int) results.get(0);
@@ -77,9 +75,17 @@ public class TextEditorTab extends JPanel {
 		} else if (!adding) {
 			int caret = (int) results.get(0);
 			int lenght = (int) results.get(1);
-			textEditorArea.replaceRange(null, caret, caret + lenght);
+			if (lenght != 1) {
+				textEditorArea.replaceRange("", caret, caret + lenght);
+			} else if (lenght == 1) {
+
+				textEditorArea.replaceRange("", caret - 1, caret - 1 + lenght);
+
+			}
 
 		}
+
+		uiController.run(() -> developerComponent.writeOnClosed(path, textEditorArea.getText()));
 
 	}
 
@@ -90,20 +96,22 @@ public class TextEditorTab extends JPanel {
 		newCaretPos = caretpos;
 
 	}
-	
+
 	public String getPath() {
-		
-		return path; 
+
+		return path;
 	}
-	
 
 	public TextEditorTab(String path, TabMiniPanel miniPanel, String project) {
 		DEBUG.debugmessage("Se ha creado un tab para el fichero en la direccion : " + path);
-		
 		this.project = project;
-		blockMessaging = true; 
+		cantWrite = false; 
+		String workSpacePath = project.substring(0, project.lastIndexOf("\\"));
+		int indexFrom = workSpacePath.lastIndexOf("\\");
 
-		support = PropertyChangeMessenger.getInstance(); 
+		keypath = path.substring(indexFrom, path.length());
+
+		support = PropertyChangeMessenger.getInstance();
 		notConsideredChanges = true;
 		this.miniPanel = miniPanel;
 		unsavedChanges = false;
@@ -120,7 +128,7 @@ public class TextEditorTab extends JPanel {
 		textEditorArea = new RSyntaxTextArea();
 
 		textEditorArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
-		textEditorArea.setCodeFoldingEnabled(true);
+		textEditorArea.setCodeFoldingEnabled(false);
 
 		try {
 			Theme theme = Theme.load(getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/dark.xml"));
@@ -130,8 +138,29 @@ public class TextEditorTab extends JPanel {
 		}
 		textEditorScrollPane = new RTextScrollPane(textEditorArea);
 		add(textEditorScrollPane, BorderLayout.CENTER);
-		
-		
+
+		textEditorArea.addKeyListener(new KeyListener() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				DEBUG.debugmessage("LISTENER WORKS" );
+			
+			}
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				if(cantWrite) {
+					return;
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if(cantWrite) {
+					return;
+				}
+			}
+		});
+
 		textEditorArea.addCaretListener(new CaretListener() {
 			public void caretUpdate(CaretEvent e) {
 
@@ -153,17 +182,17 @@ public class TextEditorTab extends JPanel {
 				updateStatus(linenum, columnnum, caretpos);
 
 			}
-
 		});
-		
-		
 
 		textEditorArea.getDocument().addDocumentListener(new DocumentListener() {
 
 			@Override
 			public void insertUpdate(DocumentEvent e) {
+				
+				
+				
+				uiController.run(() -> developerComponent.writeOnClosed(path, textEditorArea.getText()));
 
-				DEBUG.debugmessage("Pero saltas o no saltas");
 				newLenght = textEditorArea.getText().length();
 
 				if (notConsideredChanges) {
@@ -173,36 +202,32 @@ public class TextEditorTab extends JPanel {
 
 					unsavedChanges = true;
 					miniPanel.setAsUnsaved();
-					support.notify( ObserverActions.SET_SAVE_FLAG_TRUE  , null , null );
-
+					support.notify(ObserverActions.SET_SAVE_FLAG_TRUE, null, null);
 
 				}
 
-				
 				if (!messageWrite) {
 
 					if (newLenght > lastLenght) {
-
-						// Mas o menos detecta bastante bien lo que se añade al documento
 
 						WriteMessage message = new WriteMessage();
 
 						int caret = textEditorArea.getCaretPosition();
 						message.caret = caret;
 						message.lenght = e.getLength();
-						message.path = path;
+
+						message.path = keypath;
 
 						int lenght = caret + e.getLength();
 						String changes = textEditorArea.getText().substring(caret, lenght);
 						System.out.println("What changed " + changes);
 						message.adding = true;
 						message.added = changes;
-						message.path = path;
 
 						uiController.run(() -> developerComponent.sendMessageToEveryone(message));
 					}
 				}
-				
+
 				messageWrite = false;
 
 			}
@@ -210,6 +235,9 @@ public class TextEditorTab extends JPanel {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 
+				cantWrite = true; 
+				uiController.run(() -> developerComponent.writeOnClosed(path, textEditorArea.getText()));
+
 				newLenght = textEditorArea.getText().length();
 
 				if (notConsideredChanges) {
@@ -219,8 +247,7 @@ public class TextEditorTab extends JPanel {
 
 					unsavedChanges = true;
 					miniPanel.setAsUnsaved();
-					support.notify( ObserverActions.SET_SAVE_FLAG_TRUE, null , null );
-
+					support.notify(ObserverActions.SET_SAVE_FLAG_TRUE, null, null);
 
 				}
 
@@ -235,20 +262,17 @@ public class TextEditorTab extends JPanel {
 						}
 						DEBUG.debugmessage("DIFFERENCE IS : " + changelenght);
 
-						/*
-						 * DEBUG.debugmessage("DELETED THE FOLLOWING : " +
-						 * textEditorArea.getText().substring(newCaretPos, newCaretPos + changelenght));
-						 */
-
 						WriteMessage message = new WriteMessage();
 						message.adding = false;
-						// message.caret = newCaretPos - 1;
 						message.caret = newCaretPos;
 						message.lenght = e.getLength();
+						message.path = keypath;
+
 						uiController.run(() -> developerComponent.sendMessageToEveryone(message));
 					}
 				}
 				messageWrite = false;
+
 			}
 
 			@Override
@@ -271,7 +295,7 @@ public class TextEditorTab extends JPanel {
 		DEBUG.debugmessage("SET AS SAVED");
 		this.unsavedChanges = false;
 		this.miniPanel.setAsSaved();
-		support.notify( ObserverActions.SET_SAVE_FLAG_FALSE  , null , null );
+		support.notify(ObserverActions.SET_SAVE_FLAG_FALSE, null, null);
 
 	}
 
@@ -280,17 +304,7 @@ public class TextEditorTab extends JPanel {
 	}
 
 	public String getProject() {
-		// TODO Auto-generated method stub
 		return project;
 	}
-
-	public void blockMessaging() {
-		blockMessaging = true;
-		// TODO Auto-generated method stub
-		
-	}
-	
-	
-
 
 }

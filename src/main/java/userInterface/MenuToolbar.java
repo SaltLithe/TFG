@@ -270,6 +270,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 		case SAFETY_SAVE:
 			saveAll(); 
 			break;
+	 
 		default:
 			break;
 		}

@@ -109,16 +109,13 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 		try {
 			SwingUtilities.invokeAndWait(DeveloperMainFrameWrapper.getSingleInstance());
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		interpreter = new PersonalInterpreter();
 		compiler = new PersonalCompiler();
-		// Aqui esta el famoso threadpool cache , un peligro
 		executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
 		support.addPropertyChangeListener(DeveloperMainFrameWrapper.getFileExplorerToolbar());
@@ -140,8 +137,7 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 		return f.exists();
 	}
 
-	// Metodo publico para ejecutar código que maneja solo si ejecutar clase o
-	// script
+
 	private void compileAndRun(boolean global) throws IOException {
 
 		DEBUG.debugmessage("SE HA LLAMADO A RUN EN DEVELOPERCOMPONENT");
@@ -191,13 +187,13 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 
 	}
 
-	// Metodo privado para llamar al interpete
-	private String interpret(String code) {
-		DEBUG.debugmessage("SE HA LLAMADO A INTERPET EN DEVELOPERCOMPONENT");
 
-		interpreter.run(code);
-		return null;
 
+	public void writeOnClosed (String path , String contents) {
+		
+		
+		fileManager.writeOnClosed(path, contents);
+		
 	}
 
 	public void loadClassPath(String[] classes, String project) {
@@ -415,7 +411,11 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 					String editingpath = (String) results.get(3);
 					fileManager.updatePanelContents(editingpath , results); 
 		break;
-		
+		case SAVE_FULL:
+			fileManager.saveAllFull(); 
+			break;
+		default:
+			break;
 		}
 		
 	}

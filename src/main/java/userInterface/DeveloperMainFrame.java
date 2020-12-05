@@ -125,6 +125,8 @@ public class DeveloperMainFrame extends JFrame implements PropertyChangeListener
 		                 JOptionPane.QUESTION_MESSAGE);
 		    	if(result == JOptionPane.YES_OPTION) {
 		    	support.notify(ObserverActions.SAFETY_SAVE,null,null);
+		    	support.notify(ObserverActions.SAVE_FULL,null,null);
+
 		    	}
 		    	}
 		    	 dispose();
