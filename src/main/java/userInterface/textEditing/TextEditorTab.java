@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 import javax.swing.JPanel;
 import javax.swing.event.CaretEvent;
@@ -46,6 +47,9 @@ public class TextEditorTab extends JPanel {
 	private PropertyChangeMessenger support;
 	private String keypath;
 	private boolean cantWrite; 
+	private long delay = 0;
+	private Semaphore DCgate;
+	
 
 	public void setTextEditorCode(String code) {
 
@@ -78,8 +82,15 @@ public class TextEditorTab extends JPanel {
 			if (lenght != 1) {
 				textEditorArea.replaceRange("", caret, caret + lenght);
 			} else if (lenght == 1) {
+				char car = textEditorArea.getText().charAt(caret);
+				char len = textEditorArea.getText().charAt(caret+1);
 
+				if(len == '\n') {
+				textEditorArea.insert("\n", caret);
+				}else {
+				
 				textEditorArea.replaceRange("", caret - 1, caret - 1 + lenght);
+				}
 
 			}
 
@@ -104,6 +115,7 @@ public class TextEditorTab extends JPanel {
 
 	public TextEditorTab(String path, TabMiniPanel miniPanel, String project) {
 		DEBUG.debugmessage("Se ha creado un tab para el fichero en la direccion : " + path);
+		DCgate = new Semaphore(1);
 		this.project = project;
 		cantWrite = false; 
 		String workSpacePath = project.substring(0, project.lastIndexOf("\\"));
@@ -142,22 +154,36 @@ public class TextEditorTab extends JPanel {
 		textEditorArea.addKeyListener(new KeyListener() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				DEBUG.debugmessage("LISTENER WORKS" );
-			
+				try {
+				DCgate.acquire();
+				Thread.sleep(delay);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+				DCgate.release();
 			}
 
 			@Override
 			public void keyTyped(KeyEvent e) {
-				if(cantWrite) {
-					return;
-				}
+				try {
+					DCgate.acquire();
+					Thread.sleep(delay);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+					DCgate.release();
+
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if(cantWrite) {
-					return;
-				}
+				try {
+					DCgate.acquire();
+					Thread.sleep(delay);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+					DCgate.release();
 			}
 		});
 
@@ -189,6 +215,9 @@ public class TextEditorTab extends JPanel {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				
+				try {
+				DCgate.acquire();
+				}catch (Exception eaq) {}
 				
 				
 				uiController.run(() -> developerComponent.writeOnClosed(path, textEditorArea.getText()));
@@ -206,9 +235,10 @@ public class TextEditorTab extends JPanel {
 
 				}
 
+				
 				if (!messageWrite) {
 
-					if (newLenght > lastLenght) {
+					if (newLenght > lastLenght ) {
 
 						WriteMessage message = new WriteMessage();
 
@@ -229,11 +259,16 @@ public class TextEditorTab extends JPanel {
 				}
 
 				messageWrite = false;
+				DCgate.release();
 
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
+				
+				try {
+				DCgate.acquire();
+				}catch (Exception eaq) {}
 
 				cantWrite = true; 
 				uiController.run(() -> developerComponent.writeOnClosed(path, textEditorArea.getText()));
@@ -272,12 +307,12 @@ public class TextEditorTab extends JPanel {
 					}
 				}
 				messageWrite = false;
+				DCgate.release();
 
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 
@@ -287,7 +322,6 @@ public class TextEditorTab extends JPanel {
 	}
 
 	public String getContents() {
-		// TODO Auto-generated method stub
 		return this.textEditorArea.getText();
 	}
 
