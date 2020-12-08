@@ -2,6 +2,7 @@ package network;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import core.DEBUG;
 import javaMiniSockets.clientSide.ClientMessageHandler;
@@ -12,12 +13,31 @@ import userInterface.PropertyChangeMessenger;
 public class ClientHandler implements ClientMessageHandler {
 
 	PropertyChangeMessenger support;
-	ArrayList<Object> messages;
+	ArrayBlockingQueue<WriteMessage> processBuffer = new ArrayBlockingQueue<WriteMessage>(100);
 
+	public void processMessage() {
+		ArrayList<Object> messages = new ArrayList<Object>(); 
+
+		while(true) {
+		WriteMessage incoming = null;
+		try {
+			incoming = processBuffer.take();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} 
+		messages.add(incoming.path);
+		messages.add(incoming);
+		support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, null, messages);
+		messages.clear(); 
+		}
+		
+	}
 	public ClientHandler() {
 
 		support = PropertyChangeMessenger.getInstance();
-		messages = new ArrayList<Object>();
+		Thread t = new Thread(()-> processMessage());
+		t.start(); 
+
 
 	}
 
@@ -30,30 +50,17 @@ public class ClientHandler implements ClientMessageHandler {
 		DEBUG.debugmessage("HA LLEGADO UN MENSAJE DEL SERVER");
 		WriteMessage incoming = (WriteMessage) message;
 
+
 		try {
-
-			if (incoming.adding) {
-				messages.add(incoming.caret);
-				messages.add(incoming.added);
-				messages.add(incoming.adding);
-				messages.add(incoming.path);
-				support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, null, messages);
-				// panel.updateContents(incoming.caret, incoming.added);
-			} else if (!incoming.adding) {
-
-				messages.add(incoming.caret);
-				messages.add(incoming.lenght);
-				messages.add(incoming.adding);
-				messages.add(incoming.path);
-
-				support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, null, messages);
-
-			}
-
+				
+			processBuffer.put(incoming);
 		} catch (Exception e) {
-		} finally {
-			messages.clear();
-		}
+
+			e.printStackTrace();
+
+		} 
+
+
 
 	}
 

@@ -1,5 +1,6 @@
 package network;
 
+import java.awt.AWTEvent;
 import java.io.Serializable;
 
 public class WriteMessage implements Serializable {
@@ -16,11 +17,10 @@ public class WriteMessage implements Serializable {
 	public WriteMessage() {
 	}
 
-	public boolean adding;
+	public String path; 
+	public String changes;
+	public int offset; 
 	public int lenght;
-	public int caret;
-
-	public String added;
-	public String path;
+	public boolean adding;
 
 }

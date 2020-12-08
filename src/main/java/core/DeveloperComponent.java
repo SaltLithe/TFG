@@ -406,10 +406,12 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 		ArrayList<Object> results; 
 		switch(action) {
 		case UPDATE_PANEL_CONTENTS:
+			/*
 				    DEBUG.debugmessage("UPDATING CLOSED");
 					results = (ArrayList<Object>) evt.getNewValue();
 					String editingpath = (String) results.get(3);
 					fileManager.updatePanelContents(editingpath , results); 
+					*/
 		break;
 		case SAVE_FULL:
 			fileManager.saveAllFull(); 

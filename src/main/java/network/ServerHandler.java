@@ -2,6 +2,7 @@ package network;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import core.DEBUG;
 import javaMiniSockets.serverSide.ClientInfo;
@@ -11,12 +12,32 @@ import userInterface.PropertyChangeMessenger;
 
 public class ServerHandler implements ServerMessageHandler {
 	PropertyChangeMessenger support;
-	ArrayList<Object> messages;
+	ArrayBlockingQueue<WriteMessage> processBuffer = new ArrayBlockingQueue<WriteMessage>(100);
+	
+	
+	public void processMessage() {
+		ArrayList<Object> messages = new ArrayList<Object>(); 
+
+		while(true) {
+		WriteMessage incoming = null;
+		try {
+			incoming = processBuffer.take();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} 
+		messages.add(incoming.path);
+		messages.add(incoming);
+		support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, null, messages);
+		messages.clear(); 
+		}
+		
+	}
 
 	public ServerHandler() {
 
 		support = PropertyChangeMessenger.getInstance();
-		messages = new ArrayList<Object>();
+		Thread t = new Thread(()-> processMessage());
+		t.start(); 
 
 	}
 
@@ -29,31 +50,14 @@ public class ServerHandler implements ServerMessageHandler {
 		WriteMessage incoming = (WriteMessage) message;
 
 		try {
-
-			if (incoming.adding) {
-				messages.add(incoming.caret);
-				messages.add(incoming.added);
-				messages.add(incoming.adding);
-				messages.add(incoming.path);
-				support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, null, messages);
-			} else if (!incoming.adding) {
-
-				messages.add(incoming.caret);
-				messages.add(incoming.lenght);
-				messages.add(incoming.adding);
-				messages.add(incoming.path);
-				support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, null, messages);
-
-			}
+				
+			processBuffer.put(incoming);
 		} catch (Exception e) {
 
 			e.printStackTrace();
 
-		} finally {
-			messages.clear();
-		}
+		} 
 
-		// TODO Auto-generated method stub
 
 	}
 

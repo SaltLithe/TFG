@@ -5,11 +5,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 import javax.swing.JPanel;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -26,98 +25,53 @@ import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
 
 public class TextEditorTab extends JPanel {
+	
+	
+	//PUBLIC
+	
+	//userInterface
 	public RSyntaxTextArea textEditorArea;
-	private RTextScrollPane textEditorScrollPane;
-	private int lastLenght;
-	private int newLenght;
+	public TabMiniPanel miniPanel;
+	
+	//flags
+	public boolean notConsideredChanges;
 	public boolean messageWrite;
-	private int linenum;
-	private int columnnum;
-	private int lastCaretPos;
-	private int newCaretPos;
-	private boolean isFocus = false;
+	public boolean unsavedChanges;
+	
+	//PRIVATE
+	private static final long serialVersionUID = 1L;
+	
+	//userInterface
+	private RTextScrollPane textEditorScrollPane;
+
+
+	//behaviour
 	private UIController uiController;
 	private DeveloperComponent developerComponent;
-	private String path;
-	public boolean unsavedChanges;
-	public TabMiniPanel miniPanel;
-	public boolean notConsideredChanges;
-	private String project;
-	public String name;
 	private PropertyChangeMessenger support;
+	private ArrayBlockingQueue<WriteMessage> sendBuffer = new ArrayBlockingQueue<WriteMessage>(100);
+	private Semaphore sendSemaphore = new Semaphore(1);
+	private long sendDelay = 50; 
+	
+	//data
+	private String path;
+	private String project;
 	private String keypath;
-	private boolean cantWrite; 
-	private long delay = 0;
-	private Semaphore DCgate;
+	
+	
 	
 
-	public void setTextEditorCode(String code) {
-
-		/*
-		 * linenum = 1; columnnum = 1; lastCaretPos = 1; newCaretPos = 1;
-		 */
-		notConsideredChanges = true;
-		messageWrite = true;
-
-		textEditorArea.setText(code);
-
-		isFocus = true;
-
-	}
-
-	public void updateContents(ArrayList<Object> results) {
-
-		boolean adding = (boolean) results.get(2);
-
-		DEBUG.debugmessage("UPDATED CONTENTS");
-		messageWrite = true;
-		if (adding) {
-			int caret = (int) results.get(0);
-			String added = (String) results.get(1);
-			textEditorArea.insert(added, caret);
-
-		} else if (!adding) {
-			int caret = (int) results.get(0);
-			int lenght = (int) results.get(1);
-			if (lenght != 1) {
-				textEditorArea.replaceRange("", caret, caret + lenght);
-			} else if (lenght == 1) {
-				char car = textEditorArea.getText().charAt(caret);
-				char len = textEditorArea.getText().charAt(caret+1);
-
-				if(len == '\n') {
-				textEditorArea.insert("\n", caret);
-				}else {
-				
-				textEditorArea.replaceRange("", caret - 1, caret - 1 + lenght);
-				}
-
-			}
-
-		}
-
-		uiController.run(() -> developerComponent.writeOnClosed(path, textEditorArea.getText()));
-
-	}
-
-	protected void updateStatus(int linenum, int columnnum, int caretpos) {
-		this.linenum = linenum;
-		this.columnnum = columnnum;
-		lastCaretPos = newCaretPos;
-		newCaretPos = caretpos;
-
-	}
-
-	public String getPath() {
-
-		return path;
-	}
-
+	
 	public TextEditorTab(String path, TabMiniPanel miniPanel, String project) {
+		
+		
+		
 		DEBUG.debugmessage("Se ha creado un tab para el fichero en la direccion : " + path);
-		DCgate = new Semaphore(1);
+		
+		Thread t = new Thread (()-> sendMessages());
+		t.start();
+		
 		this.project = project;
-		cantWrite = false; 
 		String workSpacePath = project.substring(0, project.lastIndexOf("\\"));
 		int indexFrom = workSpacePath.lastIndexOf("\\");
 
@@ -131,8 +85,7 @@ public class TextEditorTab extends JPanel {
 		uiController = UIController.getInstance();
 		developerComponent = uiController.getDeveloperComponent();
 
-		lastLenght = 0;
-		newLenght = 0;
+	
 		messageWrite = false;
 
 		setLayout(new BorderLayout());
@@ -151,78 +104,22 @@ public class TextEditorTab extends JPanel {
 		textEditorScrollPane = new RTextScrollPane(textEditorArea);
 		add(textEditorScrollPane, BorderLayout.CENTER);
 
-		textEditorArea.addKeyListener(new KeyListener() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				try {
-				DCgate.acquire();
-				Thread.sleep(delay);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-				DCgate.release();
-			}
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-				try {
-					DCgate.acquire();
-					Thread.sleep(delay);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-					DCgate.release();
-
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				try {
-					DCgate.acquire();
-					Thread.sleep(delay);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-					DCgate.release();
-			}
-		});
-
-		textEditorArea.addCaretListener(new CaretListener() {
-			public void caretUpdate(CaretEvent e) {
-
-				int linenum = 0;
-				int columnnum = 0;
-				int caretpos = 0;
-				lastLenght = textEditorArea.getText().length();
-				try {
-
-					caretpos = textEditorArea.getCaretPosition();
-					linenum = textEditorArea.getLineOfOffset(caretpos);
-					columnnum = caretpos - textEditorArea.getLineStartOffset(linenum);
-					linenum += 1;
-
-				}
-
-				catch (Exception ex) {
-				}
-				updateStatus(linenum, columnnum, caretpos);
-
-			}
-		});
-
+		
+		//LISTENERS
+		
 		textEditorArea.getDocument().addDocumentListener(new DocumentListener() {
 
 			@Override
 			public void insertUpdate(DocumentEvent e) {
+			
 				
 				try {
-				DCgate.acquire();
-				}catch (Exception eaq) {}
+					sendSemaphore.acquire();
+				} catch (InterruptedException e2) {
+					e2.printStackTrace();
+				}
 				
-				
-				uiController.run(() -> developerComponent.writeOnClosed(path, textEditorArea.getText()));
-
-				newLenght = textEditorArea.getText().length();
+			
 
 				if (notConsideredChanges) {
 
@@ -238,42 +135,34 @@ public class TextEditorTab extends JPanel {
 				
 				if (!messageWrite) {
 
-					if (newLenght > lastLenght ) {
-
-						WriteMessage message = new WriteMessage();
-
-						int caret = textEditorArea.getCaretPosition();
-						message.caret = caret;
-						message.lenght = e.getLength();
-
-						message.path = keypath;
-
-						int lenght = caret + e.getLength();
-						String changes = textEditorArea.getText().substring(caret, lenght);
-						System.out.println("What changed " + changes);
-						message.adding = true;
-						message.added = changes;
-
-						uiController.run(() -> developerComponent.sendMessageToEveryone(message));
-					}
+			
+				WriteMessage message = new WriteMessage();
+				message.path = keypath; 
+				message.adding = true;
+				message.offset = e.getOffset();
+				message.changes = textEditorArea.getText().substring(e.getOffset() , e.getOffset()+e.getLength());
+				
+				
+				try {
+					sendBuffer.put(message);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
 				}
-
-				messageWrite = false;
-				DCgate.release();
+				
+				
+				}
+				sendSemaphore.release();
 
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				
 				try {
-				DCgate.acquire();
-				}catch (Exception eaq) {}
-
-				cantWrite = true; 
-				uiController.run(() -> developerComponent.writeOnClosed(path, textEditorArea.getText()));
-
-				newLenght = textEditorArea.getText().length();
+					sendSemaphore.acquire();
+				} catch (InterruptedException e2) {
+					e2.printStackTrace();
+				}
+				
 
 				if (notConsideredChanges) {
 
@@ -286,40 +175,111 @@ public class TextEditorTab extends JPanel {
 
 				}
 
+				
 				if (!messageWrite) {
 
-					if (newLenght < lastLenght) {
-
-						System.out.println("Last caret " + lastCaretPos + "New caret " + newCaretPos);
-						int changelenght = lastCaretPos - newCaretPos;
-						if (changelenght < 0) {
-							DEBUG.debugmessage("ESTO NO TENDRA QUE PASAR");
-						}
-						DEBUG.debugmessage("DIFFERENCE IS : " + changelenght);
-
-						WriteMessage message = new WriteMessage();
-						message.adding = false;
-						message.caret = newCaretPos;
-						message.lenght = e.getLength();
-						message.path = keypath;
-
-						uiController.run(() -> developerComponent.sendMessageToEveryone(message));
-					}
+				WriteMessage message = new WriteMessage();
+				message.path = keypath; 
+				message.adding = false;
+				message.lenght = e.getLength();
+				message.offset = e.getOffset(); 
+				
+				
+				try {
+					sendBuffer.put(message);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
 				}
-				messageWrite = false;
-				DCgate.release();
+				}
+				
+				sendSemaphore.release();
 
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-
+				
+			
 			}
 
 		});
 
 		setVisible(true);
 	}
+	
+	
+	
+	//PUBLIC 
+	
+	
+	public void sendMessages() {
+		
+		while(true) {
+		 WriteMessage message = null;
+		try {
+			message = sendBuffer.take();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		final WriteMessage finalMessage = message; 
+		uiController.run(()-> developerComponent.sendMessageToEveryone(finalMessage));
+		try {
+			Thread.sleep(sendDelay);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		}
+
+		
+	}
+		
+	
+	public void setTextEditorCode(String code) {
+
+	
+		notConsideredChanges = true;
+		messageWrite = true;
+
+		textEditorArea.setText(code);
+		messageWrite = false; 
+
+		
+
+	}
+
+	public void updateContents(ArrayList<Object> results) {
+
+
+		messageWrite = true; 
+		
+		
+		WriteMessage incoming = (WriteMessage) results.get(1);
+		if(incoming.adding) {
+			
+			textEditorArea.insert(incoming.changes, incoming.offset);
+			
+		}else {
+			
+			textEditorArea.replaceRange("", incoming.offset, incoming.offset+incoming.lenght);
+		}
+			
+			
+		
+		
+		uiController.run(() -> developerComponent.writeOnClosed(path, textEditorArea.getText()));
+		
+		messageWrite = false; 
+
+
+	}
+
+
+
+	public String getPath() {
+
+		return path;
+	}
+
 
 	public String getContents() {
 		return this.textEditorArea.getText();

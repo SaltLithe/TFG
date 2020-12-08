@@ -158,7 +158,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		case UPDATE_PANEL_CONTENTS:
 			// enableEditor();
 			results = (ArrayList<Object>) evt.getNewValue();
-			String editingpath = (String) results.get(3);
+			String editingpath = (String) results.get(0);
 
 			String key = findKeyFromPath(editingpath);
 			if(key!= null) {
