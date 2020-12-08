@@ -398,7 +398,16 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 		});
 		runningThread.start();
 	}
+	
+	
 
+	private String findKeyFromPath(String editingpath) {
+		
+return null ; 
+			
+		}
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
@@ -406,12 +415,13 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 		ArrayList<Object> results; 
 		switch(action) {
 		case UPDATE_PANEL_CONTENTS:
-			/*
+			
 				    DEBUG.debugmessage("UPDATING CLOSED");
 					results = (ArrayList<Object>) evt.getNewValue();
-					String editingpath = (String) results.get(3);
-					fileManager.updatePanelContents(editingpath , results); 
-					*/
+					String editingpath = (String) results.get(0);
+					String partialPath = workSpace.getPath().substring(0,workSpace.getPath().lastIndexOf("\\"));
+					fileManager.updatePanelContents(partialPath+editingpath , results); 
+					
 		break;
 		case SAVE_FULL:
 			fileManager.saveAllFull(); 

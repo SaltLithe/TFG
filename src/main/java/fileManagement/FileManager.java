@@ -18,6 +18,7 @@ import javax.swing.JFileChooser;
 
 import core.DEBUG;
 import core.DeveloperComponent;
+import network.WriteMessage;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
@@ -472,8 +473,40 @@ public class FileManager {
 	}
 
 	public void updatePanelContents(String editingpath, ArrayList<Object> results) {
-		// TODO Auto-generated method stub
+		saveWriteLock.lock();
+
+		if ( !editorFiles.keySet().contains(editingpath)) {
+			
+			File f = new File(editingpath);
+			if(f!= null) {
+				
+			
+			String contents = null; 
+			try {
+				contents = new String(Files.readAllBytes(Paths.get(editingpath)));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			TextFile newfile =  new TextFile(f.getName(), f.getAbsolutePath(),contents,FileType.CLASS);
+			editorFiles.put(editingpath, newfile);
+		}
+		}
 		
+		WriteMessage incoming = (WriteMessage) results.get(1);
+	if(incoming.adding) {
+			
+			editorFiles.get(editingpath).insert(incoming.changes, incoming.offset);
+			
+		}else {
+			
+			editorFiles.get(editingpath).replace(incoming.offset, incoming.offset+incoming.lenght);
+		}
+			
+	support.notify(ObserverActions.SET_SAVE_FLAG_TRUE, null, null);
+
+		
+	saveWriteLock.unlock();
+
 	}
 
 }

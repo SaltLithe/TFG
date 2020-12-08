@@ -67,4 +67,18 @@ public class TextFile {
 		this.path = path;
 	}
 
+	public void insert(String changes, int offset) {
+		String firsthalf = content.substring(0,offset);
+		String secondhalf = content.substring(offset ,content.length());
+		content = firsthalf+changes+secondhalf;
+		
+	}	
+
+	public void replace( int offset, int length) {
+		
+		String firsthalf = content.substring(0,offset);
+		String secondhalf = content.substring(length,content.length());
+		content = firsthalf+secondhalf;
+	}
+
 }

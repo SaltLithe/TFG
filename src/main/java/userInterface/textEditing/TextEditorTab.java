@@ -59,9 +59,6 @@ public class TextEditorTab extends JPanel {
 	private String keypath;
 	
 	
-	
-
-	
 	public TextEditorTab(String path, TabMiniPanel miniPanel, String project) {
 		
 		
