@@ -184,7 +184,6 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 		
 		CustomTreeNode newchild = new CustomTreeNode(path + "\\" + name, name, project, true, false);
 		String[] newpath = { path + "\\" + name };
-		developerComponent.loadClassPath(newpath, project);
 
 		String parentpath = newchild.getParentPath();
 		findParent(parentpath, (CustomTreeNode) internalTree.getModel().getRoot());
@@ -212,7 +211,6 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 	public void deleteTreeNode(CustomTreeNode node) {
 
 		String[] removepath = { node.path };
-		developerComponent.loadClassPath(removepath, project);
 		DefaultTreeModel model = (DefaultTreeModel) internalTree.getModel();
 		model.removeNodeFromParent(node);
 		model.reload();

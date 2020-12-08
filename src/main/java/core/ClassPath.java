@@ -14,7 +14,6 @@ public class ClassPath {
 		classPaths = new HashSet<String>();
 		edit(classes , null);
 		
-		// TODO Auto-generated constructor stub
 	}
 
 	public URLData[] getClassPath() {
@@ -46,6 +45,8 @@ private String checkExtension(String path) {
 	
 	public void edit(String[] addedclasses, String[] removedclasses) {
 		
+		
+		
 		if(addedclasses != null) {
 			for(String added : addedclasses) {
 				String extension = checkExtension(added);
@@ -72,5 +73,7 @@ private String checkExtension(String path) {
 		// TODO Auto-generated method stub
 		
 	}
+
+	
 
 }

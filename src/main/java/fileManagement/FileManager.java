@@ -16,6 +16,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JFileChooser;
 
+import org.apache.commons.io.FileUtils;
+
 import core.DEBUG;
 import core.DeveloperComponent;
 import network.WriteMessage;
@@ -41,14 +43,7 @@ public class FileManager {
 	private PropertyChangeMessenger support;
 	private UIController uiController;
 	private DeveloperComponent developerComponent;
-	private ReentrantLock saveWriteLock; 
-
-
-
-
-	
-	
-	
+	private ReentrantLock saveWriteLock;
 
 	public String getCurrentFolder() {
 		return currentPath;
@@ -57,7 +52,7 @@ public class FileManager {
 	public FileManager() {
 		DEBUG.debugmessage("SE HA INVOCADO AL CONSTRUCTOR DE FILEMANAGER");
 
-		saveWriteLock = new ReentrantLock(); 
+		saveWriteLock = new ReentrantLock();
 		uiController = UIController.getInstance();
 		developerComponent = uiController.getDeveloperComponent();
 		// Inicializa los objetos necesarios y variables necesarias
@@ -85,13 +80,10 @@ public class FileManager {
 		return editorFiles.get(filename);
 	}
 
-	
 //Metodo para crear un fichero para una clase , crea tanto el fichero en la carpeta elegida del sistema como
 //Un objeto TextFile para el editor
 	public void createClassFile(String name, String path, String project, Boolean isfromeditor) {
 
-		
-		
 		DEBUG.debugmessage("SE HA LLAMADO A CREATECLASSFILE EN FILEMANAGER");
 
 		String nameandpath = path + "/" + name + extension;
@@ -119,6 +111,20 @@ public class FileManager {
 
 	}
 
+	private void deleteDirectoryRecursionJava6(File file) throws IOException {
+		if (file.isDirectory()) {
+			File[] entries = file.listFiles();
+			if (entries != null) {
+				for (File entry : entries) {
+					deleteDirectoryRecursionJava6(entry);
+				}
+			}
+		}
+		if (!file.delete()) {
+			throw new IOException("Failed to delete " + file);
+		}
+	}
+
 	public void deleteFile(String name, String path, boolean isFolder, String project, CustomTreeNode node) {
 
 		if (this.editorFiles.containsKey(path) && !isFolder) {
@@ -126,7 +132,14 @@ public class FileManager {
 		}
 
 		try {
-			Files.deleteIfExists(Paths.get(path));
+			if (isFolder) {
+				Files.deleteIfExists(Paths.get(path));
+			} else if (!isFolder) {
+				File f = new File(path);
+				deleteDirectoryRecursionJava6(f);
+
+				FileUtils.deleteDirectory(f);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -141,28 +154,28 @@ public class FileManager {
 
 	}
 
-	public void  writeFolder(String path, FILE_TYPE foldertype) {
+	public void writeFolder(String path, FILE_TYPE foldertype) {
 
 		File f = new File(path);
 		f.mkdir();
 		final Path file = Paths.get(f.getAbsolutePath());
 		final UserDefinedFileAttributeView view = Files.getFileAttributeView(file, UserDefinedFileAttributeView.class);
 
-		String property = null; 
+		String property = null;
 		switch (foldertype) {
-		
+
 		case PROJECT_FOLDER:
 			property = FILE_PROPERTIES.projectProperty;
-			break; 
+			break;
 		case SRC_FOLDER:
 			property = FILE_PROPERTIES.srcProperty;
 			break;
 		case BIN_FOLDER:
 			property = FILE_PROPERTIES.binProperty;
 			break;
-			default:
-				break;
-		
+		default:
+			break;
+
 		}
 		byte[] bytes = null;
 
@@ -188,23 +201,19 @@ public class FileManager {
 	public void newProject(String name, WorkSpace workSpace) {
 
 		String newpath = workSpace.getPath() + "\\" + name;
-		
+
 		writeFolder(newpath, FILE_TYPE.PROJECT_FOLDER);
-		
-		String srcpath = newpath + "\\"+ "src";
-		
-		writeFolder(srcpath , FILE_TYPE.SRC_FOLDER);
-		
+
+		String srcpath = newpath + "\\" + "src";
+
+		writeFolder(srcpath, FILE_TYPE.SRC_FOLDER);
+
 		String binpath = newpath + "\\" + "bin";
-		
+
 		writeFolder(binpath, FILE_TYPE.BIN_FOLDER);
 		this.editorProjects.put(newpath, new Project(newpath, name));
 
 		DEBUG.debugmessage("PROYECTO CREADO");
-		
-
-		
-		
 
 	}
 
@@ -286,7 +295,7 @@ public class FileManager {
 	public String openTextFile(String name, String path, String contents, String project) {
 
 		DEBUG.debugmessage("SE HA LLAMADO A OPENTEXTFILE EN FILEMANAGER");
-		if (currentFocus != null && contents != null ) {
+		if (currentFocus != null && contents != null) {
 			editorFiles.get(currentFocus).setContent(contents);
 
 		}
@@ -330,7 +339,7 @@ public class FileManager {
 		if (contents.length == paths.length) {
 			for (int i = 0; i < contents.length; i++) {
 				try {
-					saveCurrentFile( paths[i], contents[i]);
+					saveCurrentFile(paths[i], contents[i]);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -340,90 +349,79 @@ public class FileManager {
 		}
 
 	}
-	
-	public synchronized void writeOnClosed(String path , String content ) {
+
+	public synchronized void writeOnClosed(String path, String content) {
 		saveWriteLock.lock();
 		try {
-			
-			if(!editorFiles.containsKey(path)) {
-				String name = path.substring(path.lastIndexOf("\\"+1,0));
-				editorFiles.put(path , new TextFile(name, path, content, FileType.CLASS));
-				
-				
+
+			if (!editorFiles.containsKey(path)) {
+				String name = path.substring(path.lastIndexOf("\\" + 1, 0));
+				editorFiles.put(path, new TextFile(name, path, content, FileType.CLASS));
+
 			}
-			
+
 			editorFiles.get(path).setContent(content);
-			
-			
-		}catch (Exception e) {}
-		finally {
-			
-			
-			saveWriteLock.unlock(); 
-			
+
+		} catch (Exception e) {
+		} finally {
+
+			saveWriteLock.unlock();
+
 		}
-		
-		
-		
+
 	}
-	
+
 	public void saveAllFull() {
-		
+
 		saveWriteLock.lock();
 		try {
-		for(String key : editorFiles.keySet()) {
-		
-			
-			File file = new File(editorFiles.get(key).getPath());
-			if (file != null) {
-				FileWriter fw = null;
-				try {
-					fw = new FileWriter(file);
-					fw.write(editorFiles.get(key).getContent());
-					fw.close();
+			for (String key : editorFiles.keySet()) {
 
+				File file = new File(editorFiles.get(key).getPath());
+				if (file != null) {
+					FileWriter fw = null;
+					try {
+						fw = new FileWriter(file);
+						fw.write(editorFiles.get(key).getContent());
+						fw.close();
 
-				} catch (IOException e) {
+					} catch (IOException e) {
+					}
+
 				}
-				
 
 			}
-			
-			
-			
+		} catch (Exception e) {
+		} finally {
+			saveWriteLock.unlock();
+
 		}
-		}catch (Exception e) {}
-		finally {
-			saveWriteLock.unlock(); 
-			
-		}
-		
+
 	}
 
 	// Metodo para guardar todos los ficheros del editor
 	public void saveAll(String editorContents) throws IOException {
 		saveWriteLock.lock();
 		try {
-		DEBUG.debugmessage("SE HA LLAMADO A SAVEALL EN FILEMANAGER");
+			DEBUG.debugmessage("SE HA LLAMADO A SAVEALL EN FILEMANAGER");
 
-		saveCurrentFile(editorContents, null);
+			saveCurrentFile(editorContents, null);
 
-		// File[] files = this.returnAllFiles();
-		File[] files = this.workspaceFullSearch();
+			// File[] files = this.returnAllFiles();
+			File[] files = this.workspaceFullSearch();
 
-		for (int i = 0; i < files.length; i++) {
-			String name = files[i].getName();
-			name = name.replace(extension, "");
-			if (!name.equals(currentFocus)) {
-				String contents = editorFiles.get(name).getContent();
-				FileWriter fw = new FileWriter(files[i]);
-				fw.write(contents);
-				fw.close();
+			for (int i = 0; i < files.length; i++) {
+				String name = files[i].getName();
+				name = name.replace(extension, "");
+				if (!name.equals(currentFocus)) {
+					String contents = editorFiles.get(name).getContent();
+					FileWriter fw = new FileWriter(files[i]);
+					fw.write(contents);
+					fw.close();
+				}
 			}
-		}
-		}
-		catch(Exception e) {}
-		finally {
+		} catch (Exception e) {
+		} finally {
 			saveWriteLock.unlock();
 		}
 	}
@@ -434,27 +432,27 @@ public class FileManager {
 	}
 
 //Metodo para guardar unicamente el fichero en el focus 
-	public void saveCurrentFile( String path,String editorcontents) throws IOException {
+	public void saveCurrentFile(String path, String editorcontents) throws IOException {
 		saveWriteLock.lock();
 		try {
-		DEBUG.debugmessage("SE HA LLAMADO A SAVECURRENTFILE EN FILEMANAGER");
-		// File file = this.returnSingleFile(currentFocus);
-		File file = new File(path);
-		if (file != null) {
-			editorFiles.get(path).setContent(editorcontents);
-			FileWriter fw = new FileWriter(file);
-			fw.write(editorcontents);
-			fw.close();
-			ArrayList<Object> list = new ArrayList<Object>();
-			list.add(path);
-			support.notify(ObserverActions.SAVED_SINGLE_FILE, null, list);
+			DEBUG.debugmessage("SE HA LLAMADO A SAVECURRENTFILE EN FILEMANAGER");
+			// File file = this.returnSingleFile(currentFocus);
+			File file = new File(path);
+			if (file != null) {
+				editorFiles.get(path).setContent(editorcontents);
+				FileWriter fw = new FileWriter(file);
+				fw.write(editorcontents);
+				fw.close();
+				ArrayList<Object> list = new ArrayList<Object>();
+				list.add(path);
+				support.notify(ObserverActions.SAVED_SINGLE_FILE, null, list);
 
-		}
-		}catch(Exception e) {}
-		finally {
-			
+			}
+		} catch (Exception e) {
+		} finally {
+
 			saveWriteLock.unlock();
-			
+
 		}
 
 	}
@@ -475,37 +473,35 @@ public class FileManager {
 	public void updatePanelContents(String editingpath, ArrayList<Object> results) {
 		saveWriteLock.lock();
 
-		if ( !editorFiles.keySet().contains(editingpath)) {
-			
-			File f = new File(editingpath);
-			if(f!= null) {
-				
-			
-			String contents = null; 
-			try {
-				contents = new String(Files.readAllBytes(Paths.get(editingpath)));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			TextFile newfile =  new TextFile(f.getName(), f.getAbsolutePath(),contents,FileType.CLASS);
-			editorFiles.put(editingpath, newfile);
-		}
-		}
-		
-		WriteMessage incoming = (WriteMessage) results.get(1);
-	if(incoming.adding) {
-			
-			editorFiles.get(editingpath).insert(incoming.changes, incoming.offset);
-			
-		}else {
-			
-			editorFiles.get(editingpath).replace(incoming.offset, incoming.offset+incoming.lenght);
-		}
-			
-	support.notify(ObserverActions.SET_SAVE_FLAG_TRUE, null, null);
+		if (!editorFiles.keySet().contains(editingpath)) {
 
-		
-	saveWriteLock.unlock();
+			File f = new File(editingpath);
+			if (f != null) {
+
+				String contents = null;
+				try {
+					contents = new String(Files.readAllBytes(Paths.get(editingpath)));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				TextFile newfile = new TextFile(f.getName(), f.getAbsolutePath(), contents, FileType.CLASS);
+				editorFiles.put(editingpath, newfile);
+			}
+		}
+
+		WriteMessage incoming = (WriteMessage) results.get(1);
+		if (incoming.adding) {
+
+			editorFiles.get(editingpath).insert(incoming.changes, incoming.offset);
+
+		} else {
+
+			editorFiles.get(editingpath).replace(incoming.offset, incoming.offset + incoming.lenght);
+		}
+
+		support.notify(ObserverActions.SET_SAVE_FLAG_TRUE, null, null);
+
+		saveWriteLock.unlock();
 
 	}
 

@@ -41,23 +41,12 @@ public class NodePopupMenu extends JPopupMenu {
 		addFolder = new JMenuItem("src folder");
 		addPackage = new JMenuItem("package");
 		
+		
+		
 
-		delete.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-			
-				int result = JOptionPane.showConfirmDialog(frame,
-					    "Delete this class?",
-					    "Delete",
-					    JOptionPane.OK_CANCEL_OPTION); 
-				if (result == JOptionPane.OK_OPTION) {
-					
-					uiController.run(()-> developerComponent.deleteFile(parent.name,parent.path, parent.isFile , parent.project, parent));
-				}
-			}
-
-		});
+		
+		
+		
 		
 
 		addClass.addActionListener(new ActionListener() {
@@ -86,6 +75,22 @@ public class NodePopupMenu extends JPopupMenu {
 			
 			add(addNew);
 			
+			delete.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+				
+					int result = JOptionPane.showConfirmDialog(frame,
+						    "Delete this Folder?",
+						    "Delete",
+						    JOptionPane.OK_CANCEL_OPTION); 
+					if (result == JOptionPane.OK_OPTION) {
+						
+						uiController.run(()-> developerComponent.deleteFile(parent.name,parent.path, parent.isFile , parent.project, parent));
+					}
+				}
+
+			});
 			
 	
 			add(delete);
@@ -94,6 +99,22 @@ public class NodePopupMenu extends JPopupMenu {
 		}else if (isFile){
 			
 			add(delete);
+			delete.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+				
+					int result = JOptionPane.showConfirmDialog(frame,
+						    "Delete this class?",
+						    "Delete",
+						    JOptionPane.OK_CANCEL_OPTION); 
+					if (result == JOptionPane.OK_OPTION) {
+						
+						uiController.run(()-> developerComponent.deleteFile(parent.name,parent.path, parent.isFile , parent.project, parent));
+					}
+				}
+
+			});
 
 		}else if( isProject) {
 			

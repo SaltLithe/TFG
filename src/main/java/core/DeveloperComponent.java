@@ -231,7 +231,9 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 		DEBUG.debugmessage("SE HA LLAMADO A CREATENEWCLASSFILE EN DEVELOPERCOMPONENT");
 
 		fileManager.createClassFile(name, path, project, true);
-		// fileManager.updateAllFiles();
+		String adding = path+"\\"+name+".java";
+		String[] input = {adding};
+		classpaths.get(project).edit(input, null);
 
 	}
 
@@ -361,6 +363,11 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 
 	public Object deleteFile(String name, String path, boolean isFolder, String project, CustomTreeNode node) {
 		fileManager.deleteFile(name, path, isFolder, project, node);
+		String delete = path;
+		String[] input = {delete};
+		if(!isFolder) {
+		classpaths.get(project).edit(null, input);
+		}
 		return null;
 	}
 
