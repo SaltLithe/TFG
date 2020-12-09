@@ -31,8 +31,7 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 //
 	public FileExplorerPanel fileExplorerPanel;
 
-	private JButton addClass;
-	private JButton addScript;
+
 	private DeveloperComponent developerComponent;
 	private UIController uiController;
 	private DeveloperMainFrame developerMainFrame;
@@ -47,31 +46,18 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 		this.developerMainFrame = developerMainFrame;
 		uiController = UIController.getInstance();
 		developerComponent = uiController.getDeveloperComponent();
-
-		addClass = new JButton("Add Class");
-		addScript = new JButton("Add Script");
+;
 
 		JPanel toolbarspace = new JPanel();
 		toolbarspace.setLayout(new FlowLayout(FlowLayout.LEFT));
-		toolbarspace.add(addClass);
-		toolbarspace.add(addScript);
+
 		setLayout(new BorderLayout());
 		fileExplorerPanel.setPreferredSize(new Dimension(ImageObserver.WIDTH, ImageObserver.HEIGHT));
 		add(toolbarspace, BorderLayout.NORTH);
 		add(fileExplorerPanel, BorderLayout.CENTER);
 
-		addClass.setEnabled(false);
-		addScript.setEnabled(false);
-
-		// Al botón de añadir clase se le asocia con la creación de un diálogo con los
-		// elementos necesarios
-		// para crear una nueva clase , de momento se queda en esta misma clase
 
 	}
-
-	// Método que añade un botón al FileExplorerPanel si no existe de antemano ,
-	// este método además se encarga
-	// de darle su comportamiento al bóton antes de añadirlo
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
@@ -100,6 +86,14 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 				
 
 			
+			break;
+			
+		case DELETE_PROJECT_TREE:
+			ArrayList<Object> eventList5 = (ArrayList<Object>) evt.getNewValue();
+			String projectPath2 = (String) eventList5.get(0);
+			fileExplorerPanel.removeAndClear(trees.get(projectPath2));
+			fileExplorerPanel.updateUI();
+
 			break;
 		case UPDATE_PROJECT_TREE_REMOVE:
 

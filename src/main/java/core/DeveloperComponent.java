@@ -224,13 +224,14 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 	// de los archivos de la aplicación
 	/**
 	 * 
+	 * @param isMain 
 	 * @param args args[0] : String Name , args[1] : String Contents
 	 */
 
-	public void createNewClassFile(String name, String path, String project) {
+	public void createNewClassFile(String name, String path, String project, boolean isMain) {
 		DEBUG.debugmessage("SE HA LLAMADO A CREATENEWCLASSFILE EN DEVELOPERCOMPONENT");
 
-		fileManager.createClassFile(name, path, project, true);
+		fileManager.createClassFile(name, path, project, true,isMain);
 		String adding = path+"\\"+name+".java";
 		String[] input = {adding};
 		classpaths.get(project).edit(input, null);
@@ -360,15 +361,18 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 		// TODO Auto-generated method stub
 
 	}
-
-	public Object deleteFile(String name, String path, boolean isFolder, String project, CustomTreeNode node) {
-		fileManager.deleteFile(name, path, isFolder, project, node);
-		String delete = path;
-		String[] input = {delete};
-		if(!isFolder) {
+	
+	public void deleteClassPath(String path, String project) {
+		String[] input = {path}; 
+		
 		classpaths.get(project).edit(null, input);
-		}
-		return null;
+
+	}
+	
+
+	public void deleteFile(String name, String path, boolean isFolder, String project, CustomTreeNode node) {
+		fileManager.deleteFile(name, path, isFolder, project, node);
+		
 	}
 
 	public void setProjectFocus(String project) {
@@ -419,7 +423,7 @@ return null ;
 	public void propertyChange(PropertyChangeEvent evt) {
 		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
 		
-		ArrayList<Object> results; 
+		ArrayList<Object> results = (ArrayList<Object>) evt.getNewValue();
 		switch(action) {
 		case UPDATE_PANEL_CONTENTS:
 			
@@ -430,6 +434,15 @@ return null ;
 					fileManager.updatePanelContents(partialPath+editingpath , results); 
 					
 		break;
+		case DELETE_CLASS_PATH:
+			String path =  (String) results.get(0);
+			String project = (String) results.get(1);
+			deleteClassPath(path,project);
+			break;
+		case DELETE_CLASS_PATH_FOCUSED:
+			String pathfocused =  (String) results.get(0);
+			deleteClassPath(pathfocused,focusedProject);
+			break;
 		case SAVE_FULL:
 			fileManager.saveAllFull(); 
 			break;
@@ -437,6 +450,17 @@ return null ;
 			break;
 		}
 		
+	}
+
+	public void triggerRunConfig() {
+		if (focusedProject == null || focusedProject == "" || !stillExists(focusedProject)) {
+			JOptionPane.showMessageDialog(this.developerMainFrame,
+					"There is no project selected or the project you are trying to run does not exist, choose a tab from a project to run.",
+					"Run error", JOptionPane.ERROR_MESSAGE);
+		} 
+		else {
+		runConfigDialog d = new runConfigDialog(this, this.classpaths.get(focusedProject).getClassPath());
+		}
 	}
 
 }

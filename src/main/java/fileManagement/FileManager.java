@@ -67,9 +67,9 @@ public class FileManager {
 
 	// Metodo que dado el nombre de una clase te devuelve un string con codigo
 	// basico
-	public String returnBase(String name) {
+	public String returnMain(String name) {
 
-		String base = "public class " + name + "{public static void main(String[] args) {}} ";
+		String base = "public class " + name + "{" + System.lineSeparator() +"public static void main(String[] args) {"+System.lineSeparator()+"}"+System.lineSeparator()+"} ";
 		return base;
 	}
 
@@ -82,7 +82,7 @@ public class FileManager {
 
 //Metodo para crear un fichero para una clase , crea tanto el fichero en la carpeta elegida del sistema como
 //Un objeto TextFile para el editor
-	public void createClassFile(String name, String path, String project, Boolean isfromeditor) {
+	public void createClassFile(String name, String path, String project, Boolean isfromeditor, boolean isMain) {
 
 		DEBUG.debugmessage("SE HA LLAMADO A CREATECLASSFILE EN FILEMANAGER");
 
@@ -91,7 +91,12 @@ public class FileManager {
 		try {
 			FileWriter fw = new FileWriter(newFile);
 
-			fw.write(returnBase(name));
+			if(isMain) {
+			fw.write(returnMain(name));
+			}else {
+				fw.write(returnBase(name));
+
+			}
 
 			fw.close();
 			TextFile newfile = new TextFile(name, path, null, FileType.CLASS);
@@ -111,18 +116,29 @@ public class FileManager {
 
 	}
 
-	private void deleteDirectoryRecursionJava6(File file) throws IOException {
-		if (file.isDirectory()) {
-			File[] entries = file.listFiles();
-			if (entries != null) {
-				for (File entry : entries) {
-					deleteDirectoryRecursionJava6(entry);
+	private String returnBase(String name) {
+		String base = "public class " + name + "{"
+				+ System.lineSeparator() + "} ";
+		return base;
+}
+
+	private void deleteInsides(File file) throws IOException {
+		
+		if(file.isDirectory()) {
+			File[] files = file.listFiles();
+			for(File f : files) {
+				if(f.isDirectory()) {
+					deleteInsides(f);
+				}else {
+					this.deleteFile(f.getName(), f.getPath(), false, null, null );
 				}
+				
 			}
+			file.delete();
 		}
-		if (!file.delete()) {
-			throw new IOException("Failed to delete " + file);
-		}
+	
+		
+		
 	}
 
 	public void deleteFile(String name, String path, boolean isFolder, String project, CustomTreeNode node) {
@@ -136,22 +152,31 @@ public class FileManager {
 				Files.deleteIfExists(Paths.get(path));
 			} else if (!isFolder) {
 				File f = new File(path);
-				deleteDirectoryRecursionJava6(f);
+				deleteInsides(f);
 
 				FileUtils.deleteDirectory(f);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		ArrayList<Object> list = new ArrayList<Object>();
-		;
+		
+		if(project!= null  && node != null) {
 		list.add(project);
 		list.add(node);
 
 		support.notify(ObserverActions.UPDATE_PROJECT_TREE_REMOVE, null, list);
+		list.clear();
+		list.add(path);
+		list.add(project);
+		support.notify(ObserverActions.DELETE_CLASS_PATH, null, list);
 
+		}else {
+			list.add(path);
+			support.notify(ObserverActions.DELETE_CLASS_PATH_FOCUSED,null,list);
+		}
+		
 	}
 
 	public void writeFolder(String path, FILE_TYPE foldertype) {

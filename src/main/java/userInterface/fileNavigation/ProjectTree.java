@@ -2,7 +2,7 @@
 package userInterface.fileNavigation;
 
 import java.awt.BorderLayout;
-
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -30,6 +30,8 @@ import javax.swing.tree.TreePath;
 import core.DEBUG;
 import core.DeveloperComponent;
 import userInterface.DeveloperMainFrame;
+import userInterface.ObserverActions;
+import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
 
 public class ProjectTree extends JPanel implements TreeSelectionListener {
@@ -41,6 +43,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 	private String project;
 	private DeveloperMainFrame frame;
 	private ArrayList<String> baseClassPath;
+	private PropertyChangeMessenger support = PropertyChangeMessenger.getInstance(); 
 
 	public void valueChanged(TreeSelectionEvent e) {
 		TreePath path = e.getNewLeadSelectionPath();
@@ -122,8 +125,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 		}
 		CustomTreeNode currentNode = new CustomTreeNode(path, name, project, isDir, true);
 		if (!isStart) {
-			// Si no estamos empezando podemos añadir la ruta al nodo anterior
-			// Esto es para que el project no se añada a sí mismo
+		
 			currentRootNode.add(currentNode);
 		}
 
@@ -210,14 +212,19 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 
 	public void deleteTreeNode(CustomTreeNode node) {
 
-		String[] removepath = { node.path };
 		DefaultTreeModel model = (DefaultTreeModel) internalTree.getModel();
+		CustomTreeNode root = (CustomTreeNode) model.getRoot();
+		if (root.path == node.path) {
+			ArrayList<Object> list = new ArrayList<Object>();
+			list.add(node.path);
+			support.notify(ObserverActions.DELETE_PROJECT_TREE,null,list);
+			
+		}else {
 		model.removeNodeFromParent(node);
 		model.reload();
 		internalTree.setModel(model);
 		internalTree.updateUI();
-
-		// TODO Auto-generated method stub
+		}
 
 	}
 
@@ -226,6 +233,9 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 		return internalTree;
 	}
 
-	/** Main: make a Frame, add a FileTree */
+	public JTree getInternalTree() {
+		return internalTree;
+	}
+
 
 }

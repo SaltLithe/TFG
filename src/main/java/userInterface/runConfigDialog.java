@@ -104,7 +104,9 @@ public class runConfigDialog extends JDialog {
 				
 				if(lastSelected != null) {
 					developerComponent.updateFocusedPair(lastSelected.name); 
-					//developerComponent.run();
+					developerComponent.startLocalRunningThread();
+					dispose(); 
+
 					}
 			
 

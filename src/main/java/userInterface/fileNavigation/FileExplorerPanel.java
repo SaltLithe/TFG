@@ -76,4 +76,24 @@ class FileExplorerPanel extends JPanel {
 		this.updateUI();
 		
 	}
+
+	public void removeAndClear(ProjectTree tree) {
+
+
+		newpane.remove(tree);
+		this.updateUI();
+		this.removeAll();
+		scrollPane = new JScrollPane(newpane);
+		
+	
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setSize(getPreferredSize());
+		add(scrollPane);
+		
+		scrollPane.updateUI();
+		
+		this.updateUI();
+		
+	}
 }

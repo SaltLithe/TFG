@@ -8,14 +8,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.UserDefinedFileAttributeView;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,6 +30,7 @@ import javax.tools.ToolProvider;
 import org.apache.commons.io.FileUtils;
 
 import console.ConsoleWrapper;
+import fileManagement.FILE_PROPERTIES;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 
@@ -54,12 +60,47 @@ public class PersonalCompiler implements PropertyChangeListener {
 
 		try {
 			// Copiar ficheros
+			File bindir = new File(added[0].project + "\\bin"); 
+			if (!bindir.exists()) {
+				
+				bindir.mkdir(); 
+				ArrayList<Object> list = new ArrayList<Object>();
+				final Path file = Paths.get(bindir.getAbsolutePath());
+				final UserDefinedFileAttributeView view = Files.getFileAttributeView(file, UserDefinedFileAttributeView.class);
+
+				String property = FILE_PROPERTIES.binProperty;
+
+				byte[] bytes = null;
+
+				try {
+					bytes = property.getBytes("UTF-8");
+				} catch (UnsupportedEncodingException e1) {
+					e1.printStackTrace();
+				}
+
+				final ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);
+				writeBuffer.put(bytes);
+				writeBuffer.flip();
+				try {
+					view.write(property, writeBuffer);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+		
+				list.add(added[0].project);
+				list.add("bin");
+				list.add(added[0].project);
+				
+				support.notify(ObserverActions.UPDATE_PROJECT_TREE_ADD, null, list);
+			}
 
 			File[] copied = new File[added.length];
 
 			for (int i = 0; i < added.length; i++) {
 
 				File destFile = new File(added[i].project + "\\" + "bin\\" + added[i].name + ".java");
+			
 				File sourceFile = new File(added[i].path);
 				try {
 					Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);

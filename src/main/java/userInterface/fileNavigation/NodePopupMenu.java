@@ -80,6 +80,7 @@ public class NodePopupMenu extends JPopupMenu {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 				
+					developerComponent.setProjectFocus(parent.project);
 					int result = JOptionPane.showConfirmDialog(frame,
 						    "Delete this Folder?",
 						    "Delete",
@@ -103,7 +104,8 @@ public class NodePopupMenu extends JPopupMenu {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-				
+					developerComponent.setProjectFocus(parent.project);
+
 					int result = JOptionPane.showConfirmDialog(frame,
 						    "Delete this class?",
 						    "Delete",

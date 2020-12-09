@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JCheckBox;
 
 
 
@@ -31,6 +32,7 @@ public class newClassDialog extends JDialog {
 	
 	private String path;
 	private String project;
+	private JCheckBox mainCheckBox;
 	
 	public newClassDialog(String path , String project) {
 		
@@ -81,12 +83,21 @@ public class newClassDialog extends JDialog {
 				String name = nameField.getText();
 				
 				if(name != null) {
-				uiController.run(()->developerComponent.createNewClassFile(name, path,project));
+				
+				uiController.run(()->developerComponent.createNewClassFile(name, path,project,mainCheckBox.isSelected()));
 				dispose(); 
 				}
 			}
 
 		});
+		
+		mainCheckBox = new JCheckBox("Main");
+		GridBagConstraints gbc_mainCheckBox = new GridBagConstraints();
+		gbc_mainCheckBox.anchor = GridBagConstraints.WEST;
+		gbc_mainCheckBox.insets = new Insets(0, 0, 5, 5);
+		gbc_mainCheckBox.gridx = 1;
+		gbc_mainCheckBox.gridy = 2;
+		getContentPane().add(mainCheckBox, gbc_mainCheckBox);
 		
 		JButton cancelButton = new JButton("Cancel");
 		GridBagConstraints gbc_cancelButton1 = new GridBagConstraints();

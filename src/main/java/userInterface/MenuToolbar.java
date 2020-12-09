@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -41,6 +40,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 	private JButton runLocalButton;
 	
 	private TextEditorContainer textEditorContainer;
+	private JButton runConfigButton;
 	
 
 	private void enableSaveButtons() {
@@ -108,6 +108,10 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 		terminateProcessButton.setIcon(new ImageIcon("Icons\\terminateProcess_icon.png"));
 		toolBar.add(terminateProcessButton);
 		
+		runConfigButton = new JButton("Run configuration");
+		runConfigButton.setIcon(new ImageIcon("Icons\\runConfig_icon.png"));
+		toolBar.add(runConfigButton);
+		
 		
 		newProjectMenuItem.addActionListener(new ActionListener() {
 
@@ -174,6 +178,16 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 			
 
+			}
+
+		});
+		
+		runConfigButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				developerComponent.triggerRunConfig(); 
+				
 			}
 
 		});
