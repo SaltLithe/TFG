@@ -79,10 +79,10 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 			String path = (String) eventList3.get(0);
 			String name = (String) eventList3.get(1);
 			String projectPath = (String) eventList3.get(2);
-
+			Boolean isFile = (Boolean)eventList3.get(3);
 			
 
-				trees.get(projectPath).insertTreeNode(name, path);
+				trees.get(projectPath).insertTreeNode(name, path,isFile);
 				
 
 			

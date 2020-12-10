@@ -3,7 +3,6 @@ package userInterface.fileNavigation;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -13,6 +12,7 @@ import core.DeveloperComponent;
 import userInterface.DeveloperMainFrame;
 import userInterface.UIController;
 import userInterface.fileEditing.newClassDialog;
+import userInterface.fileEditing.newSrcDialog;
 
 
 public class NodePopupMenu extends JPopupMenu {
@@ -20,9 +20,7 @@ public class NodePopupMenu extends JPopupMenu {
 	private JMenu addNew;
 	private JMenuItem addClass;
 	private JMenuItem addFolder;
-	private JMenuItem addPackage;
 	private JMenuItem delete; 
-	
 
 	
 
@@ -30,7 +28,7 @@ public class NodePopupMenu extends JPopupMenu {
 	
 	public NodePopupMenu(boolean isFile , boolean isProject, CustomTreeNode parent , DeveloperMainFrame frame , UIController uiController , DeveloperComponent developerComponent) {
 		
-		
+	
 		
 		addNew = new JMenu("new");
 		
@@ -39,9 +37,14 @@ public class NodePopupMenu extends JPopupMenu {
 
 		
 		addFolder = new JMenuItem("src folder");
-		addPackage = new JMenuItem("package");
 		
 		
+		if(developerComponent.isConnected) {
+			
+			addFolder.setEnabled(false);
+			delete.setEnabled(false);
+			
+		}
 		
 
 		
@@ -62,16 +65,29 @@ public class NodePopupMenu extends JPopupMenu {
 		
 		
 		
-		if(!isFile && !isProject) {
+		if(!isFile) {
+			
+
+			addFolder.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+		
+				
+				newSrcDialog srcd = new newSrcDialog(parent.path, parent.project); 
+					
+					
+				}
+
+			});
 			
 			
-			
+		
 			
 		
 			
 			addNew.add(addClass);
 			addNew.add(addFolder);
-			addNew.add(addPackage);
 			
 			add(addNew);
 			

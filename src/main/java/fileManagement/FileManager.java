@@ -107,7 +107,7 @@ public class FileManager {
 			list.add(path);
 			list.add(name + extension);
 			list.add(project);
-
+			list.add(true);
 			support.notify(ObserverActions.UPDATE_PROJECT_TREE_ADD, null, list);
 		} catch (IOException e) {
 			DEBUG.debugmessage("NO SE HA PODIDO CREAR EL FICHERO DE LA CLASE");
@@ -148,9 +148,9 @@ public class FileManager {
 		}
 
 		try {
-			if (isFolder) {
+			if (!isFolder) {
 				Files.deleteIfExists(Paths.get(path));
-			} else if (!isFolder) {
+			} else if (isFolder) {
 				File f = new File(path);
 				deleteInsides(f);
 
@@ -179,7 +179,7 @@ public class FileManager {
 		
 	}
 
-	public void writeFolder(String path, FILE_TYPE foldertype) {
+	public void writeFolder(String path, FILE_TYPE foldertype , boolean updateTree , String name , String project) {
 
 		File f = new File(path);
 		f.mkdir();
@@ -221,21 +221,35 @@ public class FileManager {
 			e.printStackTrace();
 		}
 
+		if(updateTree) {
+			
+			ArrayList<Object> list = new ArrayList<Object>();
+			list.add(path);
+			list.add(name);
+			list.add(project);
+			list.add(false);
+			support.notify(ObserverActions.UPDATE_PROJECT_TREE_ADD, null, list);
+
+		}
+		
+		
+		
+		
 	}
 
 	public void newProject(String name, WorkSpace workSpace) {
 
 		String newpath = workSpace.getPath() + "\\" + name;
 
-		writeFolder(newpath, FILE_TYPE.PROJECT_FOLDER);
+		writeFolder(newpath, FILE_TYPE.PROJECT_FOLDER,false , null , null );
 
 		String srcpath = newpath + "\\" + "src";
 
-		writeFolder(srcpath, FILE_TYPE.SRC_FOLDER);
+		writeFolder(srcpath, FILE_TYPE.SRC_FOLDER, false , null , null );
 
 		String binpath = newpath + "\\" + "bin";
 
-		writeFolder(binpath, FILE_TYPE.BIN_FOLDER);
+		writeFolder(binpath, FILE_TYPE.BIN_FOLDER, false , null , null );
 		this.editorProjects.put(newpath, new Project(newpath, name));
 
 		DEBUG.debugmessage("PROYECTO CREADO");

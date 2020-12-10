@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 
 import bin.javaMiniSockets.clientSide.AsynchronousClient;
 import bin.javaMiniSockets.serverSide.AsynchronousServer;
+import fileManagement.FILE_TYPE;
 import fileManagement.FileManager;
 import fileManagement.WorkSpace;
 import network.ClientHandler;
@@ -40,8 +41,8 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 	public DeveloperMainFrame developerMainFrame;
 	private PropertyChangeMessenger support;
 	private ThreadPoolExecutor executor;
-	private AsynchronousServer server;
-	private AsynchronousClient client;
+	public AsynchronousServer server;
+	public AsynchronousClient client;
 	private int defaultQueueSize = 100;
 	public Thread runningThread; 
 
@@ -50,6 +51,7 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 
 	private WorkSpace workSpace;
 	private HashMap<String, ClassPath> classpaths;
+	public boolean isConnected;
 
 	public void setAsClient(String serverAddress, String ownAddress, int serverPort, int clientPort,
 			boolean autoConnect) {
@@ -66,6 +68,7 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 			try {
 				DEBUG.debugmessage("SET AS CLIENT");
 				client.Connect();
+				isConnected = true ; 
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -88,12 +91,15 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 
 		if (autoConnect) {
 			server.Start();
+			isConnected = true; 
 		}
+		
 	}
 
 	public DeveloperComponent(WorkSpace workSpace)
 
 	{
+		isConnected = false; 
 		DEBUG.debugmessage("SE HA CREADO UNA INSTANCIA DE DEVELOPERCOMPONENT");
 
 		focusedProject = null;
@@ -461,6 +467,11 @@ return null ;
 		else {
 		runConfigDialog d = new runConfigDialog(this, this.classpaths.get(focusedProject).getClassPath());
 		}
+	}
+
+	public void createSrcFolder(String path , String name) {
+		fileManager.writeFolder(path, FILE_TYPE.SRC_FOLDER, true , name ,focusedProject );
+		
 	}
 
 }

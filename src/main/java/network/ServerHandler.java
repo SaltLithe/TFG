@@ -4,9 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import javax.swing.JOptionPane;
+
 import core.DEBUG;
 import javaMiniSockets.serverSide.ClientInfo;
 import javaMiniSockets.serverSide.ServerMessageHandler;
+import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 
@@ -63,13 +66,19 @@ public class ServerHandler implements ServerMessageHandler {
 
 	@Override
 	public void onReady() {
-		// TODO Auto-generated method stub
 
+		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
+			    "The server is ready, other users can join your sesion now.");
 	}
 
 	@Override
 	public void onDisconnect() {
-		// TODO Auto-generated method stub
+		
+		
+		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
+			    "You have disconnected!.",
+			    "Server disconnected warning",
+			    JOptionPane.WARNING_MESSAGE);
 
 	}
 

@@ -93,7 +93,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 					if (selRow > -1) {
 						internalTree.setSelectionRow(selRow);
 					}
-					if (node != null) {
+					if (node != null && !node.hideContents) {
 						NodePopupMenu menu = new NodePopupMenu(node.isFile, false, node, frame, uiController,
 								developerComponent);
 						TreePath path = internalTree.getPathForLocation(me.getX(), me.getY());
@@ -132,9 +132,12 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 		String[] fileArray = dir.list();
 		ArrayList<File> files = new ArrayList<File>();
 
+		if(!currentNode.hideContents) {
+
 		for (String filename : fileArray) {
 			File newfile = new File(path + "//" + filename);
 			files.add(newfile);
+		}
 		}
 
 		ArrayList<File> addLater = new ArrayList<File>();
@@ -142,6 +145,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 
 			if (f.isDirectory()) {
 				scanAndAdd(currentNode, f, project, false);
+				
 			} else {
 
 				addLater.add(f);
@@ -182,10 +186,15 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 
 	}
 
-	public void insertTreeNode(String name, String path) {
-		
-		CustomTreeNode newchild = new CustomTreeNode(path + "\\" + name, name, project, true, false);
-		String[] newpath = { path + "\\" + name };
+	public void insertTreeNode(String name, String path, Boolean isFile) {
+		CustomTreeNode newchild;
+		if(isFile) {
+		newchild = new CustomTreeNode(path + "\\" + name, name, project, isFile, false);
+		}
+		else {
+			newchild = new CustomTreeNode(path , name, project, isFile, false);
+
+		}
 
 		String parentpath = newchild.getParentPath();
 		findParent(parentpath, (CustomTreeNode) internalTree.getModel().getRoot());

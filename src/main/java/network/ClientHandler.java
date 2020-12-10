@@ -1,14 +1,19 @@
 package network;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import javax.swing.JOptionPane;
+
 import core.DEBUG;
 import javaMiniSockets.clientSide.ClientMessageHandler;
 import javaMiniSockets.clientSide.ServerInfo;
+import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
+import userInterface.UIController;
 
 public class ClientHandler implements ClientMessageHandler {
 
@@ -69,26 +74,41 @@ public class ClientHandler implements ClientMessageHandler {
 		// TODO Auto-generated method stub
 
 		DEBUG.debugmessage("HANDSHAKE");
+		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
+			    "Success! You have connected to a session.");
+		
 
 	}
 
 	@Override
 	public void onConnect() {
 		DEBUG.debugmessage("CONNECTED TO SERVER");
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void onServerDisconnect(ServerInfo server) {
-		// TODO Auto-generated method stub
+		
+		try {
+			UIController.getInstance().getDeveloperComponent().client.disconnect();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
+			    "You have been disconnected! The server may have failed or kicked you out of the session.",
+			    "Disconnected warning",
+			    JOptionPane.WARNING_MESSAGE);
+
 
 	}
 
 	@Override
 	public void onDisconnect() {
-		// TODO Auto-generated method stub
-
+		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
+			    "You have disconnected from the current session.",
+			    "Disconnected warning",
+			    JOptionPane.WARNING_MESSAGE);
+		
 	}
 
 }
