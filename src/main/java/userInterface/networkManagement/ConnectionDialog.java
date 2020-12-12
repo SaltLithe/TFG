@@ -31,14 +31,12 @@ public class ConnectionDialog extends JDialog {
 	private final JSplitPane splitPane;
 	private JTextField serverNameField_S;
 	private JTextField serverPortField_S;
-	private JTextField clientPortField_S;
 	private JTextField maxClientsField_S;
 	private JTextField ipField_S;
 	private JTextField clientNameField_C;
 	private JTextField ipField_C;
 	private JTextField clientIPField_C;
 	private JTextField serverPortField_C;
-	private JTextField clientPortField_C;
 	private JCheckBox setServerCheck;
 	private JCheckBox setClientCheck;
 	private UIController controller;
@@ -158,9 +156,9 @@ public class ConnectionDialog extends JDialog {
 			splitPane.setLeftComponent(panel);
 			GridBagLayout gbl_panel = new GridBagLayout();
 			gbl_panel.columnWidths = new int[] { 0, 0, 0 };
-			gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+			gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 65, 0 };
 			gbl_panel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-			gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+			gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
 			panel.setLayout(gbl_panel);
 			{
 				JLabel lblNewLabel = new JLabel("Server name");
@@ -190,7 +188,7 @@ public class ConnectionDialog extends JDialog {
 								controller.run(() -> dp.setAsServer(serverNameField_S.getText(), ipField_S.getText(),
 										Integer.valueOf(maxClientsField_S.getText()),
 										Integer.valueOf(serverPortField_S.getText()),
-										Integer.valueOf(clientPortField_S.getText()),
+									
 										Integer.valueOf(maxClientsField_S.getText()), autostart));
 
 							} else if (setClientCheck.isSelected()) {
@@ -198,9 +196,9 @@ public class ConnectionDialog extends JDialog {
 								boolean autoconnect = autoConnectCheck.isSelected();
 								controller.run(() -> dp.setAsClient(ipField_C.getText(), clientIPField_C.getText(),
 										Integer.valueOf(serverPortField_C.getText()),
-										Integer.valueOf(clientPortField_C.getText()), autoconnect));
+										autoconnect));
 							}
-
+							dispose(); 
 						}
 					});
 
@@ -243,30 +241,11 @@ public class ConnectionDialog extends JDialog {
 				serverPortField_S.setColumns(10);
 			}
 			{
-				JLabel lblNewLabel_2 = new JLabel("Cient port");
-				GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
-				gbc_lblNewLabel_2.insets = new Insets(0, 0, 5, 5);
-				gbc_lblNewLabel_2.gridx = 0;
-				gbc_lblNewLabel_2.gridy = 2;
-				panel.add(lblNewLabel_2, gbc_lblNewLabel_2);
-			}
-			{
-				clientPortField_S = new JTextField();
-				clientPortField_S.setText("8081");
-				GridBagConstraints gbc_clientPortField_S = new GridBagConstraints();
-				gbc_clientPortField_S.insets = new Insets(0, 0, 5, 0);
-				gbc_clientPortField_S.fill = GridBagConstraints.HORIZONTAL;
-				gbc_clientPortField_S.gridx = 1;
-				gbc_clientPortField_S.gridy = 2;
-				panel.add(clientPortField_S, gbc_clientPortField_S);
-				clientPortField_S.setColumns(10);
-			}
-			{
 				JLabel lblNewLabel_3 = new JLabel("Max clients");
 				GridBagConstraints gbc_lblNewLabel_3 = new GridBagConstraints();
 				gbc_lblNewLabel_3.insets = new Insets(0, 0, 5, 5);
 				gbc_lblNewLabel_3.gridx = 0;
-				gbc_lblNewLabel_3.gridy = 3;
+				gbc_lblNewLabel_3.gridy = 2;
 				panel.add(lblNewLabel_3, gbc_lblNewLabel_3);
 			}
 			{
@@ -276,7 +255,7 @@ public class ConnectionDialog extends JDialog {
 				gbc_maxClientsField_S.insets = new Insets(0, 0, 5, 0);
 				gbc_maxClientsField_S.fill = GridBagConstraints.HORIZONTAL;
 				gbc_maxClientsField_S.gridx = 1;
-				gbc_maxClientsField_S.gridy = 3;
+				gbc_maxClientsField_S.gridy = 2;
 				panel.add(maxClientsField_S, gbc_maxClientsField_S);
 				maxClientsField_S.setColumns(10);
 			}
@@ -285,7 +264,7 @@ public class ConnectionDialog extends JDialog {
 				GridBagConstraints gbc_lblNewLabel_4 = new GridBagConstraints();
 				gbc_lblNewLabel_4.insets = new Insets(0, 0, 5, 5);
 				gbc_lblNewLabel_4.gridx = 0;
-				gbc_lblNewLabel_4.gridy = 4;
+				gbc_lblNewLabel_4.gridy = 3;
 				panel.add(lblNewLabel_4, gbc_lblNewLabel_4);
 			}
 			{
@@ -295,7 +274,7 @@ public class ConnectionDialog extends JDialog {
 				gbc_ipField_S.insets = new Insets(0, 0, 5, 0);
 				gbc_ipField_S.fill = GridBagConstraints.HORIZONTAL;
 				gbc_ipField_S.gridx = 1;
-				gbc_ipField_S.gridy = 4;
+				gbc_ipField_S.gridy = 3;
 				panel.add(ipField_S, gbc_ipField_S);
 				ipField_S.setColumns(10);
 			}
@@ -303,18 +282,11 @@ public class ConnectionDialog extends JDialog {
 				autoStartCheck = new JCheckBox("Autostart");
 				autoStartCheck.setSelected(true);
 				GridBagConstraints gbc_autoStartCheck = new GridBagConstraints();
+				gbc_autoStartCheck.anchor = GridBagConstraints.NORTH;
 				gbc_autoStartCheck.insets = new Insets(0, 0, 0, 5);
 				gbc_autoStartCheck.gridx = 0;
-				gbc_autoStartCheck.gridy = 5;
+				gbc_autoStartCheck.gridy = 4;
 				panel.add(autoStartCheck, gbc_autoStartCheck);
-			}
-			{
-				JList list = new JList();
-				GridBagConstraints gbc_list = new GridBagConstraints();
-				gbc_list.fill = GridBagConstraints.BOTH;
-				gbc_list.gridx = 1;
-				gbc_list.gridy = 5;
-				panel.add(list, gbc_list);
 			}
 		}
 		{
@@ -322,9 +294,9 @@ public class ConnectionDialog extends JDialog {
 			splitPane.setRightComponent(panel);
 			GridBagLayout gbl_panel = new GridBagLayout();
 			gbl_panel.columnWidths = new int[] { 0, 0, 0 };
-			gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+			gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
 			gbl_panel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-			gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+			gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
 			panel.setLayout(gbl_panel);
 			{
 				JLabel lblNewLabel_5 = new JLabel("Client name");
@@ -387,31 +359,11 @@ public class ConnectionDialog extends JDialog {
 				serverPortField_C.setColumns(10);
 			}
 			{
-				JLabel lblNewLabel_8 = new JLabel("Client port");
-				GridBagConstraints gbc_lblNewLabel_8 = new GridBagConstraints();
-				gbc_lblNewLabel_8.anchor = GridBagConstraints.EAST;
-				gbc_lblNewLabel_8.insets = new Insets(0, 0, 5, 5);
-				gbc_lblNewLabel_8.gridx = 0;
-				gbc_lblNewLabel_8.gridy = 3;
-				panel.add(lblNewLabel_8, gbc_lblNewLabel_8);
-			}
-			{
-				clientPortField_C = new JTextField();
-				clientPortField_C.setText("8081");
-				GridBagConstraints gbc_clientPortField_C = new GridBagConstraints();
-				gbc_clientPortField_C.insets = new Insets(0, 0, 5, 0);
-				gbc_clientPortField_C.fill = GridBagConstraints.HORIZONTAL;
-				gbc_clientPortField_C.gridx = 1;
-				gbc_clientPortField_C.gridy = 3;
-				panel.add(clientPortField_C, gbc_clientPortField_C);
-				clientPortField_C.setColumns(10);
-			}
-			{
 				JLabel lblNewLabel_9 = new JLabel("Client IP");
 				GridBagConstraints gbc_lblNewLabel_9 = new GridBagConstraints();
 				gbc_lblNewLabel_9.insets = new Insets(0, 0, 5, 5);
 				gbc_lblNewLabel_9.gridx = 0;
-				gbc_lblNewLabel_9.gridy = 4;
+				gbc_lblNewLabel_9.gridy = 3;
 				panel.add(lblNewLabel_9, gbc_lblNewLabel_9);
 			}
 			{
@@ -421,7 +373,7 @@ public class ConnectionDialog extends JDialog {
 				gbc_clientIPField_C.insets = new Insets(0, 0, 5, 0);
 				gbc_clientIPField_C.fill = GridBagConstraints.HORIZONTAL;
 				gbc_clientIPField_C.gridx = 1;
-				gbc_clientIPField_C.gridy = 4;
+				gbc_clientIPField_C.gridy = 3;
 				panel.add(clientIPField_C, gbc_clientIPField_C);
 				clientIPField_C.setColumns(10);
 			}
@@ -429,18 +381,11 @@ public class ConnectionDialog extends JDialog {
 				autoConnectCheck = new JCheckBox("Autoconnect");
 				autoConnectCheck.setSelected(true);
 				GridBagConstraints gbc_auu = new GridBagConstraints();
+				gbc_auu.anchor = GridBagConstraints.NORTH;
 				gbc_auu.insets = new Insets(0, 0, 0, 5);
 				gbc_auu.gridx = 0;
-				gbc_auu.gridy = 5;
+				gbc_auu.gridy = 4;
 				panel.add(autoConnectCheck, gbc_auu);
-			}
-			{
-				JList list = new JList();
-				GridBagConstraints gbc_list = new GridBagConstraints();
-				gbc_list.fill = GridBagConstraints.BOTH;
-				gbc_list.gridx = 1;
-				gbc_list.gridy = 5;
-				panel.add(list, gbc_list);
 			}
 		}
 		splitPane.setDividerLocation(210);

@@ -1,6 +1,5 @@
-package network;
+package network; 
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -65,13 +64,10 @@ public class ClientHandler implements ClientMessageHandler {
 
 		} 
 
-
-
 	}
 
 	@Override
 	public void onServerConnect(ServerInfo server) {
-		// TODO Auto-generated method stub
 
 		DEBUG.debugmessage("HANDSHAKE");
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
@@ -89,17 +85,14 @@ public class ClientHandler implements ClientMessageHandler {
 	@Override
 	public void onServerDisconnect(ServerInfo server) {
 		
-		try {
-			UIController.getInstance().getDeveloperComponent().client.disconnect();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 			    "You have been disconnected! The server may have failed or kicked you out of the session.",
 			    "Disconnected warning",
 			    JOptionPane.WARNING_MESSAGE);
+		UIController.getInstance().getDeveloperComponent().client = null; 
 
-
+		
 	}
 
 	@Override
@@ -108,6 +101,7 @@ public class ClientHandler implements ClientMessageHandler {
 			    "You have disconnected from the current session.",
 			    "Disconnected warning",
 			    JOptionPane.WARNING_MESSAGE);
+		UIController.getInstance().getDeveloperComponent().client = null; 
 		
 	}
 

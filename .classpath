@@ -46,7 +46,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="jgoodies-forms-1.8.0.jar" sourcepath="jgoodies-forms-1.8.0-sources.jar"/>
 	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
-	<classpathentry kind="lib" path="WaifUPnP.jar"/>
 	<classpathentry kind="lib" path="flatlaf-0.42.jar"/>
 	<classpathentry kind="src" output="target/test-classes" path="target/generated-test-sources/test-annotations">
 		<attributes>
@@ -57,6 +56,7 @@
 			<attribute name="m2e-apt" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Usuario/Desktop/MiniSockets2/JavaMiniSockets2.jar" sourcepath="C:/Users/Usuario/Desktop/JavaMiniSockets-master/src/javaMiniSockets/clientSide"/>
+	<classpathentry kind="lib" path="/JavaMiniSockets/bin" sourcepath="/JavaMiniSockets/src"/>
+	<classpathentry kind="lib" path="/JavaMiniSockets/src"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

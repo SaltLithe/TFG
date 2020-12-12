@@ -2,26 +2,23 @@ package core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-//Julio no te fijes mucho en esta clase que es un monstruo 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Observable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import bin.javaMiniSockets.clientSide.AsynchronousClient;
-import bin.javaMiniSockets.serverSide.AsynchronousServer;
 import fileManagement.FILE_TYPE;
 import fileManagement.FileManager;
 import fileManagement.WorkSpace;
+import javaMiniSockets.clientSide.AsynchronousClient;
+import javaMiniSockets.serverSide.AsynchronousServer;
 import network.ClientHandler;
 import network.ServerHandler;
 import network.WriteMessage;
@@ -33,7 +30,7 @@ import userInterface.UIController;
 import userInterface.runConfigDialog;
 import userInterface.fileNavigation.CustomTreeNode;
 
-public class DeveloperComponent extends Observable implements PropertyChangeListener {
+public class DeveloperComponent implements PropertyChangeListener {
 
 	private PersonalInterpreter interpreter;
 	private PersonalCompiler compiler;
@@ -53,8 +50,7 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 	private HashMap<String, ClassPath> classpaths;
 	public boolean isConnected;
 
-	public void setAsClient(String serverAddress, String ownAddress, int serverPort, int clientPort,
-			boolean autoConnect) {
+	public void setAsClient(String serverAddress, String ownAddress, int serverPort, boolean autoConnect) {
 
 		ClientHandler handler = new ClientHandler();
 		client = new AsynchronousClient(serverAddress, ownAddress, serverPort, handler);
@@ -75,7 +71,7 @@ public class DeveloperComponent extends Observable implements PropertyChangeList
 		}
 	}
 
-	public void setAsServer(String name, String ip, int maxClients, int port, int clientPort, int queueSize,
+	public void setAsServer(String name, String ip, int maxClients, int port,  int queueSize,
 			boolean autoConnect) {
 
 		DEBUG.debugmessage("Setting as server");
