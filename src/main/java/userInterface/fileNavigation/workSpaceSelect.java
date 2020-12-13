@@ -49,6 +49,7 @@ public class workSpaceSelect extends JFrame {
 	Dimension minSize = new Dimension(0, 0);
 	Dimension prefSize = new Dimension(0, 0);
 	Dimension maxSize = new Dimension(0, 0);
+	private JButton noWorkSpaceButton;
 
 	/**
 	 * Launch the application.
@@ -113,15 +114,24 @@ public class workSpaceSelect extends JFrame {
 		gbc_lblNewLabel.gridx = 0;
 		gbc_lblNewLabel.gridy = 0;
 		contentPane.add(lblNewLabel, gbc_lblNewLabel);
+		
+		noWorkSpaceButton = new JButton("Start without WorkSpace");
+
+		GridBagConstraints gbc_noWorkspaceButton = new GridBagConstraints();
+		gbc_noWorkspaceButton.anchor = GridBagConstraints.WEST;
+		gbc_noWorkspaceButton.insets = new Insets(0, 0, 5, 0);
+		gbc_noWorkspaceButton.gridx = 0;
+		gbc_noWorkspaceButton.gridy = 1;
+		contentPane.add(noWorkSpaceButton, gbc_noWorkspaceButton);
 
 		newWorkSpaceButton = new JButton("New WorkSpace");
 		newWorkSpaceButton.setHorizontalAlignment(SwingConstants.LEFT);
-		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
-		gbc_btnNewButton.anchor = GridBagConstraints.WEST;
-		gbc_btnNewButton.insets = new Insets(0, 0, 5, 0);
-		gbc_btnNewButton.gridx = 0;
-		gbc_btnNewButton.gridy = 2;
-		contentPane.add(newWorkSpaceButton, gbc_btnNewButton);
+		GridBagConstraints gbc_btnNewButton1 = new GridBagConstraints();
+		gbc_btnNewButton1.anchor = GridBagConstraints.WEST;
+		gbc_btnNewButton1.insets = new Insets(0, 0, 5, 0);
+		gbc_btnNewButton1.gridx = 0;
+		gbc_btnNewButton1.gridy = 2;
+		contentPane.add(newWorkSpaceButton, gbc_btnNewButton1);
 
 		
 		panel = new JPanel();
@@ -158,6 +168,22 @@ public class workSpaceSelect extends JFrame {
 			
 
 		});
+		
+		noWorkSpaceButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				
+				WorkSpaceManager.getInstance().startMainApp();
+				dispose(); 
+				
+
+			}
+
+			
+
+		});
 
 		setSize(500, 500);
 		setResizable(false);
@@ -179,6 +205,8 @@ public class workSpaceSelect extends JFrame {
 		d.setVisible(true);
 		
 	}
+	
+	
 
 	public void refresh() {
 		DEBUG.debugmessage("Refreshing");

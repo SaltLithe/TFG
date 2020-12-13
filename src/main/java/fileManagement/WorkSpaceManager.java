@@ -228,9 +228,21 @@ public class WorkSpaceManager {
 		// TODO Auto-generated method stub
 		
 	}
+	public void startMainApp() {
+		Thread t = new Thread(new Runnable() {
+		    @Override
+		    public void run() {
+		    	new DeveloperComponent(null);
+		    }
+
+		   });
+		t.start();
+	}
 
 	public void startMainApp(int tempID, JFrame frame) {
 
+		
+		
 		List<WorkSpace> ws = this.getAllWorkSpaces();
 		
 		Thread t = new Thread(new Runnable() {

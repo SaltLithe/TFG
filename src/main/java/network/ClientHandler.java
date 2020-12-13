@@ -104,5 +104,13 @@ public class ClientHandler implements ClientMessageHandler {
 		UIController.getInstance().getDeveloperComponent().client = null; 
 		
 	}
+	@Override
+	public void onConnectFail() {
+		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
+			    "Unable to connect to server, the server you are trying to connect is unreachable.",
+			    "Connection error",
+			    JOptionPane.ERROR_MESSAGE);
+		UIController.getInstance().getDeveloperComponent().client = null; 
+	}
 
 }

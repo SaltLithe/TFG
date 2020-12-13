@@ -51,7 +51,7 @@ public class DeveloperMainFrameWrapper implements Runnable {
 	}
 
 	private DeveloperMainFrameWrapper() {
-
+		
 	}
 
 	@Override
@@ -65,6 +65,11 @@ public class DeveloperMainFrameWrapper implements Runnable {
 
 	public static DeveloperMainFrame getInstance() {
 		return instance;
+	}
+
+	public static PropertyChangeListener getUsersPanel() {
+		
+		return instance.usersPanel;
 	}
 
 }

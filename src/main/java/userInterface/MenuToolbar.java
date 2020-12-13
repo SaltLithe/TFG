@@ -29,27 +29,22 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 	private UIController uiController;
 	private DeveloperComponent developerComponent;
 	private DeveloperMainFrame developerMainFrame;
-	private JMenuBar menuBar;
-	JMenuItem saveMenuItem;
-	JMenuItem saveAllMenuItem;
 	JButton save;
 	JButton saveAll;
-	JMenuItem newProjectMenuItem;
 	private JButton runGlobalButton;
 	private JButton terminateProcessButton;
 	private JButton runLocalButton;
 	
 	private TextEditorContainer textEditorContainer;
 	private JButton runConfigButton;
+	private JButton newProjectButton;
 	
 
 	private void enableSaveButtons() {
 
 		save.setEnabled(true);
 		saveAll.setEnabled(true);
-		
-		saveMenuItem.setEnabled(true);
-		saveAllMenuItem.setEnabled(true);
+
 	}
 
 	public MenuToolbar(DeveloperMainFrame developerMainFrame , TextEditorContainer textEditorContainer) {
@@ -62,27 +57,6 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 		developerComponent = uiController.getDeveloperComponent();
 		this.developerMainFrame = developerMainFrame;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		
-		menuBar = new JMenuBar();
-		menuBar.setAlignmentX(Component.LEFT_ALIGNMENT);
-		add(menuBar);
-		
-		JMenu mnNewMenu = new JMenu("File");
-		mnNewMenu.setAlignmentY(Component.TOP_ALIGNMENT);
-		mnNewMenu.setAlignmentX(Component.LEFT_ALIGNMENT);
-		menuBar.add(mnNewMenu);
-		
-		newProjectMenuItem = new JMenuItem("New Project");
-		mnNewMenu.add(newProjectMenuItem);
-		
-		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Open Project");
-		mnNewMenu.add(mntmNewMenuItem_1);
-		
-		saveMenuItem = new JMenuItem("Save");
-		mnNewMenu.add(saveMenuItem);
-		
-		saveAllMenuItem = new JMenuItem("Save all");
-		mnNewMenu.add(saveAllMenuItem);
 		
 		JToolBar toolBar = new JToolBar();
 		toolBar.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -112,8 +86,12 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 		runConfigButton.setIcon(new ImageIcon("Icons\\runConfig_icon.png"));
 		toolBar.add(runConfigButton);
 		
+		newProjectButton = new JButton("Add Project");
+		newProjectButton.setIcon(new ImageIcon("Icons\\projectFolder_icon.png"));
+		toolBar.add(newProjectButton);
 		
-		newProjectMenuItem.addActionListener(new ActionListener() {
+		
+		newProjectButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -142,26 +120,6 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			public void actionPerformed(ActionEvent e) {
 			
 					saveAll(); 
-			}
-
-		});
-		
-		saveAllMenuItem.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-			
-					saveAll(); 
-			}
-
-		});
-		
-		saveMenuItem.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-			
-				save(); 
 			}
 
 		});
@@ -215,7 +173,6 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 		disableTerminate();
 		disableGlobalRun();
-		menuBar.setVisible(true);
 		this.setVisible(true);
 
 	}
@@ -284,7 +241,12 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 		case SAFETY_SAVE:
 			saveAll(); 
 			break;
-	 
+		case DISABLE_NEW_PROJECT:
+			newProjectButton.setEnabled(false);
+			break;
+		case ENABLE_NEW_PROJECT:
+			newProjectButton.setEnabled(true);
+			
 		default:
 			break;
 		}

@@ -6,23 +6,32 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Label;
+import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
+import javax.swing.JColorChooser;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import core.DeveloperComponent;
+import userInterface.DeveloperMainFrameWrapper;
 import userInterface.UIController;
 
-public class ConnectionDialog extends JDialog {
+public class ConnectionDialog extends JFrame {
 
 	private final JPanel contentPanel = new JPanel();
 	/**
@@ -43,6 +52,14 @@ public class ConnectionDialog extends JDialog {
 	private DeveloperComponent dp;
 	private JCheckBox autoStartCheck;
 	private JCheckBox autoConnectCheck;
+	private JColorChooser colorChoosersv;
+	private JColorChooser colorChoosercl;
+	private testIconComponent serverImageLabel;
+	private testIconComponent imageLabelClient;
+	private JButton serverImageButton;
+	private JButton clientImageButton;
+	private JFileChooser imageChooser;
+	private GridBagConstraints gbc_imageLabelClient;
 
 	/**
 	 * Launch the application.
@@ -52,42 +69,18 @@ public class ConnectionDialog extends JDialog {
 	 * Create the dialog.
 	 */
 	public ConnectionDialog() {
+		imageChooser = new JFileChooser();
+		imageChooser.addChoosableFileFilter(new FileNameExtensionFilter("Image Files", "jpg", "png"));
 		controller = UIController.getInstance();
 		dp = controller.getDeveloperComponent();
-		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.NORTH);
-		GridBagLayout gbl_contentPanel = new GridBagLayout();
-		gbl_contentPanel.columnWidths = new int[] { 97, 230, 97, 0 };
-		gbl_contentPanel.rowHeights = new int[] { 23, 0 };
-		gbl_contentPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, Double.MIN_VALUE };
-		gbl_contentPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
-		contentPanel.setLayout(gbl_contentPanel);
-		{
-			JPanel panel = new JPanel();
-			GridBagConstraints gbc_panel = new GridBagConstraints();
-			gbc_panel.anchor = GridBagConstraints.NORTH;
-			gbc_panel.fill = GridBagConstraints.HORIZONTAL;
-			gbc_panel.gridwidth = 3;
-			gbc_panel.gridx = 0;
-			gbc_panel.gridy = 0;
-			contentPanel.add(panel, gbc_panel);
-			GridBagLayout gbl_panel = new GridBagLayout();
-			gbl_panel.columnWidths = new int[] { 0 };
-			gbl_panel.rowHeights = new int[] { 0 };
-			gbl_panel.columnWeights = new double[] { Double.MIN_VALUE };
-			gbl_panel.rowWeights = new double[] { Double.MIN_VALUE };
-			panel.setLayout(gbl_panel);
-		}
+		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.X_AXIS));
 		{
 			setServerCheck = new JCheckBox("Set as server");
-			GridBagConstraints gbc_chckbxNewCheckBox_1 = new GridBagConstraints();
-			gbc_chckbxNewCheckBox_1.anchor = GridBagConstraints.NORTHWEST;
-			gbc_chckbxNewCheckBox_1.insets = new Insets(0, 0, 0, 5);
-			gbc_chckbxNewCheckBox_1.gridx = 0;
-			gbc_chckbxNewCheckBox_1.gridy = 0;
-			contentPanel.add(setServerCheck, gbc_chckbxNewCheckBox_1);
+			setServerCheck.setHorizontalAlignment(SwingConstants.LEFT);
+			contentPanel.add(setServerCheck);
 			setServerCheck.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent event) {
@@ -117,11 +110,8 @@ public class ConnectionDialog extends JDialog {
 
 		{
 			setClientCheck = new JCheckBox("Set as client");
-			GridBagConstraints gbc_chckbxNewCheckBox_2 = new GridBagConstraints();
-			gbc_chckbxNewCheckBox_2.anchor = GridBagConstraints.NORTHWEST;
-			gbc_chckbxNewCheckBox_2.gridx = 2;
-			gbc_chckbxNewCheckBox_2.gridy = 0;
-			contentPanel.add(setClientCheck, gbc_chckbxNewCheckBox_2);
+			setClientCheck.setAlignmentX(Component.RIGHT_ALIGNMENT);
+			contentPanel.add(setClientCheck);
 			setClientCheck.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent event) {
@@ -155,10 +145,10 @@ public class ConnectionDialog extends JDialog {
 			JPanel panel = new JPanel();
 			splitPane.setLeftComponent(panel);
 			GridBagLayout gbl_panel = new GridBagLayout();
-			gbl_panel.columnWidths = new int[] { 0, 0, 0 };
-			gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 65, 0 };
-			gbl_panel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-			gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+			gbl_panel.columnWidths = new int[] { 82, 597, 0 };
+			gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 53, 65, 0 };
+			gbl_panel.columnWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
+			gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
 			panel.setLayout(gbl_panel);
 			{
 				JLabel lblNewLabel = new JLabel("Server name");
@@ -190,6 +180,7 @@ public class ConnectionDialog extends JDialog {
 										Integer.valueOf(serverPortField_S.getText()),
 									
 										Integer.valueOf(maxClientsField_S.getText()), autostart));
+										dp.setIcon(colorChoosersv.getColor(), serverImageLabel.imagepath , serverNameField_S.getText());
 
 							} else if (setClientCheck.isSelected()) {
 
@@ -197,6 +188,8 @@ public class ConnectionDialog extends JDialog {
 								controller.run(() -> dp.setAsClient(ipField_C.getText(), clientIPField_C.getText(),
 										Integer.valueOf(serverPortField_C.getText()),
 										autoconnect));
+								dp.setIcon(colorChoosercl.getColor(), imageLabelClient.imagepath , clientNameField_C.getText());
+
 							}
 							dispose(); 
 						}
@@ -212,10 +205,11 @@ public class ConnectionDialog extends JDialog {
 
 			{
 				serverNameField_S = new JTextField();
+				serverNameField_S.setHorizontalAlignment(SwingConstants.LEFT);
 				serverNameField_S.setText("a");
 				GridBagConstraints gbc_serverNameField_S = new GridBagConstraints();
-				gbc_serverNameField_S.insets = new Insets(0, 0, 5, 0);
 				gbc_serverNameField_S.fill = GridBagConstraints.HORIZONTAL;
+				gbc_serverNameField_S.insets = new Insets(0, 0, 5, 0);
 				gbc_serverNameField_S.gridx = 1;
 				gbc_serverNameField_S.gridy = 0;
 				panel.add(serverNameField_S, gbc_serverNameField_S);
@@ -271,38 +265,89 @@ public class ConnectionDialog extends JDialog {
 				ipField_S = new JTextField();
 				ipField_S.setText("192.168.1.15");
 				GridBagConstraints gbc_ipField_S = new GridBagConstraints();
-				gbc_ipField_S.insets = new Insets(0, 0, 5, 0);
 				gbc_ipField_S.fill = GridBagConstraints.HORIZONTAL;
+				gbc_ipField_S.insets = new Insets(0, 0, 5, 0);
 				gbc_ipField_S.gridx = 1;
 				gbc_ipField_S.gridy = 3;
 				panel.add(ipField_S, gbc_ipField_S);
 				ipField_S.setColumns(10);
 			}
 			{
-				autoStartCheck = new JCheckBox("Autostart");
+				JLabel lblNewLabel_2 = new JLabel("Color");
+				GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
+				gbc_lblNewLabel_2.anchor = GridBagConstraints.NORTH;
+				gbc_lblNewLabel_2.insets = new Insets(0, 0, 5, 5);
+				gbc_lblNewLabel_2.gridx = 0;
+				gbc_lblNewLabel_2.gridy = 4;
+				panel.add(lblNewLabel_2, gbc_lblNewLabel_2);
+			}
+			{
+				colorChoosersv = new JColorChooser(); 
+				GridBagConstraints gbc_colorChooserpl = new GridBagConstraints();
+				gbc_colorChooserpl.fill = GridBagConstraints.HORIZONTAL;
+				gbc_colorChooserpl.insets = new Insets(0, 0, 5, 0);
+				gbc_colorChooserpl.gridx = 1;
+				gbc_colorChooserpl.gridy = 4;
+				colorChoosersv.setSize(colorChoosersv.getPreferredSize());
+				
+		
+				panel.add(colorChoosersv, gbc_colorChooserpl);
+			}
+			{
+				serverImageButton = new JButton("Browse");
+
+				 serverImageLabel = new testIconComponent(null , null , null, true);
+				 serverImageButton.addActionListener(new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						
+					}
+					 
+					 
+					 
+				 });
+				{
+					GridBagConstraints gbc_serverImageButton = new GridBagConstraints();
+					gbc_serverImageButton.insets = new Insets(0, 0, 5, 5);
+					gbc_serverImageButton.gridx = 0;
+					gbc_serverImageButton.gridy = 5;
+					panel.add(serverImageButton, gbc_serverImageButton);
+				}
+				GridBagConstraints gbc_serverImageLabel = new GridBagConstraints();
+				gbc_serverImageLabel.anchor = GridBagConstraints.WEST;
+				gbc_serverImageLabel.insets = new Insets(0, 0, 5, 0);
+				gbc_serverImageLabel.gridx = 1;
+				gbc_serverImageLabel.gridy = 5;
+				panel.add(serverImageLabel, gbc_serverImageLabel);
+			}
+			{
+				autoStartCheck = new JCheckBox("Start");
 				autoStartCheck.setSelected(true);
 				GridBagConstraints gbc_autoStartCheck = new GridBagConstraints();
 				gbc_autoStartCheck.anchor = GridBagConstraints.NORTH;
 				gbc_autoStartCheck.insets = new Insets(0, 0, 0, 5);
 				gbc_autoStartCheck.gridx = 0;
-				gbc_autoStartCheck.gridy = 4;
+				gbc_autoStartCheck.gridy = 6;
 				panel.add(autoStartCheck, gbc_autoStartCheck);
 			}
+			panel.setSize(panel.getPreferredSize());
 		}
+	
 		{
 			JPanel panel = new JPanel();
 			splitPane.setRightComponent(panel);
 			GridBagLayout gbl_panel = new GridBagLayout();
-			gbl_panel.columnWidths = new int[] { 0, 0, 0 };
-			gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
+			gbl_panel.columnWidths = new int[] { 77, 410, 0 };
+			gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 57, 0, 0 };
 			gbl_panel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-			gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+			gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
 			panel.setLayout(gbl_panel);
+			
 			{
 				JLabel lblNewLabel_5 = new JLabel("Client name");
 				GridBagConstraints gbc_lblNewLabel_5 = new GridBagConstraints();
 				gbc_lblNewLabel_5.insets = new Insets(0, 0, 5, 5);
-				gbc_lblNewLabel_5.anchor = GridBagConstraints.EAST;
 				gbc_lblNewLabel_5.gridx = 0;
 				gbc_lblNewLabel_5.gridy = 0;
 				panel.add(lblNewLabel_5, gbc_lblNewLabel_5);
@@ -321,7 +366,6 @@ public class ConnectionDialog extends JDialog {
 			{
 				JLabel lblNewLabel_6 = new JLabel("Server IP");
 				GridBagConstraints gbc_lblNewLabel_6 = new GridBagConstraints();
-				gbc_lblNewLabel_6.anchor = GridBagConstraints.EAST;
 				gbc_lblNewLabel_6.insets = new Insets(0, 0, 5, 5);
 				gbc_lblNewLabel_6.gridx = 0;
 				gbc_lblNewLabel_6.gridy = 1;
@@ -341,7 +385,6 @@ public class ConnectionDialog extends JDialog {
 			{
 				JLabel lblNewLabel_7 = new JLabel("Server port");
 				GridBagConstraints gbc_lblNewLabel_7 = new GridBagConstraints();
-				gbc_lblNewLabel_7.anchor = GridBagConstraints.EAST;
 				gbc_lblNewLabel_7.insets = new Insets(0, 0, 5, 5);
 				gbc_lblNewLabel_7.gridx = 0;
 				gbc_lblNewLabel_7.gridy = 2;
@@ -378,18 +421,93 @@ public class ConnectionDialog extends JDialog {
 				clientIPField_C.setColumns(10);
 			}
 			{
-				autoConnectCheck = new JCheckBox("Autoconnect");
+				Label label = new Label("Color");
+				GridBagConstraints gbc_label = new GridBagConstraints();
+				gbc_label.anchor = GridBagConstraints.NORTH;
+				gbc_label.insets = new Insets(0, 0, 5, 5);
+				gbc_label.gridx = 0;
+				gbc_label.gridy = 4;
+				panel.add(label, gbc_label);
+			}
+			{
+				colorChoosercl = new JColorChooser(); 
+				GridBagConstraints gbc_colorChoosercl = new GridBagConstraints();
+				gbc_colorChoosercl.fill = GridBagConstraints.HORIZONTAL;
+				gbc_colorChoosercl.insets = new Insets(0, 0, 5, 0);
+				gbc_colorChoosercl.gridx = 1;
+				gbc_colorChoosercl.gridy = 4;
+				colorChoosersv.setSize(colorChoosercl.getPreferredSize());
+
+				panel.add(colorChoosercl, gbc_colorChoosercl);
+			}
+			{
+				clientImageButton = new JButton("Browse");
+
+				imageLabelClient = new testIconComponent(null , null , null ,true);
+				 clientImageButton.addActionListener(new ActionListener() {
+
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+
+							int result = imageChooser.showOpenDialog(DeveloperMainFrameWrapper.getInstance());
+							if (result == JFileChooser.APPROVE_OPTION) {
+								File selectedFile = imageChooser.getSelectedFile();
+								panel.remove(imageLabelClient);
+
+								panel.remove(imageLabelClient);
+								imageLabelClient = new testIconComponent(selectedFile.getPath() ,null, null , true);
+								panel.add(imageLabelClient, gbc_imageLabelClient);
+								splitPane.updateUI();
+
+								
+							}
+						}
+						 
+						 
+						 
+					 });
+				{
+					GridBagConstraints gbc_clientImageButton = new GridBagConstraints();
+					gbc_clientImageButton.insets = new Insets(0, 0, 5, 5);
+					gbc_clientImageButton.gridx = 0;
+					gbc_clientImageButton.gridy = 5;
+					panel.add(clientImageButton, gbc_clientImageButton);
+				}
+				gbc_imageLabelClient = new GridBagConstraints();
+				gbc_imageLabelClient.anchor = GridBagConstraints.WEST;
+				gbc_imageLabelClient.insets = new Insets(0, 0, 5, 0);
+				gbc_imageLabelClient.gridx = 1;
+				gbc_imageLabelClient.gridy = 5;
+				panel.add(imageLabelClient, gbc_imageLabelClient);
+			}
+			{
+				autoConnectCheck = new JCheckBox("Connect");
 				autoConnectCheck.setSelected(true);
 				GridBagConstraints gbc_auu = new GridBagConstraints();
 				gbc_auu.anchor = GridBagConstraints.NORTH;
 				gbc_auu.insets = new Insets(0, 0, 0, 5);
 				gbc_auu.gridx = 0;
-				gbc_auu.gridy = 4;
+				gbc_auu.gridy = 6;
 				panel.add(autoConnectCheck, gbc_auu);
 			}
+			panel.setSize(panel.getPreferredSize());
 		}
-		splitPane.setDividerLocation(210);
-
+		  
+		    for (AbstractColorChooserPanel accp : colorChoosersv.getChooserPanels()) {
+                if (!accp.getDisplayName().equals("RGB")) {
+                	 colorChoosersv.removeChooserPanel(accp);
+                }
+            }
+		    for (AbstractColorChooserPanel accp : colorChoosercl.getChooserPanels()) {
+                if (!accp.getDisplayName().equals("RGB")) {
+                	 colorChoosercl.removeChooserPanel(accp);
+                }
+            }
+		setSize(getPreferredSize());
+		setResizable(true);
+		splitPane.setDividerLocation(657);
+		
 		setServerCheck.doClick();
+		setVisible(true);
 	}
 }

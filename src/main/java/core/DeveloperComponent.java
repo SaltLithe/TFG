@@ -1,5 +1,6 @@
 package core;
 
+import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -63,8 +64,10 @@ public class DeveloperComponent implements PropertyChangeListener {
 
 			try {
 				DEBUG.debugmessage("SET AS CLIENT");
+				support.notify(ObserverActions.DISABLE_NEW_PROJECT,null,null);
 				client.Connect();
 				isConnected = true ; 
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -86,6 +89,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 		}
 
 		if (autoConnect) {
+			support.notify(ObserverActions.DISABLE_NEW_PROJECT,null,null);
 			server.Start();
 			isConnected = true; 
 		}
@@ -125,11 +129,14 @@ public class DeveloperComponent implements PropertyChangeListener {
 		support.addPropertyChangeListener(DeveloperMainFrameWrapper.getTextEditorPanel());
 		support.addPropertyChangeListener(DeveloperMainFrameWrapper.getConsolePanel());
 		support.addPropertyChangeListener(DeveloperMainFrameWrapper.getMenuToolbar());
+		support.addPropertyChangeListener(DeveloperMainFrameWrapper.getUsersPanel());
 		support.addPropertyChangeListener(compiler);
 		support.addPropertyChangeListener(this);
 		support.addPropertyChangeListener(DeveloperMainFrameWrapper.getInstance());
 
+		if(workSpace != null) {
 		fileManager.scanWorkSpace(workSpace);
+		}
 	}
 
 	private boolean stillExists(String name) {
@@ -467,6 +474,15 @@ return null ;
 
 	public void createSrcFolder(String path , String name) {
 		fileManager.writeFolder(path, FILE_TYPE.SRC_FOLDER, true , name ,focusedProject );
+		
+	}
+
+	public void setIcon(Color color, String imagepath , String name) {
+		ArrayList<Object> list = new ArrayList<Object>();
+		list.add(color);
+		list.add(imagepath);
+		list.add(name);
+		support.notify(ObserverActions.SET_SELF_ICON, null , list);
 		
 	}
 
