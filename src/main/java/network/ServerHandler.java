@@ -7,16 +7,20 @@ import java.util.concurrent.ArrayBlockingQueue;
 import javax.swing.JOptionPane;
 
 import core.DEBUG;
+import core.DeveloperComponent;
+import fileManagement.FILE_PROPERTIES;
 import javaMiniSockets.serverSide.ClientInfo;
 import javaMiniSockets.serverSide.ServerMessageHandler;
 import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
+import userInterface.UIController;
 
 public class ServerHandler implements ServerMessageHandler {
 	PropertyChangeMessenger support;
 	ArrayBlockingQueue<WriteMessage> processBuffer = new ArrayBlockingQueue<WriteMessage>(100);
-	
+	UIController controller;
+	DeveloperComponent component; 
 	
 	public void processMessage() {
 		ArrayList<Object> messages = new ArrayList<Object>(); 
@@ -41,6 +45,8 @@ public class ServerHandler implements ServerMessageHandler {
 		support = PropertyChangeMessenger.getInstance();
 		Thread t = new Thread(()-> processMessage());
 		t.start(); 
+		controller = UIController.getInstance();
+		component = controller.getDeveloperComponent();
 
 	}
 
@@ -48,8 +54,14 @@ public class ServerHandler implements ServerMessageHandler {
 	public void onMessageSent(Serializable message, ClientInfo client) {
 
 		DEBUG.debugmessage("HA LLEGADO UN MENSAJE DEL CLIENTE");
-		DEBUG.debugmessage(message.getClass().toString());
+	
 
+		String messageclass = message.getClass().toString();
+		
+		switch (messageclass) {
+		case "class network.WriteMessage" : 
+		
+		
 		WriteMessage incoming = (WriteMessage) message;
 
 		try {
@@ -60,8 +72,24 @@ public class ServerHandler implements ServerMessageHandler {
 			e.printStackTrace();
 
 		} 
+		break;
+		
+		case "class network.RequestWorkspaceMessage":
+			
+		
+			ResponseCreateFileMessage response = new ResponseCreateFileMessage(); 
+			response.path = component.getWorkSpaceName(); 
+			response.type = FILE_PROPERTIES.projectProperty.toString();
+		
+			controller.run(()->component.sendSyncToClient(response, client.clientID));
+			
+			
+		break;
+		
+		default:
+			break;
 
-
+		}
 	}
 
 	@Override

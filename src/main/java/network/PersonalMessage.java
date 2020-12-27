@@ -6,9 +6,13 @@ import java.io.Serializable;
  * deserializados se podra acceder a sus propiedades fácilmente sin necesidad de tener que porgamar un parser
  * y con flexibilidad para añadirle mas campos si se desea
  */
-@SuppressWarnings("serial")
+
 public class PersonalMessage implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7202942596545627532L;
 	private final String text;
 	private final String type;
 	private final int id;

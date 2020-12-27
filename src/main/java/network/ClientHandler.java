@@ -7,17 +7,23 @@ import java.util.concurrent.ArrayBlockingQueue;
 import javax.swing.JOptionPane;
 
 import core.DEBUG;
+import core.DeveloperComponent;
+import fileManagement.FILE_PROPERTIES;
+import fileManagement.WorkSpaceManager;
 import javaMiniSockets.clientSide.ClientMessageHandler;
 import javaMiniSockets.clientSide.ServerInfo;
 import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
+import userInterface.networkManagement.acceptSyncDialog;
 
 public class ClientHandler implements ClientMessageHandler {
 
 	PropertyChangeMessenger support;
 	ArrayBlockingQueue<WriteMessage> processBuffer = new ArrayBlockingQueue<WriteMessage>(100);
+	UIController controller;
+	DeveloperComponent component;
 
 	public void processMessage() {
 		ArrayList<Object> messages = new ArrayList<Object>(); 
@@ -38,6 +44,8 @@ public class ClientHandler implements ClientMessageHandler {
 	}
 	public ClientHandler() {
 
+		controller = UIController.getInstance();
+		component = controller.getDeveloperComponent();
 		support = PropertyChangeMessenger.getInstance();
 		Thread t = new Thread(()-> processMessage());
 		t.start(); 
@@ -49,9 +57,14 @@ public class ClientHandler implements ClientMessageHandler {
 	public void onMessageSent(Serializable message, ServerInfo serverInfo) {
 		// TODO Auto-generated method stub
 
-		DEBUG.debugmessage(message.toString());
+	
 
 		DEBUG.debugmessage("HA LLEGADO UN MENSAJE DEL SERVER");
+
+		String messageclass = message.getClass().toString();
+		
+		switch (messageclass) {
+		case "class network.WriteMessage" : 
 		WriteMessage incoming = (WriteMessage) message;
 
 
@@ -63,6 +76,23 @@ public class ClientHandler implements ClientMessageHandler {
 			e.printStackTrace();
 
 		} 
+		break;
+	
+		case "class network.ResponseCreateFileMessage":
+			ResponseCreateFileMessage incoming1 = (ResponseCreateFileMessage) message;
+			
+			if(incoming1.type.equals(FILE_PROPERTIES.projectProperty.toString())) {
+		
+			 component.createWorkSpace(incoming1.path);
+			}
+				
+			
+			
+			
+			break;
+		default:
+			break;
+		}
 
 	}
 
@@ -72,6 +102,8 @@ public class ClientHandler implements ClientMessageHandler {
 		DEBUG.debugmessage("HANDSHAKE");
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 			    "Success! You have connected to a session.");
+		
+		acceptSyncDialog d = new acceptSyncDialog(); 
 		
 
 	}

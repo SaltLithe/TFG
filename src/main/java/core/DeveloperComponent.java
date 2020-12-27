@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -18,9 +19,12 @@ import javax.swing.SwingUtilities;
 import fileManagement.FILE_TYPE;
 import fileManagement.FileManager;
 import fileManagement.WorkSpace;
+import fileManagement.WorkSpaceManager;
 import javaMiniSockets.clientSide.AsynchronousClient;
 import javaMiniSockets.serverSide.AsynchronousServer;
 import network.ClientHandler;
+import network.RequestWorkspaceMessage;
+import network.ResponseCreateFileMessage;
 import network.ServerHandler;
 import network.WriteMessage;
 import userInterface.DeveloperMainFrame;
@@ -43,7 +47,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 	public AsynchronousClient client;
 	private int defaultQueueSize = 100;
 	public Thread runningThread; 
-
+	public String expectedWorkSpaceLocation = null; 
+	
 	private String focusedProject;
 	private HashMap<String, String> projectFocusPairs;
 
@@ -65,6 +70,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 			try {
 				DEBUG.debugmessage("SET AS CLIENT");
 				support.notify(ObserverActions.DISABLE_NEW_PROJECT,null,null);
+				support.notify(ObserverActions.DISABLE_JOIN_BUTTON,null , null );
 				client.Connect();
 				isConnected = true ; 
 				
@@ -90,6 +96,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 
 		if (autoConnect) {
 			support.notify(ObserverActions.DISABLE_NEW_PROJECT,null,null);
+			support.notify(ObserverActions.DISABLE_JOIN_BUTTON,null , null );
 			server.Start();
 			isConnected = true; 
 		}
@@ -484,6 +491,103 @@ return null ;
 		list.add(name);
 		support.notify(ObserverActions.SET_SELF_ICON, null , list);
 		
+		
 	}
+
+	public void sendMessageToServer(RequestWorkspaceMessage message) {
+		if(this.client != null) {
+			try {
+				this.client.send(message);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void disconnect() {
+
+		try {
+			client.disconnect();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	}
+
+	public String getWorkSpaceName() {
+		return workSpace.getName();
+	
+	}
+
+	public void sendToClient(Serializable response , int clientID) {
+		if(server != null) {
+			Serializable[] messages = {response};
+			int[] clientIDS = {clientID};
+			try {
+				server.sendMessage(clientIDS, messages);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void scanAndSend(int clientID) {
+		
+		LinkedList<ResponseCreateFileMessage> responses = fileManager.scanAndReturn(workSpace.getPath(), workSpace.getName()); 
+		
+		System.out.println("TOTAL IS : " + responses.size());
+		int count =0 ; 
+		
+		for (ResponseCreateFileMessage message : responses) {
+			
+			System.out.println("SENDING MESSAGE NUMBER : " + count);
+			count++;
+			
+			
+			
+			
+			this.sendToClient(message, clientID);
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		}
+		
+		
+		
+	}
+	
+	
+	public void sendSyncToClient(ResponseCreateFileMessage message  , int clientID) {
+		
+		sendToClient(message, clientID);
+		
+		scanAndSend(clientID); 
+	}
+
+	public void createWorkSpace(String path) {
+
+		WorkSpace ws = new WorkSpace();
+		ws.setName(path);
+		ws.setPath(expectedWorkSpaceLocation + "\\" + path);
+		File wslocation = new File(ws.getPath());
+		
+		if (!wslocation.exists()) {
+			wslocation.mkdir();
+		}
+		
+		WorkSpaceManager wsm = WorkSpaceManager.getInstance();
+		wsm.addWorkSpace(ws);
+		
+		
+		
+		
+	}
+	
 
 }

@@ -1,6 +1,6 @@
 package network;
 
-import java.awt.AWTEvent;
+
 import java.io.Serializable;
 
 public class WriteMessage implements Serializable {

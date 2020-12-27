@@ -12,19 +12,23 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JFileChooser;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import core.DEBUG;
 import core.DeveloperComponent;
+import network.ResponseCreateFileMessage;
 import network.WriteMessage;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
 import userInterface.fileNavigation.CustomTreeNode;
+import org.apache.commons.*;
 
 /*Clase que maneja todos los archivos sobre los que trabaja la aplicación , contiene un hashmap en el que
  * guarda objetos de la clase TextFile que se corresponden a ficheros en la carpeta actual que se guarda en 
@@ -44,7 +48,8 @@ public class FileManager {
 	private UIController uiController;
 	private DeveloperComponent developerComponent;
 	private ReentrantLock saveWriteLock;
-
+	private LinkedList<ResponseCreateFileMessage> returningList; 
+	
 	public String getCurrentFolder() {
 		return currentPath;
 	}
@@ -542,6 +547,167 @@ public class FileManager {
 
 		saveWriteLock.unlock();
 
+	}
+	
+	
+	private String typeOfExtension(String path) {
+		String extension = null;
+		try {
+		extension = path.substring(path.lastIndexOf(".") + 1);
+		} catch (Exception e) {
+		}
+		switch (extension) {
+		case "java":
+			return  FILE_TYPE.JAVA_FILE.toString();
+		
+		case "class":
+			return FILE_TYPE.CLASS_FILE.toString(); 
+
+		default:
+			return  FILE_TYPE.ANY_FILE.toString();
+	
+
+		}
+	}
+	
+	
+	private String typeofFile(String path) {
+		
+		
+		String returning = null; 
+		
+		final Path file = Paths.get(path);
+		final UserDefinedFileAttributeView view = Files.getFileAttributeView(file,
+				UserDefinedFileAttributeView.class);
+		ByteBuffer readBuffer = null;
+		boolean success = false;
+		int count = 0;
+		while(count < FILE_PROPERTIES.properties.length && !success) {
+			
+
+			try {
+				readBuffer = ByteBuffer.allocate(view.size(FILE_PROPERTIES.properties[count]));
+			} catch (IOException e) {
+			}
+			try {
+				view.read(FILE_PROPERTIES.properties[count], readBuffer);
+			} catch (IOException e) {
+			}
+		
+			try {
+				readBuffer.flip();
+				final String valueFromAttributes = new String(readBuffer.array(), "UTF-8");
+				if (valueFromAttributes.equals(FILE_PROPERTIES.properties[count])) {
+					switch (FILE_PROPERTIES.properties[count]) {
+						
+					case FILE_PROPERTIES.projectProperty:
+						returning = FILE_PROPERTIES.projectProperty.toString();
+						break;
+					case FILE_PROPERTIES.srcProperty:
+						returning = FILE_PROPERTIES.srcProperty.toString();
+
+						break;
+					case FILE_PROPERTIES.binProperty:
+						returning = FILE_PROPERTIES.binProperty.toString();
+
+						break;
+					default:
+						break;
+					
+					
+					}
+					success = true; 
+				}else {
+					count++;
+				}
+			} catch (Exception e) {
+				count++;
+			}
+					
+		}	
+		return returning; 
+	}
+	
+	
+	
+	private void scanAndReturnRecursive(String currentpath , boolean first  , String workspacePath , String workspaceName ){
+		
+		File current = new File(currentpath);
+		
+		if (current.exists()) {
+			
+			if(current.isDirectory()) {
+				
+				if(!first) {
+				ResponseCreateFileMessage message = new ResponseCreateFileMessage(); 
+				message.type = typeofFile(currentpath);
+				String difference =currentpath.replace(workspacePath, "");
+				difference = workspaceName + difference; 
+				
+				message.path = difference;
+				returningList.add(message);
+				}
+				
+				File[] files = current.listFiles();
+				
+				for(File f : files) {
+					
+					scanAndReturnRecursive(f.getAbsolutePath(),false,workspacePath, workspaceName);
+					
+				}
+				
+				
+				
+			}else {
+				ResponseCreateFileMessage message = new ResponseCreateFileMessage(); 
+				
+				message.type = typeOfExtension(currentpath);
+				String difference =currentpath.replace(workspacePath, "");
+				difference = workspaceName + difference; 
+
+				
+				message.path = difference;
+				
+				if(!message.type.equals(FILE_TYPE.CLASS_FILE.toString())) {
+				
+				
+				byte[] encoded = null;
+				try {
+					encoded = Files.readAllBytes(Paths.get(currentpath));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				String contents = new String(encoded, StandardCharsets.UTF_8);
+				message.contents = contents; 
+				}
+				returningList.add(message);
+				
+				
+				
+				
+				
+			}
+			
+			
+			
+		}
+		
+		
+	}
+	
+
+	public LinkedList<ResponseCreateFileMessage> scanAndReturn(String workspacepath , String workspaceName) {
+		saveAllFull();
+		saveWriteLock.lock();
+		
+		returningList = new LinkedList<ResponseCreateFileMessage>(); 
+		workspaceName += "\\";
+		scanAndReturnRecursive(workspacepath,true,workspacepath , workspaceName);
+		
+		
+		saveWriteLock.unlock();
+		return returningList;
 	}
 
 }

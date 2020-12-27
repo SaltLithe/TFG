@@ -60,6 +60,7 @@ public class ConnectionDialog extends JFrame {
 	private JButton clientImageButton;
 	private JFileChooser imageChooser;
 	private GridBagConstraints gbc_imageLabelClient;
+	private GridBagConstraints gbc_serverImageLabel; 
 
 	/**
 	 * Launch the application.
@@ -299,14 +300,25 @@ public class ConnectionDialog extends JFrame {
 				 serverImageLabel = new testIconComponent(null , null , null, true);
 				 serverImageButton.addActionListener(new ActionListener() {
 
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						
-					}
-					 
-					 
-					 
-				 });
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+
+							int result = imageChooser.showOpenDialog(DeveloperMainFrameWrapper.getInstance());
+							if (result == JFileChooser.APPROVE_OPTION) {
+								File selectedFile = imageChooser.getSelectedFile();
+
+								panel.remove(serverImageLabel);
+								serverImageLabel = new testIconComponent(selectedFile.getPath() ,null, null , true);
+								panel.add(serverImageLabel, gbc_serverImageLabel);
+								splitPane.updateUI();
+
+								
+							}
+						}
+						 
+						 
+						 
+					 });
 				{
 					GridBagConstraints gbc_serverImageButton = new GridBagConstraints();
 					gbc_serverImageButton.insets = new Insets(0, 0, 5, 5);
@@ -314,7 +326,7 @@ public class ConnectionDialog extends JFrame {
 					gbc_serverImageButton.gridy = 5;
 					panel.add(serverImageButton, gbc_serverImageButton);
 				}
-				GridBagConstraints gbc_serverImageLabel = new GridBagConstraints();
+				 gbc_serverImageLabel = new GridBagConstraints();
 				gbc_serverImageLabel.anchor = GridBagConstraints.WEST;
 				gbc_serverImageLabel.insets = new Insets(0, 0, 5, 0);
 				gbc_serverImageLabel.gridx = 1;
@@ -452,7 +464,6 @@ public class ConnectionDialog extends JFrame {
 							int result = imageChooser.showOpenDialog(DeveloperMainFrameWrapper.getInstance());
 							if (result == JFileChooser.APPROVE_OPTION) {
 								File selectedFile = imageChooser.getSelectedFile();
-								panel.remove(imageLabelClient);
 
 								panel.remove(imageLabelClient);
 								imageLabelClient = new testIconComponent(selectedFile.getPath() ,null, null , true);

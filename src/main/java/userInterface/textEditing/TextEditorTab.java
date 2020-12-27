@@ -195,7 +195,7 @@ public class TextEditorTab extends JPanel {
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				
+				DEBUG.debugmessage("TTHIS IS A CHANGE");
 			
 			}
 

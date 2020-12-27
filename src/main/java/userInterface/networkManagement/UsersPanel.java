@@ -157,7 +157,19 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 			removeClient();
 			Rearange(); 
 			break;
-			
+		
+		case DISABLE_JOIN_BUTTON:
+			sessionButton.setEnabled(false);
+			break;
+		case ENABLE_JOIN_BUTTON:
+			sessionButton.setEnabled(true);
+			break;
+		case ENABLE_DISCONNECT_BUTTON:
+			disconnectButton.setEnabled(true);
+			break;
+		case DISABLE_DISCONNECT_BUTTON:
+			disconnectButton.setEnabled(false);
+			break;
 		default:
 			
 			break;

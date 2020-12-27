@@ -75,6 +75,38 @@ public class WorkSpaceManager {
 	}
 	
 	
+	public void addWorkSpace (WorkSpace workspace) {
+		
+		List<WorkSpace> ws = null;
+		try {
+			ws = getAllWorkSpaces();
+		} catch (Exception e) {
+		}
+		if (ws == null) {
+
+			ws = new ArrayList<WorkSpace>();
+		}
+		boolean repeated = false;
+		int counter = 0;
+		while (counter < ws.size() && !repeated) {
+			WorkSpace w = ws.get(counter);
+			if (w.getPath().equals( workspace.getPath())) {
+				repeated = true;
+
+			} else {
+				counter++;
+			}
+
+		}
+		if (!repeated) {
+			ws.add(workspace);
+			
+			rewriteWorkSpaces(ws);
+
+			
+		}
+	}
+	
 	public boolean addWorkSpace(WorkSpace workspace , JFrame frame) {
 
 		
