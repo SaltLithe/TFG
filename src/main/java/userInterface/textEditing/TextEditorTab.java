@@ -1,12 +1,11 @@
 package userInterface.textEditing;
 
 import java.awt.BorderLayout;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
@@ -43,6 +42,8 @@ public class TextEditorTab extends JPanel {
 	
 	//userInterface
 	private RTextScrollPane textEditorScrollPane;
+	
+	private Semaphore editingLock;
 
 
 	//behaviour
@@ -64,6 +65,7 @@ public class TextEditorTab extends JPanel {
 		
 		
 		DEBUG.debugmessage("Se ha creado un tab para el fichero en la direccion : " + path);
+		editingLock = new Semaphore(1);
 		
 		Thread t = new Thread (()-> sendMessages());
 		t.start();
@@ -247,6 +249,13 @@ public class TextEditorTab extends JPanel {
 	public void updateContents(ArrayList<Object> results) {
 
 
+		try {
+			editingLock.acquire();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
 		messageWrite = true; 
 		
 		
@@ -266,8 +275,11 @@ public class TextEditorTab extends JPanel {
 		uiController.run(() -> developerComponent.writeOnClosed(path, textEditorArea.getText()));
 		
 		messageWrite = false; 
+		}catch(Exception e) {
+		
+		}
 
-
+		editingLock.release();
 	}
 
 
