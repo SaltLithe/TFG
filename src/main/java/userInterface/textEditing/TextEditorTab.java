@@ -24,52 +24,47 @@ import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
 
 public class TextEditorTab extends JPanel {
-	
-	
-	//PUBLIC
-	
-	//userInterface
+
+	// PUBLIC
+
+	// userInterface
 	public RSyntaxTextArea textEditorArea;
 	public TabMiniPanel miniPanel;
-	
-	//flags
+
+	// flags
 	public boolean notConsideredChanges;
 	public boolean messageWrite;
 	public boolean unsavedChanges;
-	
-	//PRIVATE
+
+	// PRIVATE
 	private static final long serialVersionUID = 1L;
-	
-	//userInterface
+
+	// userInterface
 	private RTextScrollPane textEditorScrollPane;
-	
+
 	private Semaphore editingLock;
 
-
-	//behaviour
+	// behaviour
 	private UIController uiController;
 	private DeveloperComponent developerComponent;
 	private PropertyChangeMessenger support;
-	private ArrayBlockingQueue<WriteMessage> sendBuffer = new ArrayBlockingQueue<WriteMessage>(100);
+	private ArrayBlockingQueue<WriteMessage> sendBuffer = new ArrayBlockingQueue<WriteMessage>(200);
 	private Semaphore sendSemaphore = new Semaphore(1);
-	private long sendDelay = 50; 
-	
-	//data
+	private long sendDelay = 50;
+
+	// data
 	private String path;
 	private String project;
 	private String keypath;
-	
-	
+
 	public TextEditorTab(String path, TabMiniPanel miniPanel, String project) {
-		
-		
-		
+
 		DEBUG.debugmessage("Se ha creado un tab para el fichero en la direccion : " + path);
 		editingLock = new Semaphore(1);
-		
-		Thread t = new Thread (()-> sendMessages());
+
+		Thread t = new Thread(() -> sendMessages());
 		t.start();
-		
+
 		this.project = project;
 		String workSpacePath = project.substring(0, project.lastIndexOf("\\"));
 		int indexFrom = workSpacePath.lastIndexOf("\\");
@@ -84,7 +79,6 @@ public class TextEditorTab extends JPanel {
 		uiController = UIController.getInstance();
 		developerComponent = uiController.getDeveloperComponent();
 
-	
 		messageWrite = false;
 
 		setLayout(new BorderLayout());
@@ -103,22 +97,16 @@ public class TextEditorTab extends JPanel {
 		textEditorScrollPane = new RTextScrollPane(textEditorArea);
 		add(textEditorScrollPane, BorderLayout.CENTER);
 
-		
-		//LISTENERS
-		
+		// LISTENERS
+
 		textEditorArea.getDocument().addDocumentListener(new DocumentListener() {
 
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-			
 				
-				try {
-					sendSemaphore.acquire();
-				} catch (InterruptedException e2) {
-					e2.printStackTrace();
-				}
+			try {	
 				
-			
+				sendSemaphore.acquire();
 
 				if (notConsideredChanges) {
 
@@ -131,38 +119,41 @@ public class TextEditorTab extends JPanel {
 
 				}
 
-				
 				if (!messageWrite) {
 
-			
-				WriteMessage message = new WriteMessage();
-				message.path = keypath; 
-				message.adding = true;
-				message.offset = e.getOffset();
-				message.changes = textEditorArea.getText().substring(e.getOffset() , e.getOffset()+e.getLength());
-				
-				
-				try {
-					sendBuffer.put(message);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
+					WriteMessage message = new WriteMessage();
+					message.path = keypath;
+					message.adding = true;
+					message.offset = e.getOffset();
+					message.changes = textEditorArea.getText().substring(e.getOffset(), e.getOffset() + e.getLength());
+
+					try {
+						sendBuffer.put(message);
+
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+
 				}
+			}catch(Exception ex ) {
 				
 				
-				}
+				
+			}finally {
+				
 				sendSemaphore.release();
+			}
+			
+			
 
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				try {
-					sendSemaphore.acquire();
-				} catch (InterruptedException e2) {
-					e2.printStackTrace();
-				}
-				
 
+				try {	
+					
+					sendSemaphore.acquire();
 				if (notConsideredChanges) {
 
 					notConsideredChanges = false;
@@ -174,121 +165,105 @@ public class TextEditorTab extends JPanel {
 
 				}
 
-				
 				if (!messageWrite) {
 
-				WriteMessage message = new WriteMessage();
-				message.path = keypath; 
-				message.adding = false;
-				message.lenght = e.getLength();
-				message.offset = e.getOffset(); 
-				
-				
-				try {
-					sendBuffer.put(message);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
+					WriteMessage message = new WriteMessage();
+					message.path = keypath;
+					message.adding = false;
+					message.lenght = e.getLength();
+					message.offset = e.getOffset();
+
+					try {
+						sendBuffer.put(message);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+				}}
+				catch (Exception exc) {
+					
+					
+				}finally {
+					
+					sendSemaphore.release();
 				}
-				}
-				
-				sendSemaphore.release();
 
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				DEBUG.debugmessage("TTHIS IS A CHANGE");
-			
+
 			}
 
 		});
 
 		setVisible(true);
 	}
-	
-	
-	
-	//PUBLIC 
-	
-	
+
+	// PUBLIC
+
 	public void sendMessages() {
-		
-		while(true) {
-		 WriteMessage message = null;
-		try {
-			message = sendBuffer.take();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		final WriteMessage finalMessage = message; 
-		uiController.run(()-> developerComponent.sendMessageToEveryone(finalMessage));
-		try {
-			Thread.sleep(sendDelay);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+
+		while (true) {
+			WriteMessage message = null;
+			try {
+				message = sendBuffer.take();
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			final WriteMessage finalMessage = message;
+			developerComponent.sendMessageToEveryone(finalMessage);
+			try {
+				Thread.sleep(sendDelay);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 
-		
 	}
-		
-	
+
 	public void setTextEditorCode(String code) {
 
-	
 		notConsideredChanges = true;
 		messageWrite = true;
 
 		textEditorArea.setText(code);
-		messageWrite = false; 
-
-		
+		messageWrite = false;
 
 	}
 
 	public void updateContents(ArrayList<Object> results) {
 
-/*
 		try {
 			editingLock.acquire();
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}*/
-		try {
-		messageWrite = true; 
-		
-		
-		WriteMessage incoming = (WriteMessage) results.get(1);
-		if(incoming.adding) {
-			
-			textEditorArea.insert(incoming.changes, incoming.offset);
-			
-		}else {
-			
-			textEditorArea.replaceRange("", incoming.offset, incoming.offset+incoming.lenght);
-		}
-			
-			
-		
-		
-		uiController.run(() -> developerComponent.writeOnClosed(path, textEditorArea.getText()));
-		
-		messageWrite = false; 
-		}catch(Exception e) {
-		
-		}
+			messageWrite = true;
 
-		//editingLock.release();
+			WriteMessage incoming = (WriteMessage) results.get(1);
+			if (incoming.adding) {
+
+				textEditorArea.insert(incoming.changes, incoming.offset);
+
+			} else {
+
+				textEditorArea.replaceRange("", incoming.offset, incoming.offset + incoming.lenght);
+			}
+
+			uiController.run(() -> developerComponent.writeOnClosed(path, textEditorArea.getText()));
+
+			messageWrite = false;
+		} catch (Exception e) {
+
+		}finally {
+		System.out.println("Realising editor");
+		editingLock.release();
+		}
 	}
-
-
 
 	public String getPath() {
 
 		return path;
 	}
-
 
 	public String getContents() {
 		return this.textEditorArea.getText();
