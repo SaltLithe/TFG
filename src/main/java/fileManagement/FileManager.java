@@ -186,7 +186,10 @@ public class FileManager {
 
 	public void writeFolder(String path, FILE_TYPE foldertype , boolean updateTree , String name , String project) {
 
+		
+	
 		File f = new File(path);
+		if(!f.exists()) {
 		f.mkdir();
 		final Path file = Paths.get(f.getAbsolutePath());
 		final UserDefinedFileAttributeView view = Files.getFileAttributeView(file, UserDefinedFileAttributeView.class);
@@ -238,16 +241,17 @@ public class FileManager {
 		}
 		
 		
-		
+		}
 		
 	}
 
-	public void newProject(String name, WorkSpace workSpace) {
+	public void newProject(String name, WorkSpace workSpace, boolean includeHelpFolders, boolean updateEditor) {
 
 		String newpath = workSpace.getPath() + "\\" + name;
 
 		writeFolder(newpath, FILE_TYPE.PROJECT_FOLDER,false , null , null );
 
+		if (includeHelpFolders) {
 		String srcpath = newpath + "\\" + "src";
 
 		writeFolder(srcpath, FILE_TYPE.SRC_FOLDER, false , null , null );
@@ -255,7 +259,10 @@ public class FileManager {
 		String binpath = newpath + "\\" + "bin";
 
 		writeFolder(binpath, FILE_TYPE.BIN_FOLDER, false , null , null );
+		}
+		if(updateEditor) {
 		this.editorProjects.put(newpath, new Project(newpath, name));
+		}
 
 		DEBUG.debugmessage("PROYECTO CREADO");
 
@@ -641,9 +648,7 @@ public class FileManager {
 				if(!first) {
 				ResponseCreateFileMessage message = new ResponseCreateFileMessage(); 
 				message.type = typeofFile(currentpath);
-				String difference =currentpath.replace(workspacePath, "");
-				difference = workspaceName + difference; 
-				
+				String difference =currentpath.replace(workspacePath, "");				
 				message.path = difference;
 				returningList.add(message);
 				}
@@ -662,8 +667,9 @@ public class FileManager {
 				ResponseCreateFileMessage message = new ResponseCreateFileMessage(); 
 				
 				message.type = typeOfExtension(currentpath);
-				String difference =currentpath.replace(workspacePath, "");
+				String difference =currentpath.replace(workspacePath + "\\", "");
 				difference = workspaceName + difference; 
+				difference = difference.substring(difference.indexOf("\\"), difference.length());
 
 				
 				message.path = difference;
@@ -708,6 +714,24 @@ public class FileManager {
 		
 		saveWriteLock.unlock();
 		return returningList;
+	}
+
+	public void writeFile(String path, String contents, FILE_TYPE type) {
+		
+		
+		File newFile = new File(path);
+		
+		try {
+			FileWriter fw = new FileWriter(newFile);
+
+			fw.write(contents);
+
+			fw.close();
+
+		} catch (IOException e) {
+			DEBUG.debugmessage("NO SE HA PODIDO CREAR EL FICHERO DE LA CLASE");
+			e.printStackTrace();
+		}	
 	}
 
 }

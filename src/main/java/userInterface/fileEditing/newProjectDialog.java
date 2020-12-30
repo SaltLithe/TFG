@@ -63,7 +63,7 @@ public class newProjectDialog extends JDialog{
 			
 				String name = nameField.getText() ;
 				if(name != "" && name != null ) {
-				uiController.run(()-> developerComponent.createNewProject(name));
+				uiController.run(()-> developerComponent.createNewProject(name,true,true));
 				}
 
 			}

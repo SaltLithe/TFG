@@ -63,6 +63,12 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 	public void propertyChange(PropertyChangeEvent evt) {
 		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
 		switch (action) {
+		
+		case CLEAR_PANEL:
+			
+			fileExplorerPanel.clean(); 
+			
+			break; 
 
 		case ADD_PROJECT_TREE:
 			DEBUG.debugmessage("ADDING TREE");

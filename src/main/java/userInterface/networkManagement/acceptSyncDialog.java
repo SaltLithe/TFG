@@ -23,33 +23,28 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import core.DeveloperComponent;
+import network.ClientHandler;
 import network.RequestWorkspaceMessage;
 import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
 import userInterface.UIController;
+import java.awt.Dialog.ModalityType;
 
 public class acceptSyncDialog extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 	private JTextField pathField;
-
+	
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		try {
-			acceptSyncDialog dialog = new acceptSyncDialog();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	
 
 	/**
 	 * Create the dialog.
 	 */
-	public acceptSyncDialog() {
+	public acceptSyncDialog(ClientHandler parent) {
+		setModalityType(ModalityType.APPLICATION_MODAL);
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -139,7 +134,9 @@ public class acceptSyncDialog extends JDialog {
 							
 							RequestWorkspaceMessage message = new RequestWorkspaceMessage();
 							controller.run(()->component.sendMessageToServer(message));
-							dispose(); 
+							
+							
+						    dispose(); 
 							
 							
 						}
@@ -179,6 +176,7 @@ public class acceptSyncDialog extends JDialog {
 		    public void windowClosing(WindowEvent e) {
 		    	
 				UIController.getInstance().getDeveloperComponent().disconnect();
+				
 		    	 dispose();
 		    	
 		    }

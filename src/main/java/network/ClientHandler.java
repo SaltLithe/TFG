@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import core.DEBUG;
 import core.DeveloperComponent;
 import fileManagement.FILE_PROPERTIES;
-import fileManagement.WorkSpaceManager;
+import fileManagement.FILE_TYPE;
 import javaMiniSockets.clientSide.ClientMessageHandler;
 import javaMiniSockets.clientSide.ServerInfo;
 import userInterface.DeveloperMainFrameWrapper;
@@ -17,6 +17,7 @@ import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
 import userInterface.networkManagement.acceptSyncDialog;
+import userInterface.networkManagement.awaitSyncDialog;
 
 public class ClientHandler implements ClientMessageHandler {
 
@@ -24,6 +25,7 @@ public class ClientHandler implements ClientMessageHandler {
 	ArrayBlockingQueue<WriteMessage> processBuffer = new ArrayBlockingQueue<WriteMessage>(100);
 	UIController controller;
 	DeveloperComponent component;
+	public awaitSyncDialog sync;
 
 	public void processMessage() {
 		
@@ -80,15 +82,57 @@ public class ClientHandler implements ClientMessageHandler {
 
 		} 
 		break;
+		
+		case "class network.SyncEndedMessage":
+			System.out.println("SYNC ENDED");
+
+			if(sync!= null) {
+				System.out.println("UNLOCKING UI");
+
+				sync.dispose();
+			}
+			controller.run(()-> component.reloadWorkSpace());
+			
+			break;
 	
 		case "class network.ResponseCreateFileMessage":
 			ResponseCreateFileMessage incoming1 = (ResponseCreateFileMessage) message;
 			
-			if(incoming1.type.equals(FILE_PROPERTIES.projectProperty.toString())) {
-		
-			 component.createWorkSpace(incoming1.path);
+
+			if(incoming1.type.equals(FILE_PROPERTIES.workspaceProperty.toString())) {
+				System.out.println("WORKSPACE");
+				 component.createWorkSpace(incoming1.path);
+				 sync = new awaitSyncDialog(); 
 			}
+			
+			else if(incoming1.type.equals(FILE_PROPERTIES.projectProperty.toString())) {
+				System.out.println("PROJECT");
+				String name = incoming1.path.substring(incoming1.path.lastIndexOf("\\"),incoming1.path.length());
+				component.createNewProject(name, false , false);
+			}
+			
+			else if (incoming1.type.equals(FILE_PROPERTIES.srcProperty.toString())) {
+				System.out.println("SOURCE");
+				component.writeFolder(incoming1.path,FILE_TYPE.SRC_FOLDER);
+			}
+			else if (incoming1.type.equals(FILE_PROPERTIES.binProperty.toString())) {
+				System.out.println("BIN");
+				component.writeFolder(incoming1.path,FILE_TYPE.BIN_FOLDER);
+
+			}
+			
+			else if (incoming1.type.equals(FILE_TYPE.JAVA_FILE.toString())){
+				System.out.println("JAVA FILE");
+				component.writeFile(incoming1.path , incoming1.contents , FILE_TYPE.JAVA_FILE);
 				
+			}
+			else if (incoming1.type.equals(FILE_TYPE.ANY_FILE.toString())){
+				System.out.println("ANY FILE");
+				component.writeFile(incoming1.path , incoming1.contents , FILE_TYPE.ANY_FILE);
+
+
+			}
+			
 			
 			
 			
@@ -106,7 +150,8 @@ public class ClientHandler implements ClientMessageHandler {
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 			    "Success! You have connected to a session.");
 		
-		//acceptSyncDialog d = new acceptSyncDialog(); 
+		new acceptSyncDialog(this);
+		
 		
 
 	}
@@ -146,6 +191,10 @@ public class ClientHandler implements ClientMessageHandler {
 			    "Connection error",
 			    JOptionPane.ERROR_MESSAGE);
 		UIController.getInstance().getDeveloperComponent().client = null; 
+	}
+	public void startAwaitSync() {
+
+		sync = new awaitSyncDialog(); 
 	}
 
 }

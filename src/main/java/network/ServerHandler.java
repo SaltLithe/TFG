@@ -82,7 +82,7 @@ public class ServerHandler implements ServerMessageHandler {
 		
 			ResponseCreateFileMessage response = new ResponseCreateFileMessage(); 
 			response.path = component.getWorkSpaceName(); 
-			response.type = FILE_PROPERTIES.projectProperty.toString();
+			response.type = FILE_PROPERTIES.workspaceProperty.toString();
 		
 			controller.run(()->component.sendSyncToClient(response, client.clientID));
 			

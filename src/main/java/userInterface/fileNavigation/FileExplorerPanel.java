@@ -96,4 +96,10 @@ class FileExplorerPanel extends JPanel {
 		this.updateUI();
 		
 	}
+
+	public void clean() {
+
+	newpane.removeAll();
+	newpane.updateUI();
+	}
 }

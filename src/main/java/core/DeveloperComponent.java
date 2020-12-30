@@ -26,6 +26,7 @@ import network.ClientHandler;
 import network.RequestWorkspaceMessage;
 import network.ResponseCreateFileMessage;
 import network.ServerHandler;
+import network.SyncEndedMessage;
 import network.WriteMessage;
 import userInterface.DeveloperMainFrame;
 import userInterface.DeveloperMainFrameWrapper;
@@ -254,8 +255,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 
 	}
 
-	public void createNewProject(String name) {
-		fileManager.newProject(name, workSpace);
+	public void createNewProject(String name , boolean includeHelpFolders , boolean updateEditor) {
+		fileManager.newProject(name, workSpace, includeHelpFolders , updateEditor);
 
 	}
 
@@ -557,6 +558,8 @@ return null ;
 			
 			
 		}
+		SyncEndedMessage ended = new SyncEndedMessage(); 
+		this.sendToClient(ended, clientID);
 		
 		
 		
@@ -583,8 +586,37 @@ return null ;
 		
 		WorkSpaceManager wsm = WorkSpaceManager.getInstance();
 		wsm.addWorkSpace(ws);
+		workSpace = ws;
 		
 		
+		
+		
+	}
+
+	public void writeFolder(String path, FILE_TYPE property) {
+		
+		
+		String writingname = path.substring(path.lastIndexOf("\\")+1 , path.length());
+		String writingpath = workSpace.getPath() + path;
+		String firsthalf = writingpath.replace(workSpace.getPath(), "");
+		firsthalf = firsthalf.substring(1,firsthalf.length());
+		firsthalf = firsthalf.substring(0,firsthalf.indexOf("\\"));
+		String projectpath = workSpace.getPath() + "\\" + firsthalf;
+		fileManager.writeFolder(writingpath, property, false , writingname, projectpath);
+		
+	}
+
+	public void writeFile(String path, String contents, FILE_TYPE type) {
+		path = workSpace.getPath() + path;
+		fileManager.writeFile(path , contents , type);
+		
+	}
+
+	public void  reloadWorkSpace() {
+		
+		support.notify(ObserverActions.CLEAR_PANEL , null , null);
+		fileManager.scanWorkSpace(workSpace);
+
 		
 		
 	}
