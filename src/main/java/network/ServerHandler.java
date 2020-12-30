@@ -23,6 +23,8 @@ public class ServerHandler implements ServerMessageHandler {
 	DeveloperComponent component; 
 	
 	public void processMessage() {
+		
+		
 		ArrayList<Object> messages = new ArrayList<Object>(); 
 
 		while(true) {
@@ -36,6 +38,7 @@ public class ServerHandler implements ServerMessageHandler {
 		messages.add(incoming);
 		support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, null, messages);
 		messages.clear(); 
+	
 		}
 		
 	}

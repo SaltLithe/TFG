@@ -15,12 +15,12 @@ public class TextFile {
 	private String name;
 	private String path; 
 	private String project; 
-	private Semaphore editingLock;
+	private Semaphore editingSem;
 	
 	
 	public TextFile(String name ,String path, String content,  FileType type ) {
 		DEBUG.debugmessage("SE HA INVOCADO EL CONSTRUCTOR DE TEXTFILE");
-		editingLock = new Semaphore(1);
+		editingSem = new Semaphore(1);
 		this.content = null;
 		this.type = type;
 		this.name = name;
@@ -73,29 +73,34 @@ public class TextFile {
 
 	public void insert(String changes, int offset) {
 		try {
-		editingLock.acquire();
-
+			editingSem.acquire(); 
 		String firsthalf = content.substring(0,offset);
 		String secondhalf = content.substring(offset ,content.length());
 		content = firsthalf+changes+secondhalf;
 		}catch(Exception e) {
 			e.printStackTrace();
+		}finally {
+			
+			editingSem.release();
 		}
-		editingLock.release(); 
+		
 		
 	}	
 
 	public void replace( int offset, int length) {
+	
 		try {
-
-		editingLock.acquire();
+		editingSem.acquire(); 
 		String firsthalf = content.substring(0,offset);
 		String secondhalf = content.substring(length,content.length());
 		content = firsthalf+secondhalf;
 		}catch(Exception e) {
 			e.printStackTrace();
+		}finally {
+			editingSem.release();
+
 		}
-		editingLock.release(); 
+		
 	}
 
 }

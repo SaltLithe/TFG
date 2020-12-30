@@ -248,13 +248,13 @@ public class TextEditorTab extends JPanel {
 
 	public void updateContents(ArrayList<Object> results) {
 
-
+/*
 		try {
 			editingLock.acquire();
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
+		}*/
 		try {
 		messageWrite = true; 
 		
@@ -279,7 +279,7 @@ public class TextEditorTab extends JPanel {
 		
 		}
 
-		editingLock.release();
+		//editingLock.release();
 	}
 
 

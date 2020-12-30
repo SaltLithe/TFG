@@ -157,6 +157,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			break;
 		case UPDATE_PANEL_CONTENTS:
 			// enableEditor();
+			synchronized(this) {
 			results = (ArrayList<Object>) evt.getNewValue();
 			String editingpath = (String) results.get(0);
 
@@ -167,8 +168,9 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			else {
 				//TO-DO warning de que se esta haciendo un update erroneo 
 			}
-
+			}
 			break;
+			
 		case SET_TEXT_CONTENT:
 			results = (ArrayList<Object>) evt.getNewValue();
 			String path = (String) results.get(2);

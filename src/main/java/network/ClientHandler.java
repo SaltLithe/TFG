@@ -26,6 +26,8 @@ public class ClientHandler implements ClientMessageHandler {
 	DeveloperComponent component;
 
 	public void processMessage() {
+		
+
 		ArrayList<Object> messages = new ArrayList<Object>(); 
 
 		while(true) {
@@ -39,6 +41,7 @@ public class ClientHandler implements ClientMessageHandler {
 		messages.add(incoming);
 		support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, null, messages);
 		messages.clear(); 
+
 		}
 		
 	}
@@ -103,7 +106,7 @@ public class ClientHandler implements ClientMessageHandler {
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 			    "Success! You have connected to a session.");
 		
-		acceptSyncDialog d = new acceptSyncDialog(); 
+		//acceptSyncDialog d = new acceptSyncDialog(); 
 		
 
 	}
