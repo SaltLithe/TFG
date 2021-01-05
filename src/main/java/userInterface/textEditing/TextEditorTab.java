@@ -56,9 +56,11 @@ public class TextEditorTab extends JPanel {
 	private String path;
 	private String project;
 	private String keypath;
+	private String chosenName;
 
-	public TextEditorTab(String path, TabMiniPanel miniPanel, String project) {
+	public TextEditorTab(String path, TabMiniPanel miniPanel, String project , String chosenName) {
 
+		this.chosenName = chosenName;
 		DEBUG.debugmessage("Se ha creado un tab para el fichero en la direccion : " + path);
 		editingLock = new Semaphore(1);
 
@@ -121,7 +123,7 @@ public class TextEditorTab extends JPanel {
 
 				if (!messageWrite) {
 
-					WriteMessage message = new WriteMessage();
+					WriteMessage message = new WriteMessage(chosenName);
 					message.path = keypath;
 					message.adding = true;
 					message.offset = e.getOffset();
@@ -167,7 +169,7 @@ public class TextEditorTab extends JPanel {
 
 				if (!messageWrite) {
 
-					WriteMessage message = new WriteMessage();
+					WriteMessage message = new WriteMessage(chosenName);
 					message.path = keypath;
 					message.adding = false;
 					message.lenght = e.getLength();

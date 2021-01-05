@@ -2,7 +2,9 @@ package network;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 import javax.swing.JOptionPane;
 
@@ -15,12 +17,37 @@ import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
+import userInterface.networkManagement.serverAwaitSync;
 
 public class ServerHandler implements ServerMessageHandler {
 	PropertyChangeMessenger support;
 	ArrayBlockingQueue<WriteMessage> processBuffer = new ArrayBlockingQueue<WriteMessage>(100);
 	UIController controller;
 	DeveloperComponent component; 
+	private HashSet<String> sessionNames = new HashSet<String>(); 
+	private serverAwaitSync sync;
+	private int nClients; 
+	private Semaphore syncSem;
+
+	public void syncComplete() {
+		try {
+			syncSem.acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(sync != null) {
+			sync.updateCount(1);
+		}
+		
+		syncSem.release();
+	}
+	public void closeServer() {
+		controller.run(()-> component.closeServer());
+		 if (sync != null) {
+			 sync.closeSession();
+		 }
+	}
 	
 	public void processMessage() {
 		
@@ -43,8 +70,11 @@ public class ServerHandler implements ServerMessageHandler {
 		
 	}
 
-	public ServerHandler() {
+	public ServerHandler(String chosenName , int nClients) {
 
+		syncSem = new Semaphore(1);
+		this.nClients = nClients; 
+		sessionNames.add(chosenName);
 		support = PropertyChangeMessenger.getInstance();
 		Thread t = new Thread(()-> processMessage());
 		t.start(); 
@@ -70,6 +100,7 @@ public class ServerHandler implements ServerMessageHandler {
 		try {
 				
 			processBuffer.put(incoming);
+			component.sendMessageToEveryone(incoming);
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -80,11 +111,33 @@ public class ServerHandler implements ServerMessageHandler {
 		case "class network.RequestWorkspaceMessage":
 			
 		
+
 			ResponseCreateFileMessage response = new ResponseCreateFileMessage(); 
+			
+			RequestWorkspaceMessage request = (RequestWorkspaceMessage) message; 
+			
+			if (sessionNames.contains(request.clientName)) {
+				String newname = request.clientName;
+				int count = 2;
+				do {
+					newname += Integer.toString(count);
+					count++;
+					
+				}
+				while(sessionNames.contains(newname));
+				sessionNames.add(newname);
+				response.newname = newname; 
+				
+			}else {
+				response.newname = null; 
+			}
+			
 			response.path = component.getWorkSpaceName(); 
 			response.type = FILE_PROPERTIES.workspaceProperty.toString();
 		
-			controller.run(()->component.sendSyncToClient(response, client.clientID));
+			controller.runOnThread(()->component.sendSyncToClient(response, client.clientID));
+			
+			
 			
 			
 		break;
@@ -100,6 +153,9 @@ public class ServerHandler implements ServerMessageHandler {
 
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 			    "The server is ready, other users can join your sesion now.");
+		controller.run(()-> component.saveAllFull());
+		controller.run(()->component.closeAllTabs());
+		sync = new serverAwaitSync(nClients , this);
 	}
 
 	@Override
@@ -121,14 +177,20 @@ public class ServerHandler implements ServerMessageHandler {
 
 	@Override
 	public void onClientConnect(ClientInfo client) {
-		// TODO Auto-generated method stub
-
+	
+		
+		
+		
+		
 	}
 
 	@Override
 	public void onClientDisconnect(ClientInfo client) {
-		// TODO Auto-generated method stub
 
+		if(sync != null) {
+			sync.updateCount(-1);
+		}
+		
 	}
 
 }

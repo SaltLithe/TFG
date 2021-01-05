@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -49,6 +50,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	private int defaultQueueSize = 100;
 	public Thread runningThread; 
 	public String expectedWorkSpaceLocation = null; 
+	private ServerHandler handler; 
 	
 	private String focusedProject;
 	private HashMap<String, String> projectFocusPairs;
@@ -56,10 +58,18 @@ public class DeveloperComponent implements PropertyChangeListener {
 	private WorkSpace workSpace;
 	private HashMap<String, ClassPath> classpaths;
 	public boolean isConnected;
+	
+	
+	public void setNewName(String newname) {
+		ArrayList<Object> message = new ArrayList<Object>();
+		message.add(newname);
+		support.notify(ObserverActions.SET_CHOSEN_NAME, null, message);
+		
+	}
 
-	public void setAsClient(String serverAddress, String ownAddress, int serverPort, boolean autoConnect) {
+	public void setAsClient(String serverAddress, String ownAddress, int serverPort, boolean autoConnect , String chosenName) {
 
-		ClientHandler handler = new ClientHandler();
+		ClientHandler handler = new ClientHandler(chosenName);
 		client = new AsynchronousClient(serverAddress, ownAddress, serverPort, handler);
 		if (ownAddress == null) {
 
@@ -79,13 +89,14 @@ public class DeveloperComponent implements PropertyChangeListener {
 				e.printStackTrace();
 			}
 		}
+		setNewName(chosenName);
 	}
 
 	public void setAsServer(String name, String ip, int maxClients, int port,  int queueSize,
 			boolean autoConnect) {
 
 		DEBUG.debugmessage("Setting as server");
-		ServerHandler handler = new ServerHandler();
+		 handler = new ServerHandler(name , maxClients);
 		if (queueSize == -1) {
 			queueSize = defaultQueueSize;
 		}
@@ -101,6 +112,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 			server.Start();
 			isConnected = true; 
 		}
+		
+		setNewName(name);
 		
 	}
 
@@ -379,6 +392,12 @@ public class DeveloperComponent implements PropertyChangeListener {
 
 	}
 	
+	public void closeAllTabs()	{
+
+		support.notify(ObserverActions.CLOSE_ALL_TABS , null , null );
+		
+	}
+	
 	public void deleteClassPath(String path, String project) {
 		String[] input = {path}; 
 		
@@ -434,7 +453,12 @@ public class DeveloperComponent implements PropertyChangeListener {
 return null ; 
 			
 		}
-
+public void saveAllFull() {
+	
+	fileManager.saveAllFull();
+}
+	
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
@@ -461,7 +485,7 @@ return null ;
 			deleteClassPath(pathfocused,focusedProject);
 			break;
 		case SAVE_FULL:
-			fileManager.saveAllFull(); 
+			saveAllFull(); 
 			break;
 		default:
 			break;
@@ -509,11 +533,20 @@ return null ;
 	public void disconnect() {
 
 		try {
+			if(client != null) {
 			client.disconnect();
+			client = null;
+			}
+			else if(server != null) {
+				server.Stop();
+				server = null; 
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
+		
+	
 	}
 
 	public String getWorkSpaceName() {
@@ -542,7 +575,6 @@ return null ;
 		
 		for (ResponseCreateFileMessage message : responses) {
 			
-			System.out.println("SENDING MESSAGE NUMBER : " + count);
 			count++;
 			
 			
@@ -560,6 +592,7 @@ return null ;
 		}
 		SyncEndedMessage ended = new SyncEndedMessage(); 
 		this.sendToClient(ended, clientID);
+		handler.syncComplete();
 		
 		
 		
@@ -620,6 +653,19 @@ return null ;
 		
 		
 	}
+
+	public void changeUserName() {
+		// TODO  que cambie el nombre de usuario en el panel de users 
+		
+	}
+
+	public void closeServer() {
+		if(server != null) {
+			server.close(); 
+		}
+	}
+
+
 	
 
 }

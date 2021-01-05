@@ -41,9 +41,14 @@ public class UIController {
 
 			ActionList.removeFirst();
 		}
+		
 		Command newCommand = new Command(command, developerComponent);
 		ActionList.addLast(newCommand);
 		newCommand.execute().run();
+
+	}
+	public void runOnThread (Runnable command) {
+		new Thread(command).start();
 
 	}
 

@@ -188,7 +188,7 @@ public class ConnectionDialog extends JFrame {
 								boolean autoconnect = autoConnectCheck.isSelected();
 								controller.run(() -> dp.setAsClient(ipField_C.getText(), clientIPField_C.getText(),
 										Integer.valueOf(serverPortField_C.getText()),
-										autoconnect));
+										autoconnect , clientNameField_C.getText()));
 								dp.setIcon(colorChoosercl.getColor(), imageLabelClient.imagepath , clientNameField_C.getText());
 
 							}
@@ -245,7 +245,7 @@ public class ConnectionDialog extends JFrame {
 			}
 			{
 				maxClientsField_S = new JTextField();
-				maxClientsField_S.setText("1");
+				maxClientsField_S.setText("2");
 				GridBagConstraints gbc_maxClientsField_S = new GridBagConstraints();
 				gbc_maxClientsField_S.insets = new Insets(0, 0, 5, 0);
 				gbc_maxClientsField_S.fill = GridBagConstraints.HORIZONTAL;

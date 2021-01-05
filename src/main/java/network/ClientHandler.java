@@ -26,7 +26,9 @@ public class ClientHandler implements ClientMessageHandler {
 	UIController controller;
 	DeveloperComponent component;
 	public awaitSyncDialog sync;
-
+	public String chosenName;
+	boolean unFlag = false; 
+	
 	public void processMessage() {
 		
 
@@ -47,8 +49,9 @@ public class ClientHandler implements ClientMessageHandler {
 		}
 		
 	}
-	public ClientHandler() {
+	public ClientHandler(String chosenName) {
 
+		this.chosenName = chosenName;
 		controller = UIController.getInstance();
 		component = controller.getDeveloperComponent();
 		support = PropertyChangeMessenger.getInstance();
@@ -73,24 +76,31 @@ public class ClientHandler implements ClientMessageHandler {
 		WriteMessage incoming = (WriteMessage) message;
 
 
-		try {
-				
+		try {			
+			if (!incoming.ownerName.equals(chosenName)) {
 			processBuffer.put(incoming);
+			}
 		} catch (Exception e) {
 
 			e.printStackTrace();
-
+		
 		} 
+		
 		break;
 		
 		case "class network.SyncEndedMessage":
-			System.out.println("SYNC ENDED");
 
 			if(sync!= null) {
-				System.out.println("UNLOCKING UI");
 
 				sync.dispose();
 			}
+			
+			if(unFlag) {
+				JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
+					    "Your chosen name is already in use by somebody else in this session, your username has been changed to : " + chosenName);
+			}
+			
+			component.setNewName(chosenName);
 			controller.run(()-> component.reloadWorkSpace());
 			
 			break;
@@ -100,34 +110,36 @@ public class ClientHandler implements ClientMessageHandler {
 			
 
 			if(incoming1.type.equals(FILE_PROPERTIES.workspaceProperty.toString())) {
-				System.out.println("WORKSPACE");
+				
+				 ResponseCreateFileMessage response = (ResponseCreateFileMessage) message;
+				 if (response.newname != null) {
+					 chosenName = response.newname;
+					 component.changeUserName(); 
+					 unFlag = true; 
+					 
+				 }
 				 component.createWorkSpace(incoming1.path);
 				 sync = new awaitSyncDialog(); 
 			}
 			
 			else if(incoming1.type.equals(FILE_PROPERTIES.projectProperty.toString())) {
-				System.out.println("PROJECT");
 				String name = incoming1.path.substring(incoming1.path.lastIndexOf("\\"),incoming1.path.length());
 				component.createNewProject(name, false , false);
 			}
 			
 			else if (incoming1.type.equals(FILE_PROPERTIES.srcProperty.toString())) {
-				System.out.println("SOURCE");
 				component.writeFolder(incoming1.path,FILE_TYPE.SRC_FOLDER);
 			}
 			else if (incoming1.type.equals(FILE_PROPERTIES.binProperty.toString())) {
-				System.out.println("BIN");
 				component.writeFolder(incoming1.path,FILE_TYPE.BIN_FOLDER);
 
 			}
 			
 			else if (incoming1.type.equals(FILE_TYPE.JAVA_FILE.toString())){
-				System.out.println("JAVA FILE");
 				component.writeFile(incoming1.path , incoming1.contents , FILE_TYPE.JAVA_FILE);
 				
 			}
 			else if (incoming1.type.equals(FILE_TYPE.ANY_FILE.toString())){
-				System.out.println("ANY FILE");
 				component.writeFile(incoming1.path , incoming1.contents , FILE_TYPE.ANY_FILE);
 
 
@@ -147,10 +159,13 @@ public class ClientHandler implements ClientMessageHandler {
 	public void onServerConnect(ServerInfo server) {
 
 		DEBUG.debugmessage("HANDSHAKE");
+		controller.run(()-> component.saveAllFull());
+		controller.run(()-> component.closeAllTabs());
+
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 			    "Success! You have connected to a session.");
 		
-		new acceptSyncDialog(this);
+		new acceptSyncDialog(this, chosenName);
 		
 		
 

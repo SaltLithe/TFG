@@ -14,9 +14,11 @@ public class WriteMessage implements Serializable {
 	 * 
 	 */
 
-	public WriteMessage() {
+	public WriteMessage(String ownerName) {
+		this.ownerName = ownerName;
 	}
 
+	public String ownerName;
 	public String path; 
 	public String changes;
 	public int offset; 

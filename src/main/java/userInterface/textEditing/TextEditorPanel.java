@@ -40,6 +40,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	private DeveloperComponent developerComponent;
 	private HashMap<String, TextEditorTab> tabCollection;
 	private PropertyChangeMessenger propertyChangeMessenger;
+	private String chosenName = null;
 
 	// Activa el editor de texto
 	public void enableTextEditorArea() {
@@ -61,6 +62,9 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	// Metodo para establecer los contenidos del editor de forma correcta cambiando
 	// el focus actual
 
+	private void setChosenName(String chosenName) {
+		this.chosenName = chosenName;
+	}
 	public TextEditorPanel(TextEditorContainer toolbar) {
 		propertyChangeMessenger = PropertyChangeMessenger.getInstance();
 
@@ -109,7 +113,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 		this.developerComponent.setProjectFocus(project);
 		TabMiniPanel mp1 = new TabMiniPanel(name, path, project);
-		TextEditorTab tab = new TextEditorTab(path, mp1, project);
+		TextEditorTab tab = new TextEditorTab(path, mp1, project , chosenName);
 		tab.setTextEditorCode(contents);
 		mp1.setParent(tab);
 
@@ -203,6 +207,17 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 				tabCollection.get(savingpath).setAsSaved();
 				tabCollection.get(savingpath).miniPanel.setAsSaved();
 			}
+			break;
+		case CLOSE_ALL_TABS:
+			tabPane.removeAll();
+			tabCollection.clear();
+			
+			break;
+			
+		case SET_CHOSEN_NAME:
+			results = (ArrayList<Object>)evt.getNewValue();
+			String newname = (String) results.get(0);
+			setChosenName(newname);
 			break;
 		default:
 			break;

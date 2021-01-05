@@ -21,6 +21,7 @@ public class ResponseCreateFileMessage implements Serializable {
 	public String path;
 	public String type;
 	public String contents;
+	public String newname;
 
 	
 }

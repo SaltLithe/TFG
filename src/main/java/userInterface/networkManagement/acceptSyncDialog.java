@@ -43,7 +43,7 @@ public class acceptSyncDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public acceptSyncDialog(ClientHandler parent) {
+	public acceptSyncDialog(ClientHandler parent , String name) {
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
@@ -132,7 +132,7 @@ public class acceptSyncDialog extends JDialog {
 							UIController controller = UIController.getInstance();
 							DeveloperComponent component = controller.getDeveloperComponent();
 							
-							RequestWorkspaceMessage message = new RequestWorkspaceMessage();
+							RequestWorkspaceMessage message = new RequestWorkspaceMessage(name);
 							controller.run(()->component.sendMessageToServer(message));
 							
 							
