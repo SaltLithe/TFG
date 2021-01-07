@@ -1,5 +1,7 @@
 package network; 
 
+import java.awt.Color;
+import java.awt.Image;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -28,6 +30,9 @@ public class ClientHandler implements ClientMessageHandler {
 	public awaitSyncDialog sync;
 	public String chosenName;
 	boolean unFlag = false; 
+	String chosenImage;
+	Color chosenColor;
+	
 	
 	public void processMessage() {
 		
@@ -49,8 +54,11 @@ public class ClientHandler implements ClientMessageHandler {
 		}
 		
 	}
-	public ClientHandler(String chosenName) {
+	public ClientHandler(String chosenName ,  String imageByteData , Color chosenColor) {
 
+		
+		this.chosenImage = imageByteData;
+		this.chosenColor = chosenColor;
 		this.chosenName = chosenName;
 		controller = UIController.getInstance();
 		component = controller.getDeveloperComponent();
@@ -102,6 +110,8 @@ public class ClientHandler implements ClientMessageHandler {
 			
 			component.setNewName(chosenName);
 			controller.run(()-> component.reloadWorkSpace());
+			ImageDataMessage imageMessage = new ImageDataMessage(chosenImage , chosenColor.getRGB() , chosenName );
+			controller.run(()-> component.sendMessageToServer(imageMessage));
 			
 			break;
 	
@@ -162,8 +172,10 @@ public class ClientHandler implements ClientMessageHandler {
 		controller.run(()-> component.saveAllFull());
 		controller.run(()-> component.closeAllTabs());
 
+		
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 			    "Success! You have connected to a session.");
+		
 		
 		new acceptSyncDialog(this, chosenName);
 		

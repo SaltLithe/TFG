@@ -21,44 +21,66 @@ import userInterface.UIController;
 public class serverAwaitSync extends JDialog {
 	
 	JLabel syncCountLabel ;
+	JLabel clientsConnectedLabel;
 	int nClients;
+	int clientsSynced;
 	int clientsConnected;
+	
 
-	public void closeSession() {
-		dispose();
+	
+	
+	public void updateConnectCount(int adding) {
+		if (!((clientsConnected + adding) < 0)) {
+		clientsConnected += adding;
+		clientsConnectedLabel.setText(clientsConnected + " Clients connected.");
+
+		}
 	}
 	
-	public void  updateCount(int adding) {
+	public void  updateSyncCount(int adding) {
 		System.out.println("UPDATING SYNC ");
-		if(!((clientsConnected + adding) < 0) ) {
-		clientsConnected += adding;
-		syncCountLabel.setText("Synced with " + clientsConnected + "/" + nClients  + " clients.");
-		if(nClients == clientsConnected) {
+		if(!((clientsSynced + adding) < 0) ) {
+		clientsSynced += adding;
+		syncCountLabel.setText("Synced with " + clientsSynced + "/" + nClients  + " clients.");
+		if(nClients == clientsSynced) {
 			dispose();
 		}
 		}
 		
 	}
 	
+	private void closeNumberOfClients() {
+		nClients = clientsConnected;
+
+	}
+	
 	public serverAwaitSync(int nClients , ServerHandler parent) {
 		
 		this.nClients = nClients;
+		clientsSynced = 0;
 		clientsConnected = 0;
 		setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{440, 0};
-		gridBagLayout.rowHeights = new int[]{0, 44, 0, 0, 0, 0};
+		gridBagLayout.rowHeights = new int[]{37, 33, 0, 0, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, Double.MIN_VALUE};
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		getContentPane().setLayout(gridBagLayout);
 		
 		syncCountLabel = new JLabel("");
-		updateCount(0);
-		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 0);
-		gbc_lblNewLabel.gridx = 0;
-		gbc_lblNewLabel.gridy = 1;
-		getContentPane().add(syncCountLabel, gbc_lblNewLabel);
+		updateSyncCount(0);
+		
+		clientsConnectedLabel = new JLabel(clientsConnected + " Clients connected.");
+		GridBagConstraints gbc_clientsConnectedLabel = new GridBagConstraints();
+		gbc_clientsConnectedLabel.insets = new Insets(0, 0, 5, 0);
+		gbc_clientsConnectedLabel.gridx = 0;
+		gbc_clientsConnectedLabel.gridy = 0;
+		getContentPane().add(clientsConnectedLabel, gbc_clientsConnectedLabel);
+		GridBagConstraints gbc_clientsConnectedLabel1 = new GridBagConstraints();
+		gbc_clientsConnectedLabel1.insets = new Insets(0, 0, 5, 0);
+		gbc_clientsConnectedLabel1.gridx = 0;
+		gbc_clientsConnectedLabel1.gridy = 1;
+		getContentPane().add(syncCountLabel, gbc_clientsConnectedLabel1);
 		
 		JButton closeSessionButton = new JButton("Close Session");
 		GridBagConstraints gbc_closeSessionButton = new GridBagConstraints();
@@ -96,7 +118,8 @@ public class serverAwaitSync extends JDialog {
 					public void actionPerformed(ActionEvent arg0) {
 
 						parent.closeServer();
-						dispose(); 
+						closeNumberOfClients(); 
+						updateSyncCount(0);
 						
 						
 					}

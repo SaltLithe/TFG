@@ -1,6 +1,7 @@
 package core;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -9,7 +10,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -24,7 +24,6 @@ import fileManagement.WorkSpaceManager;
 import javaMiniSockets.clientSide.AsynchronousClient;
 import javaMiniSockets.serverSide.AsynchronousServer;
 import network.ClientHandler;
-import network.RequestWorkspaceMessage;
 import network.ResponseCreateFileMessage;
 import network.ServerHandler;
 import network.SyncEndedMessage;
@@ -67,9 +66,9 @@ public class DeveloperComponent implements PropertyChangeListener {
 		
 	}
 
-	public void setAsClient(String serverAddress, String ownAddress, int serverPort, boolean autoConnect , String chosenName) {
+	public void setAsClient(String serverAddress, String ownAddress, int serverPort, boolean autoConnect , String chosenName ,String imageByteData, Color chosenColor) {
 
-		ClientHandler handler = new ClientHandler(chosenName);
+		ClientHandler handler = new ClientHandler(chosenName,  imageByteData, chosenColor);
 		client = new AsynchronousClient(serverAddress, ownAddress, serverPort, handler);
 		if (ownAddress == null) {
 
@@ -519,7 +518,9 @@ public void saveAllFull() {
 		
 	}
 
-	public void sendMessageToServer(RequestWorkspaceMessage message) {
+	public void sendMessageToServer(Serializable message) {
+	
+		
 		if(this.client != null) {
 			try {
 				this.client.send(message);
@@ -663,6 +664,15 @@ public void saveAllFull() {
 		if(server != null) {
 			server.close(); 
 		}
+	}
+
+	public void addProfilePicture(String image, int color, String name) {
+		
+		ArrayList<Object> list = new ArrayList<Object>();
+		list.add(image);
+		list.add(color);
+		list.add(name);
+		support.notify(ObserverActions.SET_CLIENT_ICON,null,list);
 	}
 
 

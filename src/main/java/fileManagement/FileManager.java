@@ -351,35 +351,43 @@ public class FileManager {
 
 		}
 		currentFocus = path;
+		String returningcontents = null;
 		if (!editorFiles.containsKey(path)) {
 			TextFile tf = new TextFile(name, path, contents, FileType.CLASS);
 			editorFiles.put(path, tf);
 
-		}
-
-		try {
-			File file = new File(path);
-			byte[] encoded = null;
 			try {
-				encoded = Files.readAllBytes(Paths.get(path));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
+				
+				File file = new File(path);
+				byte[] encoded = null;
+				try {
+					encoded = Files.readAllBytes(Paths.get(path));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				returningcontents = new String(encoded, StandardCharsets.UTF_8);
+				
+			} catch (NullPointerException e) {
+				DEBUG.debugmessage("Por que señor");
 				e.printStackTrace();
+				returningcontents = null;
+				return returningcontents;
 			}
-			String returningcontents = new String(encoded, StandardCharsets.UTF_8);
-			ArrayList<Object> list = new ArrayList<Object>();
-			list.add(returningcontents);
-			list.add(editorFiles.get(path).getName());
-			list.add(editorFiles.get(path).getPath());
-			list.add(project);
-			support.notify(ObserverActions.SET_TEXT_CONTENT, null, list);
-			return returningcontents;
-		} catch (NullPointerException e) {
-			DEBUG.debugmessage("Por que señor");
-			e.printStackTrace();
-			String returningcontents = null;
-			return returningcontents;
 		}
+		else {
+			returningcontents  = editorFiles.get(path).getContent();
+			
+		}
+		ArrayList<Object> list = new ArrayList<>();
+		list.add(returningcontents);
+		list.add(editorFiles.get(path).getName());
+		list.add(editorFiles.get(path).getPath());
+		list.add(project);
+		support.notify(ObserverActions.SET_TEXT_CONTENT, null, list);
+		return returningcontents;
+		
 
 		// TODO Auto-generated method stub
 

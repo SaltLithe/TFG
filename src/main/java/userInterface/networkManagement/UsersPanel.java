@@ -2,6 +2,7 @@ package userInterface.networkManagement;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -14,8 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-
-import org.apache.logging.log4j.util.TriConsumer;
 
 import userInterface.ObserverActions;
 
@@ -106,8 +105,8 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 
 	}
 	
-	private void setClient(Color color , String image , String name) {
-		testIconComponent client = new testIconComponent(image,color,name,false);
+	private void setClient(String string , int color , String name) {
+		testIconComponent client = new testIconComponent(color,string,name);
 		icons.addLast(client);
 		
 	}
@@ -150,7 +149,7 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 			break;
 		case SET_CLIENT_ICON:
 		
-			setClient((Color)result.get(0),(String)result.get(1),(String)result.get(2));
+			setClient((String)result.get(0),(int)result.get(1),(String)result.get(2));
 			Rearange(); 
 			break;
 		case REMOVE_CLIENT_ICON:
