@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,10 +30,12 @@ public class testIconComponent extends JPanel {
 	public Color chosenColor = Color.BLUE;
 	public JLabel imagelabel;
 	public Image raw = null;
+	public int clientID; 
 
 	
 private void decoder(String base64Image) {
   try  {
+
     byte[] imageByteArray = Base64.getDecoder().decode(base64Image);
   
     ByteArrayInputStream bais = new ByteArrayInputStream(imageByteArray);
@@ -44,18 +47,15 @@ private void decoder(String base64Image) {
   }
 }
 	
-	private void  encoder(String imagePath) {
+	private void  encoder(byte[] image) {
 		  String base64Image = "";
-		  File file = new File(imagePath);
-		  try (FileInputStream imageInFile = new FileInputStream(file)) {
+		  try  {
 		    // Reading a Image file from file system
-		    byte imageData[] = new byte[(int) file.length()];
-		    imageInFile.read(imageData);
+		    byte imageData[] = image;
 		    base64Image = Base64.getEncoder().encodeToString(imageData);
-		  } catch (FileNotFoundException e) {
-		    System.out.println("Image not found" + e);
-		  } catch (IOException ioe) {
-		    System.out.println("Exception while reading the Image " + ioe);
+		  }
+		   catch (Exception e) {
+			   e.printStackTrace();
 		  }
 		 ImageByteData =  base64Image;
 		}
@@ -73,7 +73,7 @@ private void decoder(String base64Image) {
 		int setWidth = 60;
 		int setHeight = 60;
 		int diameter = Math.min(setWidth, setHeight);
-		Image tmp = raw.getScaledInstance(setWidth, setHeight, Image.SCALE_SMOOTH);
+		Image tmp = raw.getScaledInstance(setWidth, setHeight, Image.SCALE_FAST);
 		BufferedImage tmpBuffered = new BufferedImage(tmp.getWidth(null), tmp.getHeight(null),
 				BufferedImage.TYPE_INT_RGB);
 		Graphics bg = tmpBuffered.getGraphics();
@@ -141,7 +141,20 @@ private void decoder(String base64Image) {
 		try {
 			File f = new File(imagepath);
 			raw = ImageIO.read(f);
-			encoder(imagepath);
+			Image rawRescale = raw.getScaledInstance(60, 60, Image.SCALE_FAST);
+		    BufferedImage bimage = new BufferedImage(rawRescale.getWidth(null), rawRescale.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+		    // Draw the image on to the buffered image
+		    Graphics2D bGr = bimage.createGraphics();
+		    bGr.drawImage(rawRescale, 0, 0, null);
+		    bGr.dispose();
+		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		    String ex = getFormat(imagepath);
+		    ImageIO.write(bimage, getFormat(imagepath), baos);
+		    byte[] bytes = baos.toByteArray();
+			
+			
+			encoder(bytes);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -150,9 +163,14 @@ private void decoder(String base64Image) {
 		createTestIconComponent(name, color, test);
 
 	}
+	
+	private String  getFormat(String path) {
+		return path.substring(path.lastIndexOf(".")+1 , path.length());
+	}
 
-	public testIconComponent(int colorNum, String image, String name) {
+	public testIconComponent(int colorNum, String image, String name , int clientID) {
 
+		this.clientID = clientID;
 		Color color = new Color(colorNum);
 
 		/*
@@ -186,7 +204,7 @@ private void decoder(String base64Image) {
 		}
 		raw = (Image) retrieved;
 		*/
-		decoder(image );
+		decoder(image);
 		createTestIconComponent(name, color, false);
 
 	}

@@ -1,9 +1,9 @@
 package network; 
 
 import java.awt.Color;
-import java.awt.Image;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import javax.swing.JOptionPane;
@@ -32,6 +32,7 @@ public class ClientHandler implements ClientMessageHandler {
 	boolean unFlag = false; 
 	String chosenImage;
 	Color chosenColor;
+	LinkedList<ImageDataMessage> otherClients;
 	
 	
 	public void processMessage() {
@@ -57,6 +58,7 @@ public class ClientHandler implements ClientMessageHandler {
 	public ClientHandler(String chosenName ,  String imageByteData , Color chosenColor) {
 
 		
+		otherClients = new LinkedList<ImageDataMessage>(); 
 		this.chosenImage = imageByteData;
 		this.chosenColor = chosenColor;
 		this.chosenName = chosenName;
@@ -110,7 +112,7 @@ public class ClientHandler implements ClientMessageHandler {
 			
 			component.setNewName(chosenName);
 			controller.run(()-> component.reloadWorkSpace());
-			ImageDataMessage imageMessage = new ImageDataMessage(chosenImage , chosenColor.getRGB() , chosenName );
+			ImageDataMessage imageMessage = new ImageDataMessage(chosenImage , chosenColor.getRGB() , chosenName , false );
 			controller.run(()-> component.sendMessageToServer(imageMessage));
 			
 			break;
@@ -158,6 +160,23 @@ public class ClientHandler implements ClientMessageHandler {
 			
 			
 			
+			break;
+		case "class network.ImageDataMessage" :
+			ImageDataMessage imageData = (ImageDataMessage) message;
+			if(!(imageData.name.equals(chosenName))) {
+			
+				if(imageData.isServer) {
+			controller.runOnThread(()-> component.addProfilePicture (imageData.image , imageData.color , imageData.name , imageData.isServer,-1));
+			
+				}else {
+					controller.run(()-> component.addProfilePicture(imageData.image,imageData.color, imageData.name, imageData.isServer,imageData.clientID));
+				}
+			}
+			break;
+		case "class network.ClientDisconnectedMessage":
+				ClientDisconnectedMessage disconnected = (ClientDisconnectedMessage) message;
+				controller.run(()-> component.removeProfilePicture(disconnected.clientID));
+				
 			break;
 		default:
 			break;

@@ -57,6 +57,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	private WorkSpace workSpace;
 	private HashMap<String, ClassPath> classpaths;
 	public boolean isConnected;
+	private String separator = "pairLeap.codeString";
 	
 	
 	public void setNewName(String newname) {
@@ -69,7 +70,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	public void setAsClient(String serverAddress, String ownAddress, int serverPort, boolean autoConnect , String chosenName ,String imageByteData, Color chosenColor) {
 
 		ClientHandler handler = new ClientHandler(chosenName,  imageByteData, chosenColor);
-		client = new AsynchronousClient(serverAddress, ownAddress, serverPort, handler);
+		client = new AsynchronousClient(serverAddress, ownAddress, serverPort, handler,separator);
 		if (ownAddress == null) {
 
 			client.setAutomaticIP();
@@ -92,15 +93,15 @@ public class DeveloperComponent implements PropertyChangeListener {
 	}
 
 	public void setAsServer(String name, String ip, int maxClients, int port,  int queueSize,
-			boolean autoConnect) {
+			boolean autoConnect,String imageByteData, Color chosenColor) {
 
 		DEBUG.debugmessage("Setting as server");
-		 handler = new ServerHandler(name , maxClients);
+		 handler = new ServerHandler(name , maxClients , imageByteData, chosenColor );
 		if (queueSize == -1) {
 			queueSize = defaultQueueSize;
 		}
 
-		server = new AsynchronousServer(name, handler, maxClients, port, ip, queueSize);
+		server = new AsynchronousServer(name, handler, maxClients, port, ip, queueSize,separator);
 		if (ip == null) {
 			server.setAutomaticIP();
 		}
@@ -324,7 +325,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	// DeveloperComponent
 	// La solución más facil a este cruce era inicializar filemanager despues
 
-	public void sendMessageToEveryone(WriteMessage message) {
+	public void sendMessageToEveryone(Serializable message) {
 		DEBUG.debugmessage("SENDING MESSAGE TO CLIENTS");
 		if (server != null) {
 			Serializable[] messages = { message };
@@ -591,8 +592,6 @@ public void saveAllFull() {
 			
 			
 		}
-		SyncEndedMessage ended = new SyncEndedMessage(); 
-		this.sendToClient(ended, clientID);
 		handler.syncComplete();
 		
 		
@@ -666,13 +665,32 @@ public void saveAllFull() {
 		}
 	}
 
-	public void addProfilePicture(String image, int color, String name) {
-		
+	public void addProfilePicture(String image, int color, String name, boolean isServer, int clientID) {
 		ArrayList<Object> list = new ArrayList<Object>();
 		list.add(image);
 		list.add(color);
 		list.add(name);
+		list.add(clientID);
+		
+		if(!isServer) {
+			if(this.client != null) {
+				
+				System.out.println("This is just for breakpoints");
+			}
+
 		support.notify(ObserverActions.SET_CLIENT_ICON,null,list);
+		}
+		else {
+			support.notify(ObserverActions.SET_SERVER_ICON,null,list);
+
+		}
+	}
+
+	public void removeProfilePicture(int clientID) {
+		
+		ArrayList<Object> list = new ArrayList<Object>();
+		list.add(clientID);
+		support.notify(ObserverActions.REMOVE_CLIENT_ICON,null  , list);
 	}
 
 

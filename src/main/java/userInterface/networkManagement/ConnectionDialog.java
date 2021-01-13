@@ -7,11 +7,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Label;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -19,6 +21,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
@@ -180,7 +183,7 @@ public class ConnectionDialog extends JFrame {
 										Integer.valueOf(maxClientsField_S.getText()),
 										Integer.valueOf(serverPortField_S.getText()),
 									
-										Integer.valueOf(maxClientsField_S.getText()), autostart));
+										Integer.valueOf(maxClientsField_S.getText()), autostart ,serverImageLabel.ImageByteData ,  colorChoosersv.getColor()));
 										dp.setIcon(colorChoosersv.getColor(), serverImageLabel.imagepath , serverNameField_S.getText());
 
 							} else if (setClientCheck.isSelected()) {
@@ -464,12 +467,33 @@ public class ConnectionDialog extends JFrame {
 							int result = imageChooser.showOpenDialog(DeveloperMainFrameWrapper.getInstance());
 							if (result == JFileChooser.APPROVE_OPTION) {
 								File selectedFile = imageChooser.getSelectedFile();
+								
+								BufferedImage bimg = null;
+								try {
+									bimg = ImageIO.read(selectedFile);
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								int width= bimg.getWidth();
+								int height = bimg.getHeight();
+								
+								if(width > 256 || height > 256) {
+									
+									JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
+										    "Image size can't be greater than 256x256 px.",
+										    "Error",
+										    JOptionPane.ERROR_MESSAGE);
+									
+								}
+								
 
+								else {
 								panel.remove(imageLabelClient);
 								imageLabelClient = new testIconComponent(selectedFile.getPath() ,null, null , true);
 								panel.add(imageLabelClient, gbc_imageLabelClient);
 								splitPane.updateUI();
-
+								}
 								
 							}
 						}

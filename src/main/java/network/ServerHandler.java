@@ -1,10 +1,13 @@
 package network;
 
+import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JOptionPane;
 
@@ -28,6 +31,12 @@ public class ServerHandler implements ServerMessageHandler {
 	private serverAwaitSync sync;
 	private int nClients;
 	private Semaphore syncSem;
+	String chosenImage;
+	Color chosenColor;
+	String chosenName;
+	private LinkedList<ImageDataMessage> connectedClients;
+	private AtomicInteger syncCount = new AtomicInteger(); 
+
 
 	public void syncComplete() {
 		try {
@@ -39,12 +48,20 @@ public class ServerHandler implements ServerMessageHandler {
 		if (sync != null) {
 			sync.updateSyncCount(1);
 		}
-
+		
+		if(syncCount.incrementAndGet() == nClients ) {
+			
+			SyncEndedMessage syncEnded = new SyncEndedMessage();
+			controller.run(()-> component.sendMessageToEveryone(syncEnded));
+		}
+		
 		syncSem.release();
 	}
 
 	public void closeServer() {
 		controller.run(() -> component.closeServer());
+		SyncEndedMessage syncEnded = new SyncEndedMessage();
+		controller.run(()-> component.sendMessageToEveryone(syncEnded));
 
 	}
 
@@ -68,8 +85,12 @@ public class ServerHandler implements ServerMessageHandler {
 
 	}
 
-	public ServerHandler(String chosenName, int nClients) {
+	public ServerHandler(String chosenName, int nClients , String chosenImage , Color chosenColor) {
 
+		connectedClients = new LinkedList<ImageDataMessage>();
+		this.chosenImage = chosenImage;
+		this.chosenColor = chosenColor;
+		this.chosenName = chosenName;
 		syncSem = new Semaphore(1);
 		this.nClients = nClients;
 		sessionNames.add(chosenName);
@@ -128,13 +149,25 @@ public class ServerHandler implements ServerMessageHandler {
 			response.path = component.getWorkSpaceName();
 			response.type = FILE_PROPERTIES.workspaceProperty.toString();
 
-			controller.runOnThread(() -> component.sendSyncToClient(response, client.clientID));
+			controller.runOnThread(()-> component.sendSyncToClient(response, client.clientID));
 
 			break;
 
 		case "class network.ImageDataMessage" :
 			ImageDataMessage imageData = (ImageDataMessage) message;
-			controller.runOnThread(()-> component.addProfilePicture (imageData.image , imageData.color , imageData.name));
+			imageData.clientID = client.clientID;
+			ImageDataMessage returnData =  new ImageDataMessage(chosenImage,chosenColor.getRGB(), chosenName, true);
+			try {
+			controller.run(()-> component.sendToClient(returnData, client.clientID));
+			controller.run(()-> component.sendMessageToEveryone(imageData));
+			for(ImageDataMessage clientData : connectedClients) {
+				controller.run(()->component.sendToClient(clientData,client.clientID));
+				
+			}
+			}
+			catch(Exception e) {}
+			connectedClients.add(imageData);
+			controller.runOnThread(()-> component.addProfilePicture (imageData.image , imageData.color , imageData.name, imageData.isServer,imageData.clientID));
 			
 			break;
 			
@@ -179,12 +212,17 @@ public class ServerHandler implements ServerMessageHandler {
 	}
 
 	@Override
-	public void onClientDisconnect(ClientInfo client) {
+	public void onClientDisconnect(int clientID) {
 
 		if (sync != null) {
 			sync.updateSyncCount(-1);
 			sync.updateConnectCount(-1);
+			syncCount.decrementAndGet();
 		}
+		
+		ClientDisconnectedMessage disconnected = new ClientDisconnectedMessage(clientID);
+		controller.run(()-> component.removeProfilePicture(clientID));
+		controller.runOnThread(()->component.sendMessageToEveryone(disconnected));
 
 	}
 

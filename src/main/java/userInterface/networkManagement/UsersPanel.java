@@ -2,12 +2,12 @@ package userInterface.networkManagement;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.swing.BoxLayout;
@@ -86,8 +86,25 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 	}
 	
 
-	private void removeClient() {
+	private void removeClient(int clientID) {
+		Iterator<testIconComponent> i = icons.iterator();
+		int index = -1;
+		int count = 0;
+		boolean found = false;
+		while(i.hasNext() && !found) {
+			testIconComponent next = i.next();
+			if ( next.clientID == clientID) {
+				index = count;
+				found = true;
+			}else {
+				count++;
+			}
+		}
+		if(index != -1 ) {
+		icons.remove(index);
 		
+		Rearange(); 
+		}
 		
 	}
 	
@@ -99,14 +116,14 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 	}
 	
 	
-	private void setServer(Color color , String image , String name) {
-		 server = new testIconComponent(image,color,name,false);
+	private void setServer(String string , int color , String name) {
+		 server = new testIconComponent(color,string,name,-1);
 		 icons.addFirst(server);
 
 	}
 	
-	private void setClient(String string , int color , String name) {
-		testIconComponent client = new testIconComponent(color,string,name);
+	private void setClient(String string , int color , String name , int clientID) {
+		testIconComponent client = new testIconComponent(color,string,name,clientID);
 		icons.addLast(client);
 		
 	}
@@ -143,17 +160,17 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 			Rearange();
 			break;
 		case SET_SERVER_ICON:
-			setServer((Color)result.get(0),(String)result.get(1),(String)result.get(2));
+			setServer((String)result.get(0),(int)result.get(1),(String)result.get(2));
 			Rearange();
 			
 			break;
 		case SET_CLIENT_ICON:
 		
-			setClient((String)result.get(0),(int)result.get(1),(String)result.get(2));
+			setClient((String)result.get(0),(int)result.get(1),(String)result.get(2),(int)result.get(3));
 			Rearange(); 
 			break;
 		case REMOVE_CLIENT_ICON:
-			removeClient();
+			removeClient((int)result.get(0));
 			Rearange(); 
 			break;
 		
