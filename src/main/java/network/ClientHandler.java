@@ -3,6 +3,7 @@ package network;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -25,6 +26,11 @@ public class ClientHandler implements ClientMessageHandler {
 
 	PropertyChangeMessenger support;
 	ArrayBlockingQueue<WriteMessage> processBuffer = new ArrayBlockingQueue<WriteMessage>(100);
+	ArrayBlockingQueue<HighLightMessage> highlightBuffer = new ArrayBlockingQueue<HighLightMessage>(100);
+	
+	private HashMap<String , Integer> colorData;
+
+
 	UIController controller;
 	DeveloperComponent component;
 	public awaitSyncDialog sync;
@@ -55,9 +61,36 @@ public class ClientHandler implements ClientMessageHandler {
 		}
 		
 	}
+	
+	public void processHighLights() {
+
+		ArrayList<Object> messages = new ArrayList<Object>();
+
+		while (true) {
+			HighLightMessage incoming = null;
+			try {
+				incoming = highlightBuffer.take();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if(incoming.name != chosenName) {
+
+				messages.add(incoming.linestart);
+				messages.add(incoming.lineend);
+				messages.add(colorData.get(incoming.name));
+				messages.add(incoming.name);
+				messages.add(incoming.keypath);
+			support.notify(ObserverActions.UPDATE_HIGHLIGHT, null, messages);
+			messages.clear();
+
+			}
+		}
+	}
 	public ClientHandler(String chosenName ,  String imageByteData , Color chosenColor) {
 
 		
+		colorData = new HashMap<String, Integer>(); 
+
 		otherClients = new LinkedList<ImageDataMessage>(); 
 		this.chosenImage = imageByteData;
 		this.chosenColor = chosenColor;
@@ -65,8 +98,8 @@ public class ClientHandler implements ClientMessageHandler {
 		controller = UIController.getInstance();
 		component = controller.getDeveloperComponent();
 		support = PropertyChangeMessenger.getInstance();
-		Thread t = new Thread(()-> processMessage());
-		t.start(); 
+		new Thread(()-> processMessage()).start();
+		new Thread(()-> processHighLights()).start();
 
 
 	}
@@ -113,6 +146,8 @@ public class ClientHandler implements ClientMessageHandler {
 			component.setNewName(chosenName);
 			controller.run(()-> component.reloadWorkSpace());
 			ImageDataMessage imageMessage = new ImageDataMessage(chosenImage , chosenColor.getRGB() , chosenName , false );
+			
+			
 			controller.run(()-> component.sendMessageToServer(imageMessage));
 			
 			break;
@@ -164,6 +199,8 @@ public class ClientHandler implements ClientMessageHandler {
 		case "class network.ImageDataMessage" :
 			ImageDataMessage imageData = (ImageDataMessage) message;
 			if(!(imageData.name.equals(chosenName))) {
+				colorData.put(imageData.name , imageData.color);
+
 			
 				if(imageData.isServer) {
 			controller.runOnThread(()-> component.addProfilePicture (imageData.image , imageData.color , imageData.name , imageData.isServer,-1));
@@ -171,12 +208,27 @@ public class ClientHandler implements ClientMessageHandler {
 				}else {
 					controller.run(()-> component.addProfilePicture(imageData.image,imageData.color, imageData.name, imageData.isServer,imageData.clientID));
 				}
+				
+
 			}
 			break;
 		case "class network.ClientDisconnectedMessage":
 				ClientDisconnectedMessage disconnected = (ClientDisconnectedMessage) message;
 				controller.run(()-> component.removeProfilePicture(disconnected.clientID));
 				
+			break;
+			
+		case "class network.HighLightMessage" :
+
+			DEBUG.clientmessage("Client got a highlight");
+			HighLightMessage highlightData = (HighLightMessage) message;
+			try {
+				highlightBuffer.put(highlightData);
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
 			break;
 		default:
 			break;

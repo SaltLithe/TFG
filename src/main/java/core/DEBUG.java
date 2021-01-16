@@ -11,7 +11,28 @@ public class DEBUG {
 	public static boolean enabled = false;
 	public static boolean unsetStreams = false;
 	public static boolean executing = false;
+	public static boolean serverside = false;
+	public static boolean clientside = true; 
 
+	public static void servermessage(String message) {
+		
+		
+		if(serverside && !executing) {
+			System.err.println("SERVER SAYS : " + message);
+		}
+		
+	}
+	
+
+	public static void clientmessage(String message) {
+		
+		
+		if(clientside && !executing) {
+			System.err.println("CLIENT SAYS : " + message);
+		}
+		
+	}
+	
 	public static void debugmessage(String mensaje) {
 
 		if (enabled && !executing) {

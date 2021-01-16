@@ -149,7 +149,7 @@ public class TextEditorTab extends JPanel {
 					} catch (Exception ex) {
 					}
 
-					System.out.println("LASTLINE : " + LastLine + " Linestart : " + linestart + " Lineeend : "  + lineend); 
+					//System.out.println("LASTLINE : " + LastLine + " Linestart : " + linestart + " Lineeend : "  + lineend); 
 					
 					if (linestart != LastLine && linestart != lineend) {
 						LastLine = caretline; 
@@ -283,11 +283,24 @@ public class TextEditorTab extends JPanel {
 			painters.put(color, new DefaultHighlightPainter(transparency));
 
 		}
-		textEditorArea.getHighlighter().removeAllHighlights();
+		
+		if (!highlights.containsKey(username)) {
+			
+			highlights.put(username, new HighlightData(linestart , lineend , username , null));
+			
+			
+		}
+		HighlightData removing = highlights.get(username);
+		if (removing.highlight != null) {
+		textEditorArea.getHighlighter().removeHighlight(removing.highlight);;
+		}
 
 		HighlightPainter p = painters.get(color);
 		try {
-			textEditorArea.getHighlighter().addHighlight(linestart, lineend, p);
+			
+			Object tag = textEditorArea.getHighlighter().addHighlight(linestart, lineend, p);
+			highlights.get(username).highlight = tag; 
+			
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

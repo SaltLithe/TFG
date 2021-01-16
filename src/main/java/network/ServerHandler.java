@@ -36,7 +36,7 @@ public class ServerHandler implements ServerMessageHandler {
 	String chosenImage;
 	Color chosenColor;
 	String chosenName;
-	private LinkedList<ImageDataMessage> connectedClients;
+	private HashSet<ImageDataMessage> connectedClients;
 	private HashMap<String , Integer> colorData;
 	private AtomicInteger syncCount = new AtomicInteger(); 
 
@@ -99,14 +99,17 @@ public class ServerHandler implements ServerMessageHandler {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			messages.add(incoming.name);
+			if(incoming.name != chosenName) {
+		
 			messages.add(incoming.linestart);
 			messages.add(incoming.lineend);
 			messages.add(colorData.get(incoming.name));
+			messages.add(incoming.name);
+
 			messages.add(incoming.keypath);
 			support.notify(ObserverActions.UPDATE_HIGHLIGHT, null, messages);
 			messages.clear();
-
+			}
 		}
 
 		
@@ -114,7 +117,7 @@ public class ServerHandler implements ServerMessageHandler {
 
 	public ServerHandler(String chosenName, int nClients , String chosenImage , Color chosenColor) {
 
-		connectedClients = new LinkedList<ImageDataMessage>();
+		connectedClients = new HashSet<ImageDataMessage>();
 		colorData = new HashMap<String, Integer>(); 
 		this.chosenImage = chosenImage;
 		this.chosenColor = chosenColor;
@@ -192,21 +195,25 @@ public class ServerHandler implements ServerMessageHandler {
 			controller.run(()-> component.sendToClient(returnData, client.clientID));
 			controller.run(()-> component.sendMessageToEveryone(imageData));
 			for(ImageDataMessage clientData : connectedClients) {
+				if(clientData.name != imageData.name) {
 				controller.run(()->component.sendToClient(clientData,client.clientID));
-				
+				}
 			}
 			}
 			catch(Exception e) {}
+			if(!connectedClients.contains(imageData)) {
 			connectedClients.add(imageData);
+			}
 			controller.runOnThread(()-> component.addProfilePicture (imageData.image , imageData.color , imageData.name, imageData.isServer,imageData.clientID));
 			
 			break;
 			
 		case "class network.HighLightMessage" :
-			System.out.println("INCOMING HIGHLIGHT");
 			HighLightMessage highlightData = (HighLightMessage) message;
 			try {
 				highlightBuffer.put(highlightData);
+				component.sendMessageToEveryone(highlightData);
+
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
