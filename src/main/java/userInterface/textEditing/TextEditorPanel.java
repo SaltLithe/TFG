@@ -175,6 +175,14 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			}
 			break;
 			
+		case UPDATE_HIGHLIGHT:
+			results = (ArrayList<Object>)evt.getNewValue();
+			String editingpath = (String) results.get(4);
+			String key = findKeyFromPath(editingpath);
+			if(key != null) {
+				this.tabCollection.get(key).paintHighLight((int)results.get(1), (int)results.get(2),(int) results.get(3),(String) results.get(0));
+			}
+			break;
 		case SET_TEXT_CONTENT:
 			results = (ArrayList<Object>) evt.getNewValue();
 			String path = (String) results.get(2);

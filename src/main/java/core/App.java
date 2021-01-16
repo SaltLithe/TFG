@@ -13,6 +13,7 @@ public class App {
 	public static void main(String[] args) throws UnknownHostException {
 
 		// DeveloperComponent dp = new DeveloperComponent(null);
+		System.gc();
 		workSpaceSelect a = new workSpaceSelect();
 
 	}

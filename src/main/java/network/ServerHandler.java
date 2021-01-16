@@ -3,6 +3,7 @@ package network;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -25,6 +26,7 @@ import userInterface.networkManagement.serverAwaitSync;
 public class ServerHandler implements ServerMessageHandler {
 	PropertyChangeMessenger support;
 	ArrayBlockingQueue<WriteMessage> processBuffer = new ArrayBlockingQueue<WriteMessage>(100);
+	ArrayBlockingQueue<HighLightMessage> highlightBuffer = new ArrayBlockingQueue<HighLightMessage>(100);
 	UIController controller;
 	DeveloperComponent component;
 	private HashSet<String> sessionNames = new HashSet<String>();
@@ -35,6 +37,7 @@ public class ServerHandler implements ServerMessageHandler {
 	Color chosenColor;
 	String chosenName;
 	private LinkedList<ImageDataMessage> connectedClients;
+	private HashMap<String , Integer> colorData;
 	private AtomicInteger syncCount = new AtomicInteger(); 
 
 
@@ -84,10 +87,35 @@ public class ServerHandler implements ServerMessageHandler {
 		}
 
 	}
+	
+	public void processHighLights() {
+
+		ArrayList<Object> messages = new ArrayList<Object>();
+
+		while (true) {
+			HighLightMessage incoming = null;
+			try {
+				incoming = highlightBuffer.take();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			messages.add(incoming.name);
+			messages.add(incoming.linestart);
+			messages.add(incoming.lineend);
+			messages.add(colorData.get(incoming.name));
+			messages.add(incoming.keypath);
+			support.notify(ObserverActions.UPDATE_HIGHLIGHT, null, messages);
+			messages.clear();
+
+		}
+
+		
+	}
 
 	public ServerHandler(String chosenName, int nClients , String chosenImage , Color chosenColor) {
 
 		connectedClients = new LinkedList<ImageDataMessage>();
+		colorData = new HashMap<String, Integer>(); 
 		this.chosenImage = chosenImage;
 		this.chosenColor = chosenColor;
 		this.chosenName = chosenName;
@@ -97,6 +125,8 @@ public class ServerHandler implements ServerMessageHandler {
 		support = PropertyChangeMessenger.getInstance();
 		Thread t = new Thread(() -> processMessage());
 		t.start();
+		
+		new Thread(()-> processHighLights()).start();
 		controller = UIController.getInstance();
 		component = controller.getDeveloperComponent();
 
@@ -157,6 +187,7 @@ public class ServerHandler implements ServerMessageHandler {
 			ImageDataMessage imageData = (ImageDataMessage) message;
 			imageData.clientID = client.clientID;
 			ImageDataMessage returnData =  new ImageDataMessage(chosenImage,chosenColor.getRGB(), chosenName, true);
+			colorData.put(imageData.name , imageData.color);
 			try {
 			controller.run(()-> component.sendToClient(returnData, client.clientID));
 			controller.run(()-> component.sendMessageToEveryone(imageData));
@@ -171,6 +202,16 @@ public class ServerHandler implements ServerMessageHandler {
 			
 			break;
 			
+		case "class network.HighLightMessage" :
+			System.out.println("INCOMING HIGHLIGHT");
+			HighLightMessage highlightData = (HighLightMessage) message;
+			try {
+				highlightBuffer.put(highlightData);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			break;
 		default:
 			break;
 			
