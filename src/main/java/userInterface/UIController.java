@@ -1,67 +1,81 @@
 package userInterface;
 
-import java.util.Deque;
-import java.util.LinkedList;
 
-import core.Command;
+
 import core.DeveloperComponent;
 
+/**
+ * Class part of a Command pattern that allows any user interface component to call methods in the object
+ * DeveloperComponent without needing a direct reference to it and passing any parameters it may need
+ * It runs commands as lambda expressions either in the same thread from the method call or in a separate
+ * thread
+ * This class itselfs implements the singleton pattern 
+ * @author Carmen Gómez Moreno
+ *
+ */
 public class UIController {
 
-	private static Deque<Command> ActionList;
-	private int actionsSaved = 100;
 	private static UIController instance;
-	private DeveloperComponent developerComponent;
+	public static DeveloperComponent developerComponent;
 	public static DeveloperMainFrame developerMainFrame;
 	
 	
-	public static DeveloperMainFrame getFrame() {
-		return developerMainFrame;
-	}
 
+	/**
+	 * 
+	 * @return this objects instance 
+	 */
 	public static UIController getInstance() {
 
 		if (instance == null) {
-			ActionList = new LinkedList<Command>();
 			instance = new UIController();
 		}
 		return instance;
 	}
 
+	/**
+	 * Set the instance of the developer component
+	 * @param developerComponent
+	 */
 	public void setDeveloperComponent(DeveloperComponent developerComponent) {
-		this.developerComponent = developerComponent;
+		UIController.developerComponent = developerComponent;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public DeveloperComponent getDeveloperComponent() {
 		return developerComponent;
 	}
 
-	public void run(Runnable command) {
-		if (!(ActionList.size() < actionsSaved)) {
-
-			ActionList.removeFirst();
-		}
+	//TODO remove error catcher
+	/**
+	 * Method that runs a lambda expression
+	 * @param command The lambda expression to run 
+	 */
+	public static void run(Runnable command , int errorcatcher) {
+	
 		
-		Command newCommand = new Command(command, developerComponent);
-		ActionList.addLast(newCommand);
-		newCommand.execute().run();
+		command.run();
 
 	}
-	public void runOnThread (Runnable command) {
+	//TODO remove error catcher
+	/**
+	 * Method that runs a lambda expression on a new thread
+	 * @param command The lambda expression to run 
+	 */
+	public static void runOnThread (Runnable command) {
 		new Thread(command).start();
 
 	}
 
-	public void undo() {
-		if (!ActionList.isEmpty()) {
-			Command last = ActionList.removeLast();
-			developerComponent = (DeveloperComponent) last.unExecute();
-
-		}
-	}
-
+	/**
+	 * Method to set the main user interface
+	 * @param developerMainFrame :  The main user interface
+	 */
 	public void setDeveloperMainFrame(DeveloperMainFrame developerMainFrame) {
-		this.developerMainFrame = developerMainFrame;
+		UIController.developerMainFrame = developerMainFrame;
 
 	}
 

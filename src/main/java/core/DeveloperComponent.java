@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -21,6 +22,7 @@ import fileManagement.WorkSpaceManager;
 import javaMiniSockets.clientSide.AsynchronousClient;
 import javaMiniSockets.serverSide.AsynchronousServer;
 import network.ClientHandler;
+import network.GlobalRunRequestMessage;
 import network.ResponseCreateFileMessage;
 import network.ServerHandler;
 import userInterface.DeveloperMainFrame;
@@ -33,7 +35,6 @@ import userInterface.fileNavigation.CustomTreeNode;
 
 public class DeveloperComponent implements PropertyChangeListener {
 
-	// Public
 	public DeveloperMainFrame developerMainFrame;
 	public AsynchronousServer server;
 	public AsynchronousClient client;
@@ -41,7 +42,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	public String expectedWorkSpaceLocation = null;
 	public boolean isConnected;
 
-	// Private
+	LinkedList<ResponseCreateFileMessage> responses = null;
 	private PersonalCompiler compiler;
 	private FileManager fileManager;
 	private PropertyChangeMessenger support;
@@ -59,6 +60,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 	// Structure that saves classpaths and uses projects as its keys
 	private HashMap<String, ClassPath> classpaths;
 	private String separator = "pairLeap.codeString";
+	private String chosenName = null;
+	public CountDownLatch waitingResponses;
 
 	public DeveloperComponent(WorkSpace workSpace) {
 
@@ -112,9 +115,11 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * @param newname
 	 */
 	public void setNewName(String newname) {
-		ArrayList<Object> message = new ArrayList<Object>();
-		message.add(newname);
-		support.notify(ObserverActions.SET_CHOSEN_NAME, null, message);
+
+		chosenName = newname;
+		Object[] message = { newname };
+
+		support.notify(ObserverActions.SET_CHOSEN_NAME, message);
 
 	}
 
@@ -133,6 +138,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	public void setAsClient(String serverAddress, String ownAddress, int serverPort, boolean autoConnect,
 			String chosenName, String imageByteData, Color chosenColor) {
+		this.chosenName = chosenName;
 
 		ClientHandler handler = new ClientHandler(chosenName, imageByteData, chosenColor);
 		client = new AsynchronousClient(serverAddress, ownAddress, serverPort, handler, separator);
@@ -143,8 +149,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 		}
 
 		try {
-			support.notify(ObserverActions.DISABLE_NEW_PROJECT, null, null);
-			support.notify(ObserverActions.DISABLE_JOIN_BUTTON, null, null);
+			support.notify(ObserverActions.DISABLE_NEW_PROJECT, null);
+			support.notify(ObserverActions.DISABLE_JOIN_BUTTON, null);
 			client.Connect();
 			isConnected = true;
 
@@ -172,6 +178,10 @@ public class DeveloperComponent implements PropertyChangeListener {
 	public void setAsServer(String name, String ip, int maxClients, int port, int queueSize, boolean autoConnect,
 			String imageByteData, Color chosenColor) {
 
+		waitingResponses = new CountDownLatch(maxClients);
+		chosenName = name;
+
+		responses = fileManager.scanAndReturn(workSpace.getPath(), workSpace.getName());
 		handler = new ServerHandler(name, maxClients, imageByteData, chosenColor);
 		if (queueSize == -1) {
 			queueSize = defaultQueueSize;
@@ -182,8 +192,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 			server.setAutomaticIP();
 		}
 
-		support.notify(ObserverActions.DISABLE_NEW_PROJECT, null, null);
-		support.notify(ObserverActions.DISABLE_JOIN_BUTTON, null, null);
+		support.notify(ObserverActions.DISABLE_NEW_PROJECT, null);
+		support.notify(ObserverActions.DISABLE_JOIN_BUTTON, null);
 		server.Start();
 		isConnected = true;
 
@@ -385,16 +395,15 @@ public class DeveloperComponent implements PropertyChangeListener {
 			// tab and loose the changes
 			if (n != JOptionPane.CANCEL_OPTION) {
 
-				ArrayList<Object> list = new ArrayList<Object>();
-				list.add(path);
-				support.notify(ObserverActions.CLOSE_TAB, null, list);
+				Object[] message = { path };
+				support.notify(ObserverActions.CLOSE_TAB, message);
 			}
 
 		} else {
 			// If there were no unsaved data , just close the tab
-			ArrayList<Object> list = new ArrayList<Object>();
-			list.add(path);
-			support.notify(ObserverActions.CLOSE_TAB, null, list);
+
+			Object[] message = { path };
+			support.notify(ObserverActions.CLOSE_TAB, message);
 
 		}
 
@@ -407,7 +416,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	public void closeAllTabs() {
 
-		support.notify(ObserverActions.CLOSE_ALL_TABS, null, null);
+		support.notify(ObserverActions.CLOSE_ALL_TABS, null);
 
 	}
 
@@ -469,6 +478,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * problematic thread will be killed Example : A thread running an infinite loop
 	 * is a problematic thread
 	 */
+	@SuppressWarnings("deprecation")
 	public void terminateProcess() {
 		if (runningThread != null) {
 			if (runningThread.isAlive()) {
@@ -476,20 +486,6 @@ public class DeveloperComponent implements PropertyChangeListener {
 			}
 		}
 
-	}
-
-	/**
-	 * Launches the thread used for running code by calling the compileAndRun Method
-	 */
-	public void startLocalRunningThread() {
-		runningThread = new Thread(() -> {
-			try {
-				compileAndRun(false);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
-		runningThread.start();
 	}
 
 	/**
@@ -509,7 +505,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 
 			triggerNoProjectDialog();
 		} else {
-			new runConfigDialog(this, this.classpaths.get(focusedProject).getClassPath());
+			new runConfigDialog(this.classpaths.get(focusedProject).getClassPath());
 		}
 	}
 
@@ -533,11 +529,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * @param name      : The chosen username of this user
 	 */
 	public void setIcon(Color color, String imagepath, String name) {
-		ArrayList<Object> list = new ArrayList<Object>();
-		list.add(color);
-		list.add(imagepath);
-		list.add(name);
-		support.notify(ObserverActions.SET_SELF_ICON, null, list);
+		Object[] message = { color, imagepath, name };
+		support.notify(ObserverActions.SET_SELF_ICON, message);
 
 	}
 
@@ -604,34 +597,6 @@ public class DeveloperComponent implements PropertyChangeListener {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	/**
-	 * Method used by users acting as server to scan their workspace for files and
-	 * folders and send special messages that the clients will use to recreate the
-	 * server's workspace TODO THIS METHOD INCLUDES A SEND DELAY THERE IS ALSO A
-	 * SYNCBUG IF TWO CLIENTS TRY TO SYNC CLOSE TO ONE ANOTHER
-	 * 
-	 * @param clientID
-	 */
-	private void scanAndSend(int clientID) {
-
-		// Ask the filemanager for messages describing the workspace
-		LinkedList<ResponseCreateFileMessage> responses = fileManager.scanAndReturn(workSpace.getPath(),
-				workSpace.getName());
-
-		for (ResponseCreateFileMessage message : responses) {
-			// send messages to the client one after the other
-			this.sendToClient(message, clientID);
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		}
-		handler.syncComplete();
-
 	}
 
 	/**
@@ -711,7 +676,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	public void reloadWorkSpace() {
 
-		support.notify(ObserverActions.CLEAR_PANEL, null, null);
+		support.notify(ObserverActions.CLEAR_PANEL, null);
 		fileManager.scanWorkSpace(workSpace);
 
 	}
@@ -741,16 +706,13 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * @param clientID : Id of the user this icon belongs to
 	 */
 	public void addProfilePicture(String image, int color, String name, boolean isServer, int clientID) {
-		ArrayList<Object> list = new ArrayList<Object>();
-		list.add(image);
-		list.add(color);
-		list.add(name);
-		list.add(clientID);
+
+		Object[] message = { image, color, name, clientID };
 
 		if (!isServer) {
-			support.notify(ObserverActions.SET_CLIENT_ICON, null, list);
+			support.notify(ObserverActions.SET_CLIENT_ICON, message);
 		} else {
-			support.notify(ObserverActions.SET_SERVER_ICON, null, list);
+			support.notify(ObserverActions.SET_SERVER_ICON, message);
 
 		}
 	}
@@ -763,21 +725,38 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	public void removeProfilePicture(int clientID) {
 
-		ArrayList<Object> list = new ArrayList<Object>();
-		list.add(clientID);
-		support.notify(ObserverActions.REMOVE_CLIENT_ICON, null, list);
+		Object[] message = { clientID };
+		support.notify(ObserverActions.REMOVE_CLIENT_ICON, message);
 	}
 
 	/**
-	 * Support method to check if a file still exists TODO is this a name or a path?
-	 * 
-	 * @param name : The name of the file to check
-	 * @return true if the file exists
+	 * Manages global runs
 	 */
-	private boolean stillExists(String name) {
+	public void startRunGlobal() {
+		if (server != null) {
 
-		File f = new File(name);
-		return f.exists();
+			DEBUG.debugmessage("Starting running thread");
+			runningThread = new Thread(()-> localGlobalRunningThread());
+			runningThread.start();
+			GlobalRunRequestMessage message = new GlobalRunRequestMessage(chosenName);
+			sendMessageToEveryone(message);
+
+		}
+
+	}
+
+	/**
+	 * Launches the thread used for running code by calling the compileAndRun Method
+	 */
+	public void startLocalRunningThread() {
+		runningThread = new Thread(() -> {
+			try {
+				compileAndRun(false);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+		runningThread.start();
 	}
 
 	/**
@@ -815,6 +794,65 @@ public class DeveloperComponent implements PropertyChangeListener {
 	}
 
 	/**
+	 * Starts the running thread set to a global run
+	 */
+	private void localGlobalRunningThread() {
+		try {
+			waitingResponses.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			compileAndRun(true);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Method used by users acting as server to scan their workspace for files and
+	 * folders and send special messages that the clients will use to recreate the
+	 * server's workspace TODO THIS METHOD INCLUDES A SEND DELAY THERE IS ALSO A
+	 * SYNCBUG IF TWO CLIENTS TRY TO SYNC CLOSE TO ONE ANOTHER
+	 * 
+	 * @param clientID
+	 */
+	private void scanAndSend(int clientID) {
+
+		if (responses != null) {
+
+			LinkedList<ResponseCreateFileMessage> responseCopy = responses;
+			for (ResponseCreateFileMessage message : responseCopy) {
+				// send messages to the client one after the other
+				this.sendToClient(message, clientID);
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
+			}
+		}
+		handler.syncComplete();
+
+	}
+
+	/**
+	 * Support method to check if a file still exists TODO is this a name or a path?
+	 * 
+	 * @param name : The name of the file to check
+	 * @return true if the file exists
+	 */
+	private boolean stillExists(String name) {
+
+		File f = new File(name);
+		return f.exists();
+	}
+
+	/**
 	 * Support method used to trigger the warning dialog indicating that there is no
 	 * focused project
 	 */
@@ -849,34 +887,31 @@ public class DeveloperComponent implements PropertyChangeListener {
 			if (focusedClassName != null && focusedClassName != "" && stillExists(focusedClassName)) {
 				// Disable run buttons
 				if (!global) {
-					support.notify(ObserverActions.DISABLE_LOCAL_RUN, null, null);
-				} else {
-					support.notify(ObserverActions.DISABLE_GLOBAL_RUN, null, null);
-
+					support.notify(ObserverActions.DISABLE_LOCAL_RUN, null);
 				}
 				// Get the name of the focused class
 				String subname = focusedClassName.substring(focusedClassName.lastIndexOf("\\") + 1,
 						focusedClassName.length());
 				// Call the compile function with the files from the classpath and the name of
 				// the entrypoint class
-				compile(files, subname);
+				compile(files, subname, global);
 				// After the code has run enable run buttons
 				if (!global) {
-					support.notify(ObserverActions.ENABLE_LOCAL_RUN, null, null);
+					support.notify(ObserverActions.ENABLE_LOCAL_RUN, null);
 				} else {
-					support.notify(ObserverActions.ENABLE_GLOBAL_RUN, null, null);
+					support.notify(ObserverActions.ENABLE_GLOBAL_RUN, null);
 
 				}
 				// Disable the terminate button , this button is enabled by the compiler when
 				// terminating the
 				// running process is safe
-				support.notify(ObserverActions.DISABLE_TERMINATE, null, null);
+				support.notify(ObserverActions.DISABLE_TERMINATE, null);
 
 			} else {
 
 				// If there is no entrypoint class selected the run configuration dialog is
 				// called
-				new runConfigDialog(this, files);
+				new runConfigDialog(files);
 
 			}
 		}
@@ -884,17 +919,16 @@ public class DeveloperComponent implements PropertyChangeListener {
 	}
 
 	/**
-	 * Method used to call the compilers compile method TODO is returning a String
-	 * necessary?
+	 * Method used to call the compilers compile method
 	 * 
 	 * @param files     : The files to be compiled
 	 * @param className : The name of the entrypoint class
+	 * @param global
 	 * @return
 	 */
-	private String compile(URLData[] files, String className) {
-		DEBUG.debugmessage("SE HA LLAMADO A COMPILE EN DEVELOPERCOMPONENT");
+	private void compile(URLData[] files, String className, boolean global) {
 
-		return compiler.run(className, files);
+		compiler.run(className, files, global);
 
 	}
 

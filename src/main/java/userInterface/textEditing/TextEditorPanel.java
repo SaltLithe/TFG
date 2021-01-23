@@ -7,16 +7,16 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.fife.ui.rtextarea.RTextScrollPane;
-
 import core.DEBUG;
-import core.DeveloperComponent;
+import network.HighLightMessage;
+import network.WriteMessage;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
@@ -26,57 +26,44 @@ import userInterface.UIController;
  * trabajando actualmente en la aplicación
  * 
  */
+/**
+ * UI Class containing the text of the edited files inside of a special text
+ * area RSyntaxTextArea implements line numbers , syntax highlight and more
+ * 
+ * @author Carmen Gómez Moreno
+ *
+ */
 @SuppressWarnings("serial")
 public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
-	private RTextScrollPane textEditorScrollPane;
+	public ArrayBlockingQueue<WriteMessage> sendBuffer = new ArrayBlockingQueue<WriteMessage>(200);
+	public ArrayBlockingQueue<HighLightMessage> highlightBuffer = new ArrayBlockingQueue<HighLightMessage>(200);
+	
 	private JTabbedPane tabPane;
-
-	private String focus = null;
-
-	private int newCaretPos;
-	private TextEditorContainer toolbar;
-	private UIController uicontroller;
-	private DeveloperComponent developerComponent;
 	private HashMap<String, TextEditorTab> tabCollection;
 	private PropertyChangeMessenger propertyChangeMessenger;
 	private String chosenName = null;
+	private Thread messager;
+	private Thread highlighter;
+	private long sendDelay = 50;
 
-	// Activa el editor de texto
-	public void enableTextEditorArea() {
-
-	}
-
-	// Metodo para poner el focus del editor
-	public void setFocus(String name) {
-
-		this.focus = name;
-	}
-
-	// Metodo para recuperar el focus actual
-	public String getFocus() {
-
-		return focus;
-	}
-
-	// Metodo para establecer los contenidos del editor de forma correcta cambiando
-	// el focus actual
-
-	private void setChosenName(String chosenName) {
-		this.chosenName = chosenName;
-	}
-	public TextEditorPanel(TextEditorContainer toolbar) {
+	
+	public TextEditorPanel() {
 		propertyChangeMessenger = PropertyChangeMessenger.getInstance();
-
-		uicontroller = UIController.getInstance();
-		developerComponent = uicontroller.getDeveloperComponent();
 
 		tabCollection = new HashMap<String, TextEditorTab>();
 
+		
+		
+		messager = new Thread(() -> sendMessages());
+		highlighter = new Thread(() -> sendHighlights());
+		
+		messager.start();
+		highlighter.start();
+		
 		setLayout(new BorderLayout());
 		this.setSize(new Dimension(ImageObserver.WIDTH, ImageObserver.HEIGHT));
 
-		this.toolbar = toolbar;
 		tabPane = new JTabbedPane();
 
 		tabPane.setTabLayoutPolicy(1);
@@ -85,35 +72,33 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 		tabPane.setVisible(true);
 
-		// Trackear el caret
-
 		this.setVisible(true);
 	}
 
-	// Metodo que recupera los contenidos del editor de texto
-
-	private void updateContainer(String currentProject, String currentTab) {
-
-		ArrayList<Object> list = new ArrayList<Object>();
-		list.add(currentTab);
-		list.add(currentProject);
-
-		propertyChangeMessenger.notify(ObserverActions.CHANGE_TAB_FOCUS, null, list);
-
-	}
-
+	/**
+	 * Method that , given a tab name , will return it's contents
+	 * 
+	 * @param name : The name of the tab where the contents will be pulled from
+	 * @return string containing the contents of a tab
+	 */
 	public String getContents(String name) {
 
 		return tabCollection.get(name).getContents();
 	}
 
-	// Metodo para activar el editor de texto
-
+	/**
+	 * Method used to add a tab to the editor
+	 * 
+	 * @param name     : The name of the tab
+	 * @param path     : The path of the file this tab is opening
+	 * @param project  : The project the file belongs to
+	 * @param contents : The contents of the file
+	 */
 	public void addTab(String name, String path, String project, String contents) {
 
-		this.developerComponent.setProjectFocus(project);
+		UIController.developerComponent.setProjectFocus(project);
 		TabMiniPanel mp1 = new TabMiniPanel(name, path, project);
-		TextEditorTab tab = new TextEditorTab(path, mp1, project , chosenName);
+		TextEditorTab tab = new TextEditorTab(path, mp1, project, chosenName,this);
 		tab.setTextEditorCode(contents);
 		mp1.setParent(tab);
 
@@ -123,12 +108,11 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 
-				DEBUG.debugmessage("CAMBIA CAMBIA");
 				try {
 
 					JTabbedPane tabbedPane = (JTabbedPane) e.getSource();
 					TextEditorTab selected = (TextEditorTab) tabbedPane.getSelectedComponent();
-					developerComponent.setProjectFocus(selected.getProject());
+					UIController.developerComponent.setProjectFocus(selected.getProject());
 					updateContainer(tab.getProject(), tab.getPath());
 
 				} catch (Exception excp) {
@@ -145,10 +129,107 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 	}
 
-	public void setFullText(String path, String contents) {
-		this.tabCollection.get(path).setTextEditorCode(contents);
+	/**
+	 * Method used to close a tab
+	 * 
+	 * @param name : The name of this tab
+	 */
+	public void CloseTab(String name) {
+		this.tabPane.remove(tabPane.indexOfComponent(tabCollection.get(name)));
+
 	}
 
+	/**
+	 * Method used to retrieve the contents of all opened tabs
+	 * 
+	 * @return an array containing the contents of all tabs
+	 */
+	public String[] getAllContents() {
+		String[] returning = new String[tabCollection.size()];
+		int count = 0;
+		for (String key : tabCollection.keySet()) {
+			returning[count] = tabCollection.get(key).getContents();
+
+			count++;
+		}
+		return returning;
+	}
+
+	/**
+	 * Method used to retrieve the name of all opened tabs
+	 * 
+	 * @return an array containing the nams of all tabs
+	 */
+	public String[] getAllNames() {
+		String[] returning = new String[tabCollection.size()];
+		int count = 0;
+		for (String key : tabCollection.keySet()) {
+			returning[count] = tabCollection.get(key).getPath();
+
+			count++;
+		}
+		return returning;
+	}
+	/**
+	 * Method used by a special thread that sends highlights to other users TODO
+	 * VERY IMPORTANT HOLY FUCK THIS SHOULD NOT BE A TREAD PER TAB YOU ONLY
+	 * REALISTICALLY EDIT ONE TAB AT A TIME ARE YOU CRAZY
+	 */
+	public void sendHighlights() {
+
+		while (true) {
+			HighLightMessage message = null;
+
+			try {
+
+				message = highlightBuffer.take();
+
+			} catch (InterruptedException e) {
+
+				e.printStackTrace();
+			}
+
+			final HighLightMessage finalMessage = message;
+			UIController.developerComponent.sendMessageToEveryone(finalMessage);
+			try {
+				Thread.sleep(sendDelay);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	
+	/**
+	 * Method used by a special thread that sends write updates to other users TODO
+	 * HOLY SHIT SAME AS ABOVE
+	 */
+	public void sendMessages() {
+
+		while (true) {
+			WriteMessage message = null;
+			try {
+				message = sendBuffer.take();
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			final WriteMessage finalMessage = message;
+			UIController.developerComponent.sendMessageToEveryone(finalMessage);
+			try {
+				Thread.sleep(sendDelay);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	/**
+	 * Implementation of propertyChange from PropertyChangeListener so that this
+	 * class can listen to ui notifications
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
@@ -157,37 +238,34 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		switch (action) {
 
 		case ENABLE_TEXT_EDITOR:
-			// enableEditor();
 			break;
 		case UPDATE_PANEL_CONTENTS:
-			// enableEditor();
-			synchronized(this) {
-			results = (ArrayList<Object>) evt.getNewValue();
-			String editingpath = (String) results.get(0);
+			synchronized (this) {
+				results = (ArrayList<Object>) evt.getNewValue();
+				String editingpath = (String) results.get(0);
 
-			String key = findKeyFromPath(editingpath);
-			if(key!= null) {
-			this.tabCollection.get(key).updateContents(results);
-			}
-			else {
-				//TO-DO warning de que se esta haciendo un update erroneo 
-			}
+				String key = findKeyFromPath(editingpath);
+				if (key != null) {
+					this.tabCollection.get(key).updateContents(results);
+				} else {
+				}
 			}
 			break;
-			
+
 		case UPDATE_HIGHLIGHT:
-			DEBUG.clientmessage("Updating highlight");
-			results = (ArrayList<Object>)evt.getNewValue();
+			results = (ArrayList<Object>) evt.getNewValue();
 			String editingpath = (String) results.get(4);
 			String key = findKeyFromPath(editingpath);
-			if(key != null) {
-				int lines = (int)results.get(0);
-				int linee = (int)results.get(1);
+			if (key != null) {
+
+				DEBUG.debugmessage("Got a highlight for name " + (String)results.get(3));
 				int color = -1;
 				try {
-				color = (int)results.get(2);
-				}catch(Exception uwu) {}
-				this.tabCollection.get(key).paintHighLight((int)results.get(0),(int)results.get(1),color,(String)results.get(3));
+					color = (int) results.get(2);
+				} catch (Exception uwu) {
+				}
+				this.tabCollection.get(key).paintHighLight((int) results.get(0), (int) results.get(1), color,
+						(String) results.get(3));
 			}
 			break;
 		case SET_TEXT_CONTENT:
@@ -226,60 +304,63 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		case CLOSE_ALL_TABS:
 			tabPane.removeAll();
 			tabCollection.clear();
-			
+
 			break;
-			
+
 		case SET_CHOSEN_NAME:
-			results = (ArrayList<Object>)evt.getNewValue();
+			results = (ArrayList<Object>) evt.getNewValue();
 			String newname = (String) results.get(0);
 			setChosenName(newname);
 			break;
+		case DISABLE_TEXT_EDITOR:
+			setEnabled(false);
+			break;
 		default:
+			
 			break;
 		}
 	}
-
+	
+	/**
+	 * Support method that , given the path of a file , check if there is any tab that could match it
+	 * @param editingpath : The path to find a key from 
+	 * @return the key for this path if it exists
+	 */
 	private String findKeyFromPath(String editingpath) {
-		
-		//TO-DO put a lock here
-		String similar = null; 
-		for ( String key : tabCollection.keySet()) {
-			
-			if(key.contains(editingpath));
+
+		// TODO put a lock here
+		String similar = null;
+		for (String key : tabCollection.keySet()) {
+
+			if (key.contains(editingpath))
+				;
 			similar = key;
-			
+
 		}
-		
-		
-		
+
 		return similar;
 	}
 
-	public void CloseTab(String path) {
-		this.tabPane.remove(tabPane.indexOfComponent(tabCollection.get(path)));
-
+	/**
+	 * Used to update the users name in the sesion 
+	 * @param chosenName : The new name
+	 */
+	private void setChosenName(String chosenName) {
+		this.chosenName = chosenName;
 	}
 
-	public String[] getAllContents() {
-		String[] returning = new String[tabCollection.size()];
-		int count = 0;
-		for (String key : tabCollection.keySet()) {
-			returning[count] = tabCollection.get(key).getContents();
+	
 
-			count++;
-		}
-		return returning;
-	}
+	/**
+	 * Support method used to update the focus as to indicate what tab is in focus 
+	 * @param currentProject : The project this tab belongs to 
+	 * @param currentTab : The tab that is in focus 
+	 */
+	private void updateContainer(String currentProject, String currentTab) {
 
-	public String[] getAllNames() {
-		String[] returning = new String[tabCollection.size()];
-		int count = 0;
-		for (String key : tabCollection.keySet()) {
-			returning[count] = tabCollection.get(key).getPath();
+		Object[] message = { currentTab, currentProject };
+		propertyChangeMessenger.notify(ObserverActions.CHANGE_TAB_FOCUS, message);
 
-			count++;
-		}
-		return returning;
 	}
 
 }

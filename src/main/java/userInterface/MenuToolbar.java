@@ -10,152 +10,144 @@ import java.io.IOException;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import core.DEBUG;
-import core.DeveloperComponent;
 import userInterface.fileEditing.newProjectDialog;
 import userInterface.textEditing.TextEditorContainer;
 
-/*Clase que contiene todos los botones del menu superior de la aplicacion y que implementa sus 
- * comportamientos
+/**
+ * Class implementing the top bar menu of this program , contains useful
+ * features such as saving saving all running code globally running code locally
+ * terminating running processes run configuration creating new Projects
+ * 
+ * @author Carmen Gómez Moreno
+ *
  */
 @SuppressWarnings("serial")
 public class MenuToolbar extends JPanel implements PropertyChangeListener {
-	private UIController uiController;
-	private DeveloperComponent developerComponent;
-	private DeveloperMainFrame developerMainFrame;
 	JButton save;
 	JButton saveAll;
+
+	private UIController uiController;
 	private JButton runGlobalButton;
 	private JButton terminateProcessButton;
 	private JButton runLocalButton;
-	
 	private TextEditorContainer textEditorContainer;
 	private JButton runConfigButton;
 	private JButton newProjectButton;
-	
+	private PropertyChangeMessenger support;
 
-	private void enableSaveButtons() {
-
-		save.setEnabled(true);
-		saveAll.setEnabled(true);
-
-	}
-
-	public MenuToolbar(DeveloperMainFrame developerMainFrame , TextEditorContainer textEditorContainer) {
+	/**
+	 * 
+	 * @param textEditorContainer The object containing the text editor interface
+	 *                            classes
+	 */
+	public MenuToolbar(TextEditorContainer textEditorContainer) {
+		support = PropertyChangeMessenger.getInstance();
 		this.textEditorContainer = textEditorContainer;
 		setAlignmentY(Component.TOP_ALIGNMENT);
 		setAlignmentX(Component.LEFT_ALIGNMENT);
 
-		DEBUG.debugmessage("SE HA INVOCADO AL CONSTRUCTOR DE MENUTOOLBAR");
-		uiController = UIController.getInstance();
-		developerComponent = uiController.getDeveloperComponent();
-		this.developerMainFrame = developerMainFrame;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		
 		JToolBar toolBar = new JToolBar();
 		toolBar.setAlignmentX(Component.LEFT_ALIGNMENT);
 		add(toolBar);
-		
-		 save = new JButton("Save");
-		 save.setIcon(new ImageIcon("Icons\\save_icon.png"));
+
+		// Prepare all of the buttons
+		save = new JButton("Save");
+		save.setIcon(new ImageIcon("Icons\\save_icon.png"));
 		toolBar.add(save);
-		
-		 saveAll = new JButton("Save All");
-		 saveAll.setIcon(new ImageIcon("Icons\\saveAll_icon.png"));
+
+		saveAll = new JButton("Save All");
+		saveAll.setIcon(new ImageIcon("Icons\\saveAll_icon.png"));
 		toolBar.add(saveAll);
-		
+
 		runLocalButton = new JButton("Run Locally");
 		runLocalButton.setIcon(new ImageIcon("Icons\\runLocal_icon.png"));
 		toolBar.add(runLocalButton);
-		
+
 		runGlobalButton = new JButton("Run Globally");
 		runGlobalButton.setIcon(new ImageIcon("Icons\\runGlobal_icon.png"));
 		toolBar.add(runGlobalButton);
-		
+
 		terminateProcessButton = new JButton("Terminate Run");
 		terminateProcessButton.setIcon(new ImageIcon("Icons\\terminateProcess_icon.png"));
 		toolBar.add(terminateProcessButton);
-		
+
 		runConfigButton = new JButton("Run configuration");
 		runConfigButton.setIcon(new ImageIcon("Icons\\runConfig_icon.png"));
 		toolBar.add(runConfigButton);
-		
+
 		newProjectButton = new JButton("Add Project");
 		newProjectButton.setIcon(new ImageIcon("Icons\\projectFolder_icon.png"));
 		toolBar.add(newProjectButton);
-		
-		
+
 		newProjectButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				newProjectDialog d = new newProjectDialog(uiController , developerComponent);
+				new newProjectDialog();
 
 			}
 
 		});
-		
-		
+
 		save.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-			save();
+				save();
 
 			}
 
 		});
-		
-		
 
 		saveAll.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-			
-					saveAll(); 
+
+				saveAll();
 			}
 
 		});
-		
-		
-		
+
 		runLocalButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				saveAll();
-				developerComponent.startLocalRunningThread(); 
-			
-
-			
+				disableSaveButtons(); 
+				UIController.developerComponent.startLocalRunningThread();
 
 			}
 
 		});
-		
+
 		runConfigButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				developerComponent.triggerRunConfig(); 
-				
+				UIController.developerComponent.triggerRunConfig();
+
 			}
 
 		});
-		
+
 		runGlobalButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				DEBUG.debugmessage("this is a global button ");
+				disableGlobalRun();
+				saveAll();
+				disableSaveButtons();
+				support.notify(ObserverActions.DISABLE_TEXT_EDITOR,null);
 				
-		//TO-DO RUN GLOBAL 
+				UIController.developerComponent.startRunGlobal();
+
 
 			}
 
@@ -165,7 +157,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				developerComponent.terminateProcess();
+				UIController.developerComponent.terminateProcess();
 
 			}
 
@@ -176,112 +168,152 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 		this.setVisible(true);
 
 	}
-	
-	private void enableTerminate() {
-		
-		terminateProcessButton.setEnabled(true);
 
-		
-	}
-
-	private void disableTerminate() {
-		
-		terminateProcessButton.setEnabled(false);
-
-		
-	}
-	
-	private void enableLocalRun() {
-		
-		runLocalButton.setEnabled(true);
-		
-	}
-	
-	private void disableLocalRun() {
-		
-		runLocalButton.setEnabled(false);
-
-		
-	}
-	private void disableGlobalRun() {
-		runGlobalButton.setEnabled(false);
-	}
-	
-	private void enableGlobalRun() {
-		runGlobalButton.setEnabled(true);
-	}
-	
-	
-	private void terminateProcess() {
-		developerComponent.terminateProcess(); 
-	}
-	
-	
+	/**
+	 * Implementation of propertyChange from PropertyChangeListener in order for
+	 * this class to listen to ui notifications
+	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
 		switch (action) {
-		
+
 		case DISABLE_TERMINATE:
 			disableTerminate();
 			break;
 		case ENABLE_TERMINATE:
-			enableTerminate(); 
+			enableTerminate();
+			break;
+		case ENABLE_GLOBAL_RUN:
+			enableGlobalRun();
+			break;
+		case DISABLE_GLOBAL_RUN:
+			disableGlobalRun();
 			break;
 		case DISABLE_LOCAL_RUN:
-			DEBUG.debugmessage("Coming through");
 			disableLocalRun();
 			break;
 		case ENABLE_LOCAL_RUN:
 			enableLocalRun();
 			break;
 		case SAFETY_STOP:
-			terminateProcess(); 
+			terminateProcess();
 			break;
 		case SAFETY_SAVE:
-			saveAll(); 
+			saveAll();
 			break;
 		case DISABLE_NEW_PROJECT:
 			newProjectButton.setEnabled(false);
 			break;
 		case ENABLE_NEW_PROJECT:
 			newProjectButton.setEnabled(true);
-			
+
 		default:
 			break;
 		}
 
 	}
-	
 
+	private void disableSaveButtons() {
+		save.setEnabled(false);
+		saveAll.setEnabled(false);
+	}
+
+	private void enableSaveButtons() {
 	
+		save.setEnabled(true);
+		saveAll.setEnabled(true);
+	
+	}
+
+	/**
+	 * Support method to enable the terminate process button
+	 */
+	private void enableTerminate() {
+
+		terminateProcessButton.setEnabled(true);
+
+	}
+
+	/**
+	 * Support method to disable the terminate process button
+	 */
+	private void disableTerminate() {
+
+		terminateProcessButton.setEnabled(false);
+
+	}
+
+	/**
+	 * Support method to enable the run locally button
+	 */
+	private void enableLocalRun() {
+
+		runLocalButton.setEnabled(true);
+
+	}
+
+	/**
+	 * Support method to disable the local run button
+	 */
+	private void disableLocalRun() {
+
+		runLocalButton.setEnabled(false);
+
+	}
+
+	/**
+	 * Support method to disable the global run method
+	 */
+	private void disableGlobalRun() {
+		runGlobalButton.setEnabled(false);
+	}
+
+	/**
+	 * Support method to enable the global run method
+	 */
+	private void enableGlobalRun() {
+		runGlobalButton.setEnabled(true);
+	}
+
+	/**
+	 * Support method to terminate the running process
+	 */
+	private void terminateProcess() {
+		UIController.developerComponent.terminateProcess();
+	}
+
+	/**
+	 * Support method to save the current focused file
+	 */
 	private void save() {
-		
 
-		if(textEditorContainer.getCurrentTabName() != null && textEditorContainer.getContents() != null) {
-		try {
-			developerComponent.saveCurrentFile(textEditorContainer.getCurrentTabName(), textEditorContainer.getContents());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-		
+		if (textEditorContainer.getCurrentTabName() != null && textEditorContainer.getContents() != null) {
+			try {
+				UIController.developerComponent.saveCurrentFile(textEditorContainer.getCurrentTabName(),
+						textEditorContainer.getContents());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 		}
-		
+
 	}
-	
+
+	/**
+	 * Support method to save all files
+	 */
 	private void saveAll() {
-		DEBUG.debugmessage("SE HA PULSADO EL BOTON SAVEALL");
-		String[] contents = textEditorContainer.getAllContents(); 
-		String[] names = textEditorContainer.getAllNames(); 
-		if(names.length != 0 && contents.length != 0) {
-		
-				try {
-					developerComponent.saveAllFiles(names,contents);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-		
-		
-	}
+		String[] contents = textEditorContainer.getAllContents();
+		String[] names = textEditorContainer.getAllNames();
+		if (names.length != 0 && contents.length != 0) {
+
+			try {
+				UIController.developerComponent.saveAllFiles(names, contents);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
 	}
 }

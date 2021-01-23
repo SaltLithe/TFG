@@ -1,29 +1,27 @@
 package userInterface.fileEditing;
 
-import javax.swing.JDialog;
-
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-
-import core.DEBUG;
-import core.DeveloperComponent;
-import userInterface.UIController;
-
-import java.awt.GridLayout;
-import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 
+import userInterface.UIController;
+/**
+ * Class used to create a new project taking input from the user for the project name 
+ * @author Carmen Gómez Moreno
+ *
+ */
+@SuppressWarnings("serial")
 public class newProjectDialog extends JDialog{
 	private JTextField nameField;
-	public newProjectDialog(UIController uiController , DeveloperComponent developerComponent) {
+	public newProjectDialog() {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 265, 0, 0, 0};
 		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -63,7 +61,7 @@ public class newProjectDialog extends JDialog{
 			
 				String name = nameField.getText() ;
 				if(name != "" && name != null ) {
-				uiController.run(()-> developerComponent.createNewProject(name,true,true));
+				UIController.developerComponent.createNewProject(name,true,true);
 				}
 
 			}

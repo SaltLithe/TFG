@@ -18,11 +18,15 @@ import javax.swing.JToolBar;
 
 import userInterface.ObserverActions;
 
-/*Esta clase contiene un panel en el que de momento se añaden labels con el dueño de sesion y su ip
- * en el futuro tiene que ser capaz de sacar notificaciones cuando ocurran eventos como que se conecte un 
- * usuario , se comience una ejecucion global , etc 
+/**
+ * Ui class that contains functionality to join and disconnect from sessions as
+ * well as a list rendering the users connected a session represented with
+ * profile icons
+ * 
+ * @author Carmen Gómez Moreno
+ *
  */
-
+@SuppressWarnings("serial")
 public class UsersPanel extends JPanel implements PropertyChangeListener {
 
 	JLabel sessionowner;
@@ -30,13 +34,13 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 	JButton sessionButton;
 	JButton disconnectButton;
 	JPanel userIconsPanel;
-	testIconComponent self; 
-	testIconComponent server; 
-	LinkedList<testIconComponent> icons;
+	ProfileIIconComponent self;
+	ProfileIIconComponent server;
+	LinkedList<ProfileIIconComponent> icons;
 
 	public UsersPanel() {
-		
-		icons = new LinkedList<testIconComponent>(); 
+
+		icons = new LinkedList<ProfileIIconComponent>();
 		setLayout(new BorderLayout(0, 0));
 
 		JPanel panel = new JPanel();
@@ -52,7 +56,7 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				ConnectionDialog d = new ConnectionDialog();
+				new ConnectionDialog();
 
 			}
 
@@ -69,111 +73,37 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 
 	}
 
-	public void setSessionOwner(String name) {
-		sessionowner = new JLabel("Owner : " + name);
-		add(sessionowner);
-		updateUI();
-		// TODO Auto-generated method stub
-
-	}
-
-	public void setIpIndicator(String remoteaddr) {
-		ipIndicator = new JLabel(remoteaddr);
-		add(ipIndicator);
-		updateUI();
-		// TODO Auto-generated method stub
-
-	}
-	
-
-	private void removeClient(int clientID) {
-		Iterator<testIconComponent> i = icons.iterator();
-		int index = -1;
-		int count = 0;
-		boolean found = false;
-		while(i.hasNext() && !found) {
-			testIconComponent next = i.next();
-			if ( next.clientID == clientID) {
-				index = count;
-				found = true;
-			}else {
-				count++;
-			}
-		}
-		if(index != -1 ) {
-		icons.remove(index);
-		
-		Rearange(); 
-		}
-		
-	}
-	
-
-	
-	private void setSelf(Color color , String image , String name) {
-		 self =  new testIconComponent(image,color,name,false);
-		 icons.addFirst(self);
-	}
-	
-	
-	private void setServer(String string , int color , String name) {
-		 server = new testIconComponent(color,string,name,-1);
-		 icons.addFirst(server);
-
-	}
-	
-	private void setClient(String string , int color , String name , int clientID) {
-		testIconComponent client = new testIconComponent(color,string,name,clientID);
-		icons.addLast(client);
-		
-	}
-	
-	
-	private void Rearange() {
-		
-		this.userIconsPanel.removeAll();
-		for (testIconComponent c : icons) {
-			
-			c.setMaximumSize( c.getPreferredSize() );
-			c.setMaximumSize( c.getPreferredSize() );
-			c.setMaximumSize( c.getPreferredSize() );
-			userIconsPanel.add(c);
-			
-			
-			
-		}
-		userIconsPanel.updateUI();
-		
-		
-	}
-	
-
+	/**
+	 * Implementation of propertyChange from PropertyChangeListener for this class
+	 * to listen to ui notifications
+	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
+		@SuppressWarnings("unchecked")
 		ArrayList<Object> result = (ArrayList<Object>) evt.getNewValue();
-		
-		switch(action) {
-		case  SET_SELF_ICON :
-			
-			setSelf((Color)result.get(0),(String)result.get(1),(String)result.get(2));
+
+		switch (action) {
+		case SET_SELF_ICON:
+
+			setSelf((Color) result.get(0), (String) result.get(1), (String) result.get(2));
 			Rearange();
 			break;
 		case SET_SERVER_ICON:
-			setServer((String)result.get(0),(int)result.get(1),(String)result.get(2));
+			setServer((String) result.get(0), (int) result.get(1), (String) result.get(2));
 			Rearange();
-			
+
 			break;
 		case SET_CLIENT_ICON:
-		
-			setClient((String)result.get(0),(int)result.get(1),(String)result.get(2),(int)result.get(3));
-			Rearange(); 
+
+			setClient((String) result.get(0), (int) result.get(1), (String) result.get(2), (int) result.get(3));
+			Rearange();
 			break;
 		case REMOVE_CLIENT_ICON:
-			removeClient((int)result.get(0));
-			Rearange(); 
+			removeClient((int) result.get(0));
+			Rearange();
 			break;
-		
+
 		case DISABLE_JOIN_BUTTON:
 			sessionButton.setEnabled(false);
 			break;
@@ -187,13 +117,65 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 			disconnectButton.setEnabled(false);
 			break;
 		default:
-			
+
 			break;
-		
-		
+
 		}
-		
-		
+
+	}
+
+	private void removeClient(int clientID) {
+		Iterator<ProfileIIconComponent> i = icons.iterator();
+		int index = -1;
+		int count = 0;
+		boolean found = false;
+		while (i.hasNext() && !found) {
+			ProfileIIconComponent next = i.next();
+			if (next.clientID == clientID) {
+				index = count;
+				found = true;
+			} else {
+				count++;
+			}
+		}
+		if (index != -1) {
+			icons.remove(index);
+
+			Rearange();
+		}
+
+	}
+
+	private void setSelf(Color color, String image, String name) {
+		self = new ProfileIIconComponent(image, color, name, false);
+		icons.addFirst(self);
+	}
+
+	private void setServer(String string, int color, String name) {
+		server = new ProfileIIconComponent(color, string, name, -1);
+		icons.addFirst(server);
+
+	}
+
+	private void setClient(String string, int color, String name, int clientID) {
+		ProfileIIconComponent client = new ProfileIIconComponent(color, string, name, clientID);
+		icons.addLast(client);
+
+	}
+
+	private void Rearange() {
+
+		this.userIconsPanel.removeAll();
+		for (ProfileIIconComponent c : icons) {
+
+			c.setMaximumSize(c.getPreferredSize());
+			c.setMaximumSize(c.getPreferredSize());
+			c.setMaximumSize(c.getPreferredSize());
+			userIconsPanel.add(c);
+
+		}
+		userIconsPanel.updateUI();
+
 	}
 
 }

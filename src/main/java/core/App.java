@@ -13,8 +13,8 @@ public class App {
 
 	public static void main(String[] args) throws UnknownHostException {
 
-		System.gc();
-		workSpaceSelect a = new workSpaceSelect();
+
+		new workSpaceSelect();
 
 	}
 

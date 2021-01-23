@@ -43,44 +43,6 @@ public class OutStreamWrapper extends PrintStream {
 
 	}
 
-	/**
-	 * Transforms the running program's output into a String and sends it to the console gui
-	 * @param realPrint
-	 * @param outputStream
-	 */
-	
-	//SERIOUS TODO , YOU MAY NOT NEED THE REALPRINT HERE
-	private void sendToConsole(PrintStream realPrint, OutputStream outputStream) {
-		//Prevent multiple writing at the same time
-		writeLock.lock();
-		//We put the output of the console into a a byte array
-		byte[] inbaos = ((ByteArrayOutputStream) outputStream).toByteArray();
-		//We create a new string from the bytes
-		String s = new String(inbaos, StandardCharsets.UTF_8);
-		try {
-			outputStream.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		realPrint.flush();
-		try {
-			outputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		realPrint.close();
-		//We send the string we created to the gui 
-		console.writeOutput(s);
-		writeLock.unlock();
-
-	}
-	/*
-	 * Overrides OutputStream's write method.
-	 * We don't need to override this method but we need to so 
-	 * this class can inherit from OutputStream
-	 */
-	
 	@Override
 	public void write(byte[] b) throws IOException {
 
@@ -119,5 +81,39 @@ public class OutStreamWrapper extends PrintStream {
 		sendToConsole(null, null);
 
 	}
+	
+	
 
+	/**
+	 * Transforms the running program's output into a String and sends it to the console gui
+	 * @param realPrint
+	 * @param outputStream
+	 */
+	
+	//SERIOUS TODO , YOU MAY NOT NEED THE REALPRINT HERE
+	private void sendToConsole(PrintStream realPrint, OutputStream outputStream) {
+		//Prevent multiple writing at the same time
+		writeLock.lock();
+		//We put the output of the console into a a byte array
+		byte[] inbaos = ((ByteArrayOutputStream) outputStream).toByteArray();
+		//We create a new string from the bytes
+		String s = new String(inbaos, StandardCharsets.UTF_8);
+		try {
+			outputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		realPrint.flush();
+		try {
+			outputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	
+		realPrint.close();
+		//We send the string we created to the gui 
+		console.writeOutput(s);
+		writeLock.unlock();
+	
+	}
 }

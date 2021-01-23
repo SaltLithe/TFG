@@ -1,30 +1,21 @@
 package userInterface.fileNavigation;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
-import java.util.Enumeration;
-
-import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
-
-import core.DEBUG;
 import fileManagement.FILE_PROPERTIES;
 import fileManagement.FILE_TYPE;
 
+/**
+ * Nodes of the trees that serve as file navigation for the user 
+ * @author Carmen Gómez Moreno
+ *
+ */
+@SuppressWarnings({ "unused", "serial" })
 public class CustomTreeNode extends DefaultMutableTreeNode   {
 	
 	
@@ -36,16 +27,21 @@ public class CustomTreeNode extends DefaultMutableTreeNode   {
 	public boolean hideContents; 
 	
 	
+	
 	private static String folderPath =  "Icons/warning_icon.png";
 	private String packagePath = "Icons/warning_icon.png";
 	private String filePath = "Icons/warning_icon.png";
-	
-	
-	
-	
 
 	
 	
+	/**
+	 * 
+	 * @param path : The path of the element this node represents
+	 * @param name : The name of this node
+	 * @param project : The project this node belongs to 
+	 * @param isFile : Flag indicating if this node represents a file
+	 * @param isProject : Flag indicating if this node represents a project 
+	 */
 	public CustomTreeNode(String path, String name , String project , boolean isFile , boolean isProject ) {
 		
 		
@@ -60,10 +56,13 @@ public class CustomTreeNode extends DefaultMutableTreeNode   {
 		
 		getMetaData(path);
 		
-		
 
 	}
 	
+	/**
+	 * 
+	 * @return the path of this node's parent node
+	 */
 	public String getParentPath() {
 		
 		int last = path.lastIndexOf("\\");
@@ -73,7 +72,10 @@ public class CustomTreeNode extends DefaultMutableTreeNode   {
 	}	
 	
 	
-	
+	/**
+	 * Support method that returns this node metadata if this is a folder
+	 * @param path : TODO  what is this??
+	 */
 	private void getMetaData(String path) {
 		
 		FILE_TYPE returning = null; 

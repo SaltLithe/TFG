@@ -1,8 +1,12 @@
 package fileManagement;
 
-/*Esto es solo un enum para controlar mas facilmente la ejecucion de los TextFile
- * ademas luego puedo añadir mas tipos si quiero 
+/**
+ * Enum used to indicate if a code file is a class or a script
+ * 
+ * @author Carmen Gómez Moreno
+ *
  */
+//TODO you dont need this but are you going to refactor the code? nope
 public enum FileType {
 	CLASS, SCRIPT
 }

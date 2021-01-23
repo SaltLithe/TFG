@@ -1,5 +1,10 @@
 package fileManagement;
 
+/**
+ * Static class used to retrieve the strings to use as metadata for certain folders 
+ * @author Carmen Gómez Moreno
+ *
+ */
 public class FILE_PROPERTIES {
 
 	public final static String projectProperty = "pairleap.projectfolder";

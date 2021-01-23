@@ -19,18 +19,22 @@ import fileManagement.WorkSpace;
 import fileManagement.WorkSpaceManager;
 import userInterface.fileNavigation.workSpaceSelect;
 
+/**
+ * Class used to pop a dialog for the user to add a new workspace
+ * @author Carmen Gómez Moreno
+ *
+ */
+@SuppressWarnings({"serial","unused"})
 public class AddWorkSpaceDialog extends JDialog {
 	private JTextField nameField;
 	private JTextField pathField;
-	private boolean parentUpdated; 
-	private JFrame self; 
+	private workSpaceSelect self; 
 	private WorkSpaceManager wsm; 
 	
 
-	public AddWorkSpaceDialog(workSpaceSelect parent , JFrame self){
+	public AddWorkSpaceDialog( workSpaceSelect self){
 	
 		this.self = self; 
-		parentUpdated = false;
 		wsm = WorkSpaceManager.getInstance();
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();

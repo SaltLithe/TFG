@@ -31,65 +31,52 @@ import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
 
+@SuppressWarnings("unused")
 public class TextEditorTab extends JPanel {
 
-	// PUBLIC
-
-	// userInterface
 	public RSyntaxTextArea textEditorArea;
 	public TabMiniPanel miniPanel;
 
-	// flags
 	public boolean notConsideredChanges;
 	public boolean messageWrite;
 	public boolean unsavedChanges;
-
-	// PRIVATE
 	private static final long serialVersionUID = 1L;
-
-	// userInterface
 	private RTextScrollPane textEditorScrollPane;
 	private HashMap<Integer, HighlightPainter> painters;
 	private HashMap<String, HighlightData> highlights;
 	private Semaphore editingLock;
-	private Semaphore highlightLock;
-
-	// behaviour
 	private UIController uiController;
 	private DeveloperComponent developerComponent;
 	private PropertyChangeMessenger support;
-	private ArrayBlockingQueue<WriteMessage> sendBuffer = new ArrayBlockingQueue<WriteMessage>(200);
-	private ArrayBlockingQueue<HighLightMessage> highlightBuffer = new ArrayBlockingQueue<HighLightMessage>(200);
 
 	private Semaphore sendSemaphore = new Semaphore(1);
-	private long sendDelay = 50;
-
-	// data
 	private String path;
 	private String project;
 	private String keypath;
 	private String chosenName;
 	private int alpha = 65;
-
 	private Highlight[] lasthighlight;
 	private int LastLine = -2;
+	private TextEditorPanel parent;
 
-	public TextEditorTab(String path, TabMiniPanel miniPanel, String project, String chosenName) {
+	/**
+	 * 
+	 * @param path       : The path of this file this tab opens
+	 * @param miniPanel  : The panel for the tab above the editor window
+	 * @param project    : The project this file belongs to
+	 * @param chosenName : The name of this user for the session
+	 */
+	public TextEditorTab(String path, TabMiniPanel miniPanel, String project, String chosenName,
+			TextEditorPanel parent) {
 
+		this.parent = parent;
 		lasthighlight = new Highlight[1];
-		highlightLock = new Semaphore(1);
 		LastLine = -1;
 
 		painters = new HashMap<Integer, HighlightPainter>();
 		highlights = new HashMap<String, HighlightData>();
 		this.chosenName = chosenName;
-		DEBUG.debugmessage("Se ha creado un tab para el fichero en la direccion : " + path);
 		editingLock = new Semaphore(1);
-
-		new Thread(() -> sendMessages()).start();
-		;
-
-		new Thread(() -> sendHighlights()).start();
 
 		this.project = project;
 		String workSpacePath = project.substring(0, project.lastIndexOf("\\"));
@@ -123,20 +110,13 @@ public class TextEditorTab extends JPanel {
 		textEditorScrollPane = new RTextScrollPane(textEditorArea);
 		add(textEditorScrollPane, BorderLayout.CENTER);
 
-		// LISTENERS
-
 		textEditorArea.addCaretListener(new CaretListener() {
 			public void caretUpdate(CaretEvent e) {
 
-				try {
-					editingLock.acquire();
-				} catch (InterruptedException e3) {
-					// TODO Auto-generated catch block
-					e3.printStackTrace();
-				}
-				
-				
-
+				/*
+				 * try { editingLock.acquire(); } catch (InterruptedException e3) {
+				 * e3.printStackTrace(); }
+				 */
 				if (developerComponent.isConnected) {
 
 					int caretline = textEditorArea.getCaretLineNumber();
@@ -149,16 +129,14 @@ public class TextEditorTab extends JPanel {
 					} catch (Exception ex) {
 					}
 
-					//System.out.println("LASTLINE : " + LastLine + " Linestart : " + linestart + " Lineeend : "  + lineend); 
-					
-					if (linestart != LastLine && linestart != lineend) {
-						LastLine = caretline; 
+					if (caretline != LastLine && linestart != lineend) {
+						DEBUG.debugmessage("LASTLINECHANGED");
+						LastLine = caretline;
 						HighLightMessage highlightmessage = new HighLightMessage(linestart, lineend, chosenName,
 								keypath);
 						try {
-							highlightBuffer.put(highlightmessage);
+							parent.highlightBuffer.put(highlightmessage);
 						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 
@@ -166,7 +144,7 @@ public class TextEditorTab extends JPanel {
 
 				}
 
-				editingLock.release();
+				// editingLock.release();
 
 			}
 
@@ -188,7 +166,7 @@ public class TextEditorTab extends JPanel {
 
 						unsavedChanges = true;
 						miniPanel.setAsUnsaved();
-						support.notify(ObserverActions.SET_SAVE_FLAG_TRUE, null, null);
+						support.notify(ObserverActions.SET_SAVE_FLAG_TRUE, null);
 
 					}
 
@@ -202,7 +180,7 @@ public class TextEditorTab extends JPanel {
 								e.getOffset() + e.getLength());
 
 						try {
-							sendBuffer.put(message);
+							parent.sendBuffer.put(message);
 
 						} catch (InterruptedException e1) {
 							e1.printStackTrace();
@@ -231,7 +209,7 @@ public class TextEditorTab extends JPanel {
 
 						unsavedChanges = true;
 						miniPanel.setAsUnsaved();
-						support.notify(ObserverActions.SET_SAVE_FLAG_TRUE, null, null);
+						support.notify(ObserverActions.SET_SAVE_FLAG_TRUE, null);
 
 					}
 
@@ -244,7 +222,7 @@ public class TextEditorTab extends JPanel {
 						message.offset = e.getOffset();
 
 						try {
-							sendBuffer.put(message);
+							parent.sendBuffer.put(message);
 						} catch (InterruptedException e1) {
 							e1.printStackTrace();
 						}
@@ -260,7 +238,6 @@ public class TextEditorTab extends JPanel {
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				DEBUG.debugmessage("TTHIS IS A CHANGE");
 
 			}
 
@@ -270,11 +247,15 @@ public class TextEditorTab extends JPanel {
 
 	}
 
-	// PUBLIC
-
+	/**
+	 * Method used to paint highlights from other users
+	 * 
+	 * @param linestart : Where the highlight starts
+	 * @param lineend   : Where the highlight ends
+	 * @param color     : A number representing the color of this highlight
+	 * @param username  : The username of the client that created this highlight
+	 */
 	public void paintHighLight(int linestart, int lineend, int color, String username) {
-
-	
 
 		if (!painters.containsKey(color)) {
 
@@ -283,118 +264,36 @@ public class TextEditorTab extends JPanel {
 			painters.put(color, new DefaultHighlightPainter(transparency));
 
 		}
-		
+
 		if (!highlights.containsKey(username)) {
-			
-			highlights.put(username, new HighlightData(linestart , lineend , username , null));
-			
-			
+
+			highlights.put(username, new HighlightData(linestart, lineend, username, null));
+
 		}
 		HighlightData removing = highlights.get(username);
 		if (removing.highlight != null) {
-		textEditorArea.getHighlighter().removeHighlight(removing.highlight);;
+			textEditorArea.getHighlighter().removeHighlight(removing.highlight);
+			;
 		}
 
 		HighlightPainter p = painters.get(color);
 		try {
-			
+
 			Object tag = textEditorArea.getHighlighter().addHighlight(linestart, lineend, p);
-			highlights.get(username).highlight = tag; 
-			
+			highlights.get(username).highlight = tag;
+
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
-
-		/*
-		 * 
-		 * if(highlights.containsKey(username)) {
-		 * 
-		 * textEditorArea.getHighlighter().removeHighlight(highlights.remove(username).
-		 * highlight); }
-		 * 
-		 * boolean positionTaken = false; Object[] names =
-		 * highlights.keySet().toArray();
-		 * 
-		 * int count = 0 ;
-		 * 
-		 * while (count < names.length && !positionTaken) {
-		 * 
-		 * if (highlights.get(names[count]).linestart == linestart) { positionTaken =
-		 * true; }else { count++; }
-		 * 
-		 * }
-		 * 
-		 * 
-		 * if(positionTaken) {
-		 * 
-		 * // data = new HighlightData(linestart , name , lineend , null);
-		 * //highlights.put(name, data);
-		 * 
-		 * }else { try { HighlightPainter p = painters.get(color);
-		 * 
-		 * textEditorArea.getHighlighter().addHighlight(linestart, lineend, p);
-		 * Highlight[] highlightlist = textEditorArea.getHighlighter().getHighlights();
-		 * if (highlightlist.length >0 ) { highlights.put(username, new
-		 * HighlightData(linestart,username , lineend
-		 * ,highlightlist[highlightlist.length-1])); } } catch (BadLocationException e)
-		 * { e.printStackTrace(); }
-		 * 
-		 * }
-		 * 
-		 * 
-		 * 
-		 */
 
 	}
 
-	public void sendHighlights() {
-
-		while (true) {
-			HighLightMessage message = null;
-
-			try {
-
-				message = highlightBuffer.take();
-
-			} catch (InterruptedException e) {
-
-				e.printStackTrace();
-			}
-
-			final HighLightMessage finalMessage = message;
-			developerComponent.sendMessageToEveryone(finalMessage);
-			try {
-				Thread.sleep(sendDelay);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		}
-	}
-
-	public void sendMessages() {
-
-		while (true) {
-			WriteMessage message = null;
-			try {
-				message = sendBuffer.take();
-
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			final WriteMessage finalMessage = message;
-			developerComponent.sendMessageToEveryone(finalMessage);
-			try {
-				Thread.sleep(sendDelay);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-
-	}
-
+	/**
+	 * Method used whenever a user opens a file and a big string of code has to be
+	 * written into the tab
+	 * 
+	 * @param code : The string containing the saved code inside of the file
+	 */
 	public void setTextEditorCode(String code) {
 
 		notConsideredChanges = true;
@@ -405,6 +304,12 @@ public class TextEditorTab extends JPanel {
 
 	}
 
+	/**
+	 * Method used to insert updates to the code made by other users
+	 * 
+	 * @param results : The results from the message sent by other users containing
+	 *                the necessary data to update the code
+	 */
 	public void updateContents(ArrayList<Object> results) {
 
 		try {
@@ -421,38 +326,48 @@ public class TextEditorTab extends JPanel {
 				textEditorArea.replaceRange("", incoming.offset, incoming.offset + incoming.lenght);
 			}
 
-			uiController.run(() -> developerComponent.writeOnClosed(path, textEditorArea.getText()));
+			UIController.developerComponent.writeOnClosed(path, textEditorArea.getText());
 
 			messageWrite = false;
 		} catch (Exception e) {
 
 		} finally {
-			System.out.println("Realising editor");
 			editingLock.release();
 		}
 	}
 
+	/**
+	 * 
+	 * @return the path of the file this tab opens
+	 */
 	public String getPath() {
 
 		return path;
 	}
 
+	/**
+	 * 
+	 * @return the contents of this tab
+	 */
 	public String getContents() {
 		return this.textEditorArea.getText();
 	}
 
+	/**
+	 * Method that calls the panel for this tab so it changes the name , it also
+	 * updates this tab unsaved flag and notifies the mainframe
+	 */
 	public void setAsSaved() {
-		DEBUG.debugmessage("SET AS SAVED");
 		this.unsavedChanges = false;
 		this.miniPanel.setAsSaved();
-		support.notify(ObserverActions.SET_SAVE_FLAG_FALSE, null, null);
+		support.notify(ObserverActions.SET_SAVE_FLAG_FALSE, null);
 
 	}
 
-	public void setProject(String project) {
-		this.project = project;
-	}
-
+	/**
+	 * 
+	 * @return the project of the file that this tab opens
+	 */
 	public String getProject() {
 		return project;
 	}

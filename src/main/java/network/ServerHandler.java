@@ -2,10 +2,8 @@ package network;
 
 import java.awt.Color;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,102 +21,44 @@ import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
 import userInterface.networkManagement.serverAwaitSync;
 
+/**
+ * Class implementing the SErver Message Handler it receives the calls from the
+ * server when certain events happen Events like receiving messages or
+ * connection notifications
+ * 
+ * @author Carmen Gómez Moreno
+ *
+ */
 public class ServerHandler implements ServerMessageHandler {
+
 	PropertyChangeMessenger support;
 	ArrayBlockingQueue<WriteMessage> processBuffer = new ArrayBlockingQueue<WriteMessage>(100);
 	ArrayBlockingQueue<HighLightMessage> highlightBuffer = new ArrayBlockingQueue<HighLightMessage>(100);
 	UIController controller;
 	DeveloperComponent component;
+	String chosenImage;
+	Color chosenColor;
+	String chosenName;
 	private HashSet<String> sessionNames = new HashSet<String>();
 	private serverAwaitSync sync;
 	private int nClients;
 	private Semaphore syncSem;
-	String chosenImage;
-	Color chosenColor;
-	String chosenName;
 	private HashSet<ImageDataMessage> connectedClients;
-	private HashMap<String , Integer> colorData;
-	private AtomicInteger syncCount = new AtomicInteger(); 
+	private HashMap<String, Integer> colorData;
+	private AtomicInteger syncCount = new AtomicInteger();
 
-
-	public void syncComplete() {
-		try {
-			syncSem.acquire();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (sync != null) {
-			sync.updateSyncCount(1);
-		}
-		
-		if(syncCount.incrementAndGet() == nClients ) {
-			
-			SyncEndedMessage syncEnded = new SyncEndedMessage();
-			controller.run(()-> component.sendMessageToEveryone(syncEnded));
-		}
-		
-		syncSem.release();
-	}
-
-	public void closeServer() {
-		controller.run(() -> component.closeServer());
-		SyncEndedMessage syncEnded = new SyncEndedMessage();
-		controller.run(()-> component.sendMessageToEveryone(syncEnded));
-
-	}
-
-	public void processMessage() {
-
-		ArrayList<Object> messages = new ArrayList<Object>();
-
-		while (true) {
-			WriteMessage incoming = null;
-			try {
-				incoming = processBuffer.take();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			messages.add(incoming.path);
-			messages.add(incoming);
-			support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, null, messages);
-			messages.clear();
-
-		}
-
-	}
-	
-	public void processHighLights() {
-
-		ArrayList<Object> messages = new ArrayList<Object>();
-
-		while (true) {
-			HighLightMessage incoming = null;
-			try {
-				incoming = highlightBuffer.take();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			if(incoming.name != chosenName) {
-		
-			messages.add(incoming.linestart);
-			messages.add(incoming.lineend);
-			messages.add(colorData.get(incoming.name));
-			messages.add(incoming.name);
-
-			messages.add(incoming.keypath);
-			support.notify(ObserverActions.UPDATE_HIGHLIGHT, null, messages);
-			messages.clear();
-			}
-		}
-
-		
-	}
-
-	public ServerHandler(String chosenName, int nClients , String chosenImage , Color chosenColor) {
+	/**
+	 * 
+	 * @param chosenName  : The name of this user
+	 * @param nClients    : The maximum number of clients that can connect to this
+	 *                    server
+	 * @param chosenImage : The data representing this users profile icon image
+	 * @param chosenColor : The object representing this users profile icon color
+	 */
+	public ServerHandler(String chosenName, int nClients, String chosenImage, Color chosenColor) {
 
 		connectedClients = new HashSet<ImageDataMessage>();
-		colorData = new HashMap<String, Integer>(); 
+		colorData = new HashMap<String, Integer>();
 		this.chosenImage = chosenImage;
 		this.chosenColor = chosenColor;
 		this.chosenName = chosenName;
@@ -128,21 +68,101 @@ public class ServerHandler implements ServerMessageHandler {
 		support = PropertyChangeMessenger.getInstance();
 		Thread t = new Thread(() -> processMessage());
 		t.start();
-		
-		new Thread(()-> processHighLights()).start();
+
+		new Thread(() -> processHighLights()).start();
 		controller = UIController.getInstance();
 		component = controller.getDeveloperComponent();
 
 	}
 
+	/**
+	 * Method called when a sync operation has finished
+	 */
+	public void syncComplete() {
+		try {
+			syncSem.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		if (sync != null) {
+			sync.updateSyncCount(1);
+		}
+
+		if (syncCount.incrementAndGet() == nClients) {
+
+			SyncEndedMessage syncEnded = new SyncEndedMessage();
+			UIController.developerComponent.sendMessageToEveryone(syncEnded);
+		}
+
+		syncSem.release();
+	}
+
+	/**
+	 * Method called when the user decides to close this server from receiving more
+	 * clients
+	 */
+	public void closeServer() {
+		UIController.developerComponent.closeServer();
+		SyncEndedMessage syncEnded = new SyncEndedMessage();
+		UIController.developerComponent.sendMessageToEveryone(syncEnded);
+
+	}
+
+	/**
+	 * Method a thread accesses to process the write petitions from other users
+	 */
+	public void processMessage() {
+
+		while (true) {
+			WriteMessage incoming = null;
+			try {
+				incoming = processBuffer.take();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			DEBUG.debugmessage("GOT A WRITEMESSAGE");
+			Object[] message = { incoming.path, incoming };
+			support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, message);
+
+		}
+
+	}
+
+	/**
+	 * Method a thread accesses to process the highlight information other users
+	 * send
+	 */
+	public void processHighLights() {
+
+		while (true) {
+			HighLightMessage incoming = null;
+			try {
+				incoming = highlightBuffer.take();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if (!incoming.name.equals(chosenName)) {
+
+				Object[] message = { incoming.linestart, incoming.lineend, colorData.get(incoming.name), incoming.name,
+						incoming.keypath };
+				support.notify(ObserverActions.UPDATE_HIGHLIGHT, message);
+			}
+		}
+
+	}
+
+	/**
+	 * Implementation of the method that sends messages as they are received Behaves
+	 * differently depending on the type of message received
+	 */
 	@Override
 	public void onMessageSent(Serializable message, ClientInfo client) {
-
-		DEBUG.debugmessage("HA LLEGADO UN MENSAJE DEL CLIENTE");
 
 		String messageclass = message.getClass().toString();
 
 		switch (messageclass) {
+		// Message is a write order
 		case "class network.WriteMessage":
 
 			WriteMessage incoming = (WriteMessage) message;
@@ -158,6 +178,7 @@ public class ServerHandler implements ServerMessageHandler {
 			}
 			break;
 
+		// Message is a request from a client to receive wworkspace data
 		case "class network.RequestWorkspaceMessage":
 
 			ResponseCreateFileMessage response = new ResponseCreateFileMessage();
@@ -182,33 +203,37 @@ public class ServerHandler implements ServerMessageHandler {
 			response.path = component.getWorkSpaceName();
 			response.type = FILE_PROPERTIES.workspaceProperty.toString();
 
-			controller.runOnThread(()-> component.sendSyncToClient(response, client.clientID));
+			UIController.runOnThread(() -> UIController.developerComponent.sendSyncToClient(response, client.clientID));
 
 			break;
 
-		case "class network.ImageDataMessage" :
+		// Message contains image data from clients
+		case "class network.ImageDataMessage":
 			ImageDataMessage imageData = (ImageDataMessage) message;
 			imageData.clientID = client.clientID;
-			ImageDataMessage returnData =  new ImageDataMessage(chosenImage,chosenColor.getRGB(), chosenName, true);
-			colorData.put(imageData.name , imageData.color);
+			ImageDataMessage returnData = new ImageDataMessage(chosenImage, chosenColor.getRGB(), chosenName, true);
+			colorData.put(imageData.name, imageData.color);
 			try {
-			controller.run(()-> component.sendToClient(returnData, client.clientID));
-			controller.run(()-> component.sendMessageToEveryone(imageData));
-			for(ImageDataMessage clientData : connectedClients) {
-				if(clientData.name != imageData.name) {
-				controller.run(()->component.sendToClient(clientData,client.clientID));
+				UIController.developerComponent.sendToClient(returnData, client.clientID);
+				UIController.developerComponent.sendMessageToEveryone(imageData);
+				for (ImageDataMessage clientData : connectedClients) {
+				
+						UIController.developerComponent.sendToClient(clientData, client.clientID);
+					
 				}
+			} catch (Exception e) {
 			}
+			if (!(connectedClients.contains(imageData))) {
+				connectedClients.add(imageData);
 			}
-			catch(Exception e) {}
-			if(!connectedClients.contains(imageData)) {
-			connectedClients.add(imageData);
-			}
-			controller.runOnThread(()-> component.addProfilePicture (imageData.image , imageData.color , imageData.name, imageData.isServer,imageData.clientID));
-			
+			UIController.runOnThread(() -> UIController.developerComponent.addProfilePicture(imageData.image,
+					imageData.color, imageData.name, imageData.isServer, imageData.clientID));
+
 			break;
-			
-		case "class network.HighLightMessage" :
+
+		// Message contais highlight data for the server to paint highlights and
+		// redistribute
+		case "class network.HighLightMessage":
 			HighLightMessage highlightData = (HighLightMessage) message;
 			try {
 				highlightBuffer.put(highlightData);
@@ -217,25 +242,47 @@ public class ServerHandler implements ServerMessageHandler {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+
+			break;
+		
+		case "class network.GlobalRunRequestResponse":
+			GlobalRunRequestResponse runResponse = (GlobalRunRequestResponse) message;
+			if(!runResponse.ok) {
+				UIController.developerComponent.runningThread.interrupt();
+				GlobalRunRequestResponse clientResponse = new GlobalRunRequestResponse();
+				clientResponse.canceled = true;
+				UIController.runOnThread(()-> UIController.developerComponent.sendMessageToEveryone(clientResponse));
+			}
+			else {
+				UIController.developerComponent.waitingResponses.countDown();
+			}
 			
 			break;
 		default:
 			break;
-			
 
 		}
 	}
 
+	/**
+	 * Method called when the server is ready to accept connections , waits for a
+	 * sync operation
+	 */
 	@Override
 	public void onReady() {
 
+		// TODO check if this dialog blocks
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 				"The server is ready, other users can join your sesion now.");
-		controller.run(() -> component.saveAllFull());
-		controller.run(() -> component.closeAllTabs());
+		UIController.developerComponent.saveAllFull();
+		UIController.developerComponent.closeAllTabs();
 		sync = new serverAwaitSync(nClients, this);
 	}
 
+	/**
+	 * Method called when the server disconnects , breaking all connections between
+	 * the clients
+	 */
 	@Override
 	public void onDisconnect() {
 
@@ -246,12 +293,15 @@ public class ServerHandler implements ServerMessageHandler {
 
 	@Override
 	public void onServerConnect(ClientInfo client) {
-		// TODO Auto-generated method stub
 
 	}
 
+	/**
+	 * Method called when a client has connected
+	 */
 	@Override
 	public void onClientConnect(ClientInfo client) {
+		// TODO , MAYBE THIS SHOULD GO IN THE METHOD ABOVE
 
 		if (sync != null) {
 			sync.updateConnectCount(1);
@@ -259,6 +309,9 @@ public class ServerHandler implements ServerMessageHandler {
 
 	}
 
+	/**
+	 * Method called when a client disconnects from this server
+	 */
 	@Override
 	public void onClientDisconnect(int clientID) {
 
@@ -267,11 +320,17 @@ public class ServerHandler implements ServerMessageHandler {
 			sync.updateConnectCount(-1);
 			syncCount.decrementAndGet();
 		}
-		
-		ClientDisconnectedMessage disconnected = new ClientDisconnectedMessage(clientID);
-		controller.run(()-> component.removeProfilePicture(clientID));
-		controller.runOnThread(()->component.sendMessageToEveryone(disconnected));
 
+		ClientDisconnectedMessage disconnected = new ClientDisconnectedMessage(clientID);
+		UIController.developerComponent.removeProfilePicture(clientID);
+		UIController.runOnThread(() -> UIController.developerComponent.sendMessageToEveryone(disconnected));
+
+	}
+
+	public void activateGlobal() {
+		support.notify(ObserverActions.DISABLE_LOCAL_RUN, null);
+		support.notify(ObserverActions.ENABLE_GLOBAL_RUN,null);
+		
 	}
 
 }

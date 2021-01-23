@@ -15,61 +15,61 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import userInterface.UIController;
-import java.awt.Dialog.ModalityType;
-import java.awt.Dialog.ModalExclusionType;
 
+@SuppressWarnings("serial")
+/**
+ * UI class that pops a dialog TODO blocking the ui?  for users acting as clients to signal that there is an 
+ * ongoing syncing operation with the server
+ * @author Carmen Gómez Moreno
+ *
+ */
 public class awaitSyncDialog extends JDialog {
 	public awaitSyncDialog() {
 		setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[]{440, 0};
-		gridBagLayout.rowHeights = new int[]{0, 44, 0, 0};
-		gridBagLayout.columnWeights = new double[]{0.0, Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gridBagLayout.columnWidths = new int[] { 440, 0 };
+		gridBagLayout.rowHeights = new int[] { 0, 44, 0, 0 };
+		gridBagLayout.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		getContentPane().setLayout(gridBagLayout);
-		
+
 		JLabel lblNewLabel = new JLabel("Syncing");
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
 		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 0);
 		gbc_lblNewLabel.gridx = 0;
 		gbc_lblNewLabel.gridy = 1;
 		getContentPane().add(lblNewLabel, gbc_lblNewLabel);
-		
+
 		JButton cancelButton = new JButton("Cancel Sync");
 		GridBagConstraints gbc_cancelButton = new GridBagConstraints();
 		gbc_cancelButton.gridx = 0;
 		gbc_cancelButton.gridy = 2;
 		getContentPane().add(cancelButton, gbc_cancelButton);
-		
+
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-		
 		cancelButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
 				UIController.getInstance().getDeveloperComponent().disconnect();
-				dispose(); 
 				
-				
+				dispose();
+
 			}
-			
-			
-			
+
 		});
-		
 
 		addWindowListener(new WindowAdapter() {
-		    public void windowClosing(WindowEvent e) {
-		    	
+			public void windowClosing(WindowEvent e) {
+
 				UIController.getInstance().getDeveloperComponent().disconnect();
-		    	 dispose();
-		    	
-		    }
+				dispose();
+
+			}
 		});
-		
-		
+
 		setSize(new Dimension(getPreferredSize().width, 200));
 		setVisible(true);
 	}

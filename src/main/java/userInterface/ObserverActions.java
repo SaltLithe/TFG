@@ -1,5 +1,12 @@
 package userInterface;
-
+/**
+ * Enum representing all of the different types of ui notifications , used by the component that listen to them 
+ * to decide if they should process the notification and the way they should process them
+ * This allows different components to listen to the same notification and implement their responses differently 
+ * Almost all of the user interface functionality can be seen in this enum
+ * @author Carmen Gómez Moreno
+ *
+ */
 public enum ObserverActions {
 
 	CONSOLE_PANEL_CONTENTS, ENABLE_TEXT_EDITOR, UPDATE_CONTENTS, ENABLE_TEXTEDITORTOOLBAR_BUTTONS, SET_TEXT_CONTENT,
@@ -9,6 +16,6 @@ public enum ObserverActions {
 	SAFETY_SAVE, SAFETY_DELETE, SAFETY_STOP,SET_SAVE_FLAG_TRUE, SET_SAVE_FLAG_FALSE, SAVE_FULL, DELETE_PROJECT_TREE, DELETE_CLASS_PATH, 
 	DELETE_CLASS_PATH_FOCUSED, DISABLE_NEW_PROJECT, ENABLE_NEW_PROJECT, SET_SELF_ICON, SET_SERVER_ICON, SET_CLIENT_ICON, 
 	REMOVE_CLIENT_ICON, DISABLE_JOIN_BUTTON, ENABLE_JOIN_BUTTON, ENABLE_DISCONNECT_BUTTON, DISABLE_DISCONNECT_BUTTON, CLEAR_PANEL,
-	SET_CHOSEN_NAME, CLOSE_ALL_TABS, UPDATE_HIGHLIGHT
+	SET_CHOSEN_NAME, CLOSE_ALL_TABS, UPDATE_HIGHLIGHT, DISABLE_TEXT_EDITOR
 
 }

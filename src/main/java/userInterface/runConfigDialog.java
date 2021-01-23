@@ -17,72 +17,55 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
-import core.DEBUG;
-import core.DeveloperComponent;
+import core.CustomRunConfigSelector;
 import core.URLData;
-import core.customRunConfigSelector;
 
+/**
+ * Class that opens a dialog for the user to select the entrypoint class , uses
+ * CustomRunConfigSelector items for the user to select an entrypoint
+ * 
+ * @author Carmen Gómez Moreno
+ *
+ */
+@SuppressWarnings("serial")
 public class runConfigDialog extends JDialog {
-
-	private final JPanel contentPanel = new JPanel();
-	private customRunConfigSelector lastSelected;
-	private HashMap<String, customRunConfigSelector> selectorCollection;
-	private JScrollPane scrollPane; 
-	
-
 
 	JButton ApplyButton;
 	JButton ApplyRunButton;
 	JButton CancelButton;
-	private JLabel lblNewLabel;
 	JPanel panel;
-	
-	private void fillSelectors(URLData[] classes) {
-		Dimension d = new Dimension(0,0);
-		panel.add(Box.createRigidArea(new Dimension(0,5)));
-		
-		for(URLData data : classes) {
-			customRunConfigSelector newselector = new customRunConfigSelector(data.path, this);
-			selectorCollection.put(data.path, newselector);
-			newselector.setAlignmentX(0.0f);
-			newselector.setAlignmentY(Component.TOP_ALIGNMENT);
-			
-			panel.add(newselector);
-			panel.add(new Box.Filler(d, d, d));
 
-			
-		}
-		scrollPane.updateUI();
-	}
-	
-	
-	public runConfigDialog(DeveloperComponent developerComponent , URLData[] classes) {
+	private final JPanel contentPanel = new JPanel();
+	private CustomRunConfigSelector lastSelected;
+	private HashMap<String, CustomRunConfigSelector> selectorCollection;
+	private JScrollPane scrollPane;
+	private JLabel lblNewLabel;
+
+	public runConfigDialog(URLData[] classes) {
 		setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		selectorCollection = new HashMap<String,customRunConfigSelector>();
+		selectorCollection = new HashMap<String, CustomRunConfigSelector>();
 		lastSelected = null;
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(new BorderLayout(0, 0));
-		panel = new JPanel(); 
+		panel = new JPanel();
 		scrollPane = new JScrollPane(panel);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		contentPanel.add(scrollPane, BorderLayout.CENTER);
-		
+
 		lblNewLabel = new JLabel("Select a class with a main method");
 		scrollPane.setColumnHeaderView(lblNewLabel);
-		
-		
-		
+
 		fillSelectors(classes);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
-			
+
 			ApplyRunButton = new JButton("Apply and Run");
 			buttonPane.add(ApplyRunButton);
 			{
@@ -101,30 +84,26 @@ public class runConfigDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				if(lastSelected != null) {
-					developerComponent.updateFocusedPair(lastSelected.name); 
-					developerComponent.startLocalRunningThread();
-					dispose(); 
 
-					}
-			
+				if (lastSelected != null) {
+					UIController.developerComponent.updateFocusedPair(lastSelected.name);
+					UIController.developerComponent.startLocalRunningThread();
+					dispose();
+
+				}
 
 			}
 
 		});
 
-		
 		ApplyButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				if(lastSelected != null) {
-				developerComponent.updateFocusedPair(lastSelected.name); 
+
+				if (lastSelected != null) {
+					UIController.developerComponent.updateFocusedPair(lastSelected.name);
 				}
-				
-			
 
 			}
 
@@ -134,35 +113,55 @@ public class runConfigDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				dispose(); 
-			
+
+				dispose();
 
 			}
 
 		});
 
-		
-		
-		
-		
-		
 		setVisible(true);
 	}
 
-
+	/**
+	 * Method used by the components representing the entrypoint class to indicate
+	 * that they have been selected
+	 * 
+	 * @param code : The code of the component that has been selected
+	 */
 	public void clickedOption(String code) {
 
-		
-		DEBUG.debugmessage("PARENT NOTIFIED");
-		if(lastSelected!= null) {
+		if (lastSelected != null) {
 			lastSelected.setUnselected();
 		}
 		lastSelected = selectorCollection.get(code);
 		lastSelected.setSelected();
-		
+
 	}
 
+	/**
+	 * Method to create the classes representing the class files that comprise the
+	 * project
+	 * 
+	 * @param classes : The class file paths from the project
+	 */
+	private void fillSelectors(URLData[] classes) {
 
-	
+		Dimension d = new Dimension(0, 0);
+		panel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+		// For each class , create a selector and add it
+		for (URLData data : classes) {
+			CustomRunConfigSelector newselector = new CustomRunConfigSelector(data.path, this);
+			selectorCollection.put(data.path, newselector);
+			newselector.setAlignmentX(0.0f);
+			newselector.setAlignmentY(Component.TOP_ALIGNMENT);
+
+			panel.add(newselector);
+			panel.add(new Box.Filler(d, d, d));
+
+		}
+		scrollPane.updateUI();
+	}
+
 }

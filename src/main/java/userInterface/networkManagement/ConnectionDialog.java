@@ -34,6 +34,10 @@ import core.DeveloperComponent;
 import userInterface.DeveloperMainFrameWrapper;
 import userInterface.UIController;
 
+
+
+
+@SuppressWarnings("serial")
 public class ConnectionDialog extends JFrame {
 
 	private final JPanel contentPanel = new JPanel();
@@ -57,8 +61,8 @@ public class ConnectionDialog extends JFrame {
 	private JCheckBox autoConnectCheck;
 	private JColorChooser colorChoosersv;
 	private JColorChooser colorChoosercl;
-	private testIconComponent serverImageLabel;
-	private testIconComponent imageLabelClient;
+	private ProfileIIconComponent serverImageLabel;
+	private ProfileIIconComponent imageLabelClient;
 	private JButton serverImageButton;
 	private JButton clientImageButton;
 	private JFileChooser imageChooser;
@@ -179,19 +183,19 @@ public class ConnectionDialog extends JFrame {
 							if (setServerCheck.isSelected()) {
 								boolean autostart = autoStartCheck.isSelected();
 
-								controller.run(() -> dp.setAsServer(serverNameField_S.getText(), ipField_S.getText(),
+								UIController.developerComponent.setAsServer(serverNameField_S.getText(), ipField_S.getText(),
 										Integer.valueOf(maxClientsField_S.getText()),
 										Integer.valueOf(serverPortField_S.getText()),
 									
-										Integer.valueOf(maxClientsField_S.getText()), autostart ,serverImageLabel.ImageByteData ,  colorChoosersv.getColor()));
+										Integer.valueOf(maxClientsField_S.getText()), autostart ,serverImageLabel.ImageByteData ,  colorChoosersv.getColor());
 										dp.setIcon(colorChoosersv.getColor(), serverImageLabel.imagepath , serverNameField_S.getText());
 
 							} else if (setClientCheck.isSelected()) {
 
 								boolean autoconnect = autoConnectCheck.isSelected();
-								controller.run(() -> dp.setAsClient(ipField_C.getText(), clientIPField_C.getText(),
+								UIController.developerComponent.setAsClient(ipField_C.getText(), clientIPField_C.getText(),
 										Integer.valueOf(serverPortField_C.getText()),
-										autoconnect , clientNameField_C.getText(), imageLabelClient.ImageByteData, colorChoosercl.getColor() ));
+										autoconnect , clientNameField_C.getText(), imageLabelClient.ImageByteData, colorChoosercl.getColor() );
 								dp.setIcon(colorChoosercl.getColor(), imageLabelClient.imagepath , clientNameField_C.getText());
 
 							}
@@ -300,7 +304,7 @@ public class ConnectionDialog extends JFrame {
 			{
 				serverImageButton = new JButton("Browse");
 
-				 serverImageLabel = new testIconComponent(null , null , null, true);
+				 serverImageLabel = new ProfileIIconComponent(null , null , null, true);
 				 serverImageButton.addActionListener(new ActionListener() {
 
 						@Override
@@ -311,7 +315,7 @@ public class ConnectionDialog extends JFrame {
 								File selectedFile = imageChooser.getSelectedFile();
 
 								panel.remove(serverImageLabel);
-								serverImageLabel = new testIconComponent(selectedFile.getPath() ,null, null , true);
+								serverImageLabel = new ProfileIIconComponent(selectedFile.getPath() ,null, null , true);
 								panel.add(serverImageLabel, gbc_serverImageLabel);
 								splitPane.updateUI();
 
@@ -458,7 +462,7 @@ public class ConnectionDialog extends JFrame {
 			{
 				clientImageButton = new JButton("Browse");
 
-				imageLabelClient = new testIconComponent(null , null , null ,true);
+				imageLabelClient = new ProfileIIconComponent(null , null , null ,true);
 				 clientImageButton.addActionListener(new ActionListener() {
 
 						@Override
@@ -490,7 +494,7 @@ public class ConnectionDialog extends JFrame {
 
 								else {
 								panel.remove(imageLabelClient);
-								imageLabelClient = new testIconComponent(selectedFile.getPath() ,null, null , true);
+								imageLabelClient = new ProfileIIconComponent(selectedFile.getPath() ,null, null , true);
 								panel.add(imageLabelClient, gbc_imageLabelClient);
 								splitPane.updateUI();
 								}

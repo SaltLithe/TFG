@@ -2,55 +2,40 @@ package userInterface.textEditing;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import core.DEBUG;
-import core.DeveloperComponent;
-import network.WriteMessage;
 import userInterface.ConsolePanel;
-import userInterface.DeveloperMainFrame;
 import userInterface.ObserverActions;
-import userInterface.UIController;
 
-/*Clase que contiene los botones del menu asociado al editor de texto y que implementa sus
- * funcionalidades 
- * Qedan por implementar las funciones de ejecucion global y detener la ejecucion
+/**
+ * UI class containing bot the texteditor panel and the console
+ * 
+ * @author Carmen Gómez Moreno
+ *
  */
 @SuppressWarnings("serial")
 public class TextEditorContainer extends JPanel implements PropertyChangeListener {
 
 	public TextEditorPanel textEditorPanel;
-	
+
 	private JSplitPane consoleDivision;
 	public ConsolePanel consolePanel;
 	String currentTabName = null;
-	String currentProject = null; 
+	String currentProject = null;
 
-	private UIController uiController;
-	private DeveloperComponent developerComponent;
-	private DeveloperMainFrame developerMainFrame;
+	public TextEditorContainer() {
 
-	public TextEditorContainer(DeveloperMainFrame developerMainFrame) {
-
-		DEBUG.debugmessage("SE HA INVOCADO EL CONSTRUCTOR DE TEXTEDITORTOOLBAR");
-		textEditorPanel = new TextEditorPanel(this);
-		this.developerMainFrame = developerMainFrame;
-		uiController = UIController.getInstance();
-		developerComponent = uiController.getDeveloperComponent();
+		textEditorPanel = new TextEditorPanel();
 		setLayout(new BorderLayout());
-		
+
 		JPanel toolbarArea = new JPanel();
 		toolbarArea.setLayout(new FlowLayout(FlowLayout.LEFT));
-		
+
 		consolePanel = new ConsolePanel();
 
 		add(toolbarArea, BorderLayout.NORTH);
@@ -59,62 +44,68 @@ public class TextEditorContainer extends JPanel implements PropertyChangeListene
 		add(toolbarArea, BorderLayout.NORTH);
 		add(consoleDivision, BorderLayout.CENTER);
 
-		
-
-	
-
-		
 	}
 
-	// Metodo que llama al metodo run de developer component para ejecutar el codigo
-	// y recupera los resultados
-	// devueltos tras la ejecucion que son mostrados en el panel de consola
-	// ARQUITECTURA A CONTROLLER CAMBIADA
-
-
-	// Metodo que sirve para recuperar los contenidos del editor
+	/**
+	 * Method that returns the contents of an opened tab
+	 * 
+	 * @return the contents of the requested tab
+	 */
 	public String getContents() {
-		DEBUG.debugmessage("SE HA LLAMADO A GETCONTENTS EN TEXTEDITORTOOLBAR");
 		return textEditorPanel.getContents(currentTabName);
 
 	}
 
-	protected void sendTextUpdate(WriteMessage message) {
-
-		uiController.run(() -> developerComponent.sendMessageToEveryone(message));
-
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
-		switch (action) {
-		case ENABLE_TEXTEDITORTOOLBAR_BUTTONS:
-			break;
-			
-		case CHANGE_TAB_FOCUS:
-			DEBUG.debugmessage("CHANGING FOCUS");
-			ArrayList<Object> list = (ArrayList<Object>) evt.getNewValue();
-			currentTabName = (String)list.get(0);
-			currentProject = (String)list.get(1);
-			break; 
-		default:
-			break;
-		}
-
-	}
-
+	/**
+	 * Returns the focused tab name
+	 * 
+	 * @return the focused tab name
+	 */
 	public String getCurrentTabName() {
 
 		return currentTabName;
 	}
 
+	/**
+	 * Returns all of the contents of opened tabs
+	 * 
+	 * @return a String array containing the contents of the opened tabs
+	 */
 	public String[] getAllContents() {
-		return  textEditorPanel.getAllContents(); 
-		
+		return textEditorPanel.getAllContents();
+
 	}
 
+	/**
+	 * Returns all of the names of opened tabs
+	 * 
+	 * @return a String array containing the contents of the opened tabs
+	 */
 	public String[] getAllNames() {
 		return textEditorPanel.getAllNames();
+	}
+
+	/**
+	 * Implementation of propertyChange from PropertyChangeListener so this class
+	 * can listen to ui notifications
+	 */
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
+		@SuppressWarnings("unchecked")
+		ArrayList<Object> list = (ArrayList<Object>) evt.getNewValue();
+
+		switch (action) {
+		case ENABLE_TEXTEDITORTOOLBAR_BUTTONS:
+			break;
+
+		case CHANGE_TAB_FOCUS:
+			currentTabName = (String) list.get(0);
+			currentProject = (String) list.get(1);
+			break;
+		default:
+			break;
+		}
+
 	}
 }

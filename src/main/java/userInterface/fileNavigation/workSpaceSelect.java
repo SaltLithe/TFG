@@ -32,59 +32,35 @@ import fileManagement.WorkSpaceManager;
 import fileManagement.customWorkSpaceElement;
 import userInterface.fileEditing.AddWorkSpaceDialog;
 
+@SuppressWarnings("serial")
+/**
+ * UI class used as an entrypoint to this program. It contains workspace
+ * representation objects so the user can select , locate or delete workspaces
+ * and can pop up a series of dialogs for the user to create new workspaces and
+ * manage deletion and location operations
+ * 
+ * @author Carmen Gómez Moreno
+ *
+ */
 public class workSpaceSelect extends JFrame {
 
 	private JPanel contentPane;
-	LinkedList<Component> selectPanelComponents;
 	private JLabel lblNewLabel;
 	private JButton newWorkSpaceButton;
 	private JPanel panel;
-	private boolean canUpdate = false;
-	private WorkSpaceManager wsm; 
-	
-	private JFrame self; 
-	
-	private JScrollPane scrollPanel; 
-	
+	private WorkSpaceManager wsm;
+	@SuppressWarnings("unused")
+	private JFrame self;
+	private JScrollPane scrollPanel;
+	private JButton noWorkSpaceButton;
 	Dimension minSize = new Dimension(0, 0);
 	Dimension prefSize = new Dimension(0, 0);
 	Dimension maxSize = new Dimension(0, 0);
-	private JButton noWorkSpaceButton;
-
-	/**
-	 * Launch the application.
-	 */
-
-	/**
-	 * Create the frame.
-	 */
-
-	private void readAndGenerate() {
-		
-		panel.add(new Box.Filler(minSize, prefSize, maxSize));
-
-		ArrayList<WorkSpace> ws = (ArrayList<WorkSpace>) wsm.getAllWorkSpaces();
-		if (ws != null) {
-			for (int i =0 ; i < ws.size() ; i++) {
-				WorkSpace workspace = ws.get(i);
-				customWorkSpaceElement cwse = new customWorkSpaceElement(workspace.getName(), workspace.getPath(),this,self);
-				cwse.tempID = i; 
-				cwse.setAlignmentY(Component.TOP_ALIGNMENT);
-				cwse.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-				panel.add(cwse);
-				
-				panel.add(new Box.Filler(minSize, prefSize, maxSize));
-
-			}
-
-		}
-
-	}
+	LinkedList<Component> selectPanelComponents;
 
 	public workSpaceSelect() {
-		
-		self = this; 
+
+		self = this;
 		wsm = WorkSpaceManager.getInstance();
 
 		try {
@@ -92,7 +68,7 @@ public class workSpaceSelect extends JFrame {
 		} catch (Exception ex) {
 			System.err.println("Failed to initialize LaF");
 		}
-//aaaaç
+
 		selectPanelComponents = new LinkedList<Component>();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -114,7 +90,7 @@ public class workSpaceSelect extends JFrame {
 		gbc_lblNewLabel.gridx = 0;
 		gbc_lblNewLabel.gridy = 0;
 		contentPane.add(lblNewLabel, gbc_lblNewLabel);
-		
+
 		noWorkSpaceButton = new JButton("Start without WorkSpace");
 
 		GridBagConstraints gbc_noWorkspaceButton = new GridBagConstraints();
@@ -133,7 +109,6 @@ public class workSpaceSelect extends JFrame {
 		gbc_btnNewButton1.gridy = 2;
 		contentPane.add(newWorkSpaceButton, gbc_btnNewButton1);
 
-		
 		panel = new JPanel();
 		scrollPanel = new JScrollPane(panel);
 		GridBagConstraints gbc_panel = new GridBagConstraints();
@@ -141,82 +116,100 @@ public class workSpaceSelect extends JFrame {
 		gbc_panel.anchor = GridBagConstraints.NORTHWEST;
 		gbc_panel.gridx = 0;
 		gbc_panel.gridy = 3;
-	
+
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-	    panel.setSize(panel.getPreferredSize());
-	  
-	    scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-	    scrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		panel.setSize(panel.getPreferredSize());
+
+		scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		this.contentPane.add(scrollPanel, gbc_panel);
 		readAndGenerate();
 
-		
-		
 		newWorkSpaceButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				
 				DEBUG.debugmessage("SET TO TRUE");
 				openAddWorkSpaceDialog();
-				
-				
 
 			}
 
-			
-
 		});
-		
+
 		noWorkSpaceButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				
 				WorkSpaceManager.getInstance().startMainApp();
-				dispose(); 
-				
+				dispose();
 
 			}
-
-			
 
 		});
 
 		setSize(500, 500);
 		setResizable(false);
-	
-		
+
 		this.setVisible(true);
 
 	}
+
+	/**
+	 * Method used to refresh this frame
+	 */
+	public void refresh() {
+		panel.removeAll();
+
+		readAndGenerate();
+
+		panel.updateUI();
+
+	}
+
+	/**
+	 * Method called to read from the xml list to look for workspaces and create
+	 * their visual representations in order to add them to the panel
+	 */
+	private void readAndGenerate() {
+
+		panel.add(new Box.Filler(minSize, prefSize, maxSize));
+
+		ArrayList<WorkSpace> ws = (ArrayList<WorkSpace>) wsm.getAllWorkSpaces();
+		if (ws != null) {
+			for (int i = 0; i < ws.size(); i++) {
+				WorkSpace workspace = ws.get(i);
+				customWorkSpaceElement cwse = new customWorkSpaceElement(workspace.getName(), workspace.getPath(),
+						this);
+				cwse.tempID = i;
+				cwse.setAlignmentY(Component.TOP_ALIGNMENT);
+				cwse.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+				panel.add(cwse);
+
+				panel.add(new Box.Filler(minSize, prefSize, maxSize));
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Called to pop open a dialog for the user to add a workspace
+	 */
 	private void openAddWorkSpaceDialog() {
-		
-		
-		AddWorkSpaceDialog d = new AddWorkSpaceDialog(this,self);
+
+		AddWorkSpaceDialog d = new AddWorkSpaceDialog(this);
 		d.addWindowListener(new WindowAdapter() {
-		    @Override
-		    public void windowClosed(WindowEvent e) {
-		    	refresh(); 
-		    }
+			@Override
+			public void windowClosed(WindowEvent e) {
+				refresh();
+			}
 		});
 		d.setVisible(true);
-		
-	}
-	
-	
 
-	public void refresh() {
-		DEBUG.debugmessage("Refreshing");
-		panel.removeAll();
-		
-		readAndGenerate(); 
-		
-		panel.updateUI();
-	
 	}
-
 
 }

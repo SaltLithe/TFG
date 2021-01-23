@@ -17,16 +17,20 @@ import core.DeveloperComponent;
 import userInterface.DeveloperMainFrameWrapper;
 import userInterface.UIController;
 
+/**
+ * Class used to pop a dialog for the user to add a source file 
+ * @author Carmen Gómez Moreno
+ *
+ */
+@SuppressWarnings({ "unused", "serial" })
 public class newSrcDialog extends JDialog {
 	private JTextField nameField;
 	private JTextField parentPathField;
 	private String parentpath;
-	private UIController uiController;
-	private DeveloperComponent developerComponent; 
+
 	
 	public newSrcDialog(String parentpath, String project) {
-		uiController = UIController.getInstance();
-		developerComponent = uiController.getDeveloperComponent();
+	
 		this.parentpath = parentpath; 
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0, 0};
@@ -96,8 +100,8 @@ public class newSrcDialog extends JDialog {
 					}
 					else {
 						DEBUG.debugmessage("CREATING FILE IN " + parentpath + "\\"+ possiblename);
-						developerComponent.setProjectFocus(project);
-						uiController.run(()-> developerComponent.createSrcFolder(parentpath+"\\"+possiblename , possiblename));
+						UIController.developerComponent.setProjectFocus(project);
+						UIController.developerComponent.createSrcFolder(parentpath+"\\"+possiblename , possiblename);
 						dispose(); 
 
 					}

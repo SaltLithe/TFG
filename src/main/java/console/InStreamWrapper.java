@@ -74,8 +74,8 @@ public class InStreamWrapper extends InputStream {
 	public int read(byte[] b, int off, int len) throws IOException {
 
 		//Tell the console guy to allow writing and start listening for input
-		console.support.notify(ObserverActions.ENABLE_CONSOLE_PANEL, null, null);
-		console.support.notify(ObserverActions.ENABLE_READING_LISTENER, null, null);
+		console.support.notify(ObserverActions.ENABLE_CONSOLE_PANEL,null);
+		console.support.notify(ObserverActions.ENABLE_READING_LISTENER,null);
 
 		try {
 			//Block until something has been written
@@ -108,8 +108,8 @@ public class InStreamWrapper extends InputStream {
 	@Override
 	public int read() throws IOException {
 
-		console.support.notify(ObserverActions.ENABLE_CONSOLE_PANEL, null, null);
-		console.support.notify(ObserverActions.ENABLE_READING_LISTENER, null, null);
+		console.support.notify(ObserverActions.ENABLE_CONSOLE_PANEL, null);
+		console.support.notify(ObserverActions.ENABLE_READING_LISTENER, null);
 		int nread = input.read();
 		return nread;
 

@@ -28,10 +28,23 @@ import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
+/**
+ * UI class that contains a panel for the graphical part of the tree nodes This
+ * class helps the cell tree renderer to render the correct icon for each node
+ * 
+ * @author Carmen Gómez Moreno
+ *
+ */
+@SuppressWarnings("serial")
 public class NodeMiniPanel extends JPanel {
 
 	/**
-	 * Create the panel.
+	 * 
+	 * @param name     : The name of the node
+	 * @param hasFocus : Flag indicating if this node has focus
+	 * @param sel      : Flag indicating if this node is selected
+	 * @param leaf     : Flag indcating if this node is a leaf
+	 * @param path     : Path of this node
 	 */
 	public NodeMiniPanel(String name, Boolean hasFocus, Boolean sel, Boolean leaf, String path) {
 
@@ -84,6 +97,13 @@ public class NodeMiniPanel extends JPanel {
 		setVisible(true);
 	}
 
+	/**
+	 * Support method used to get the extension from the nodes path
+	 * 
+	 * @param path : The path for this node
+	 * @return a String containing the extension TODO this method could go in a
+	 *         static class
+	 */
 	private String getExtension(String path) {
 		String returning = null;
 		try {
@@ -93,20 +113,22 @@ public class NodeMiniPanel extends JPanel {
 		return returning;
 	}
 
-	
-	
+	/**
+	 * Support method that , given a folder path , returns the type of metadata
+	 * 
+	 * @param path : The path of the folder
+	 * @return enum FILE_TYPE indicating the type of folder
+	 */
 	private FILE_TYPE getMetaData(String path) {
-		
-		FILE_TYPE returning = null; 
-		
+
+		FILE_TYPE returning = null;
+
 		final Path file = Paths.get(path);
-		final UserDefinedFileAttributeView view = Files.getFileAttributeView(file,
-				UserDefinedFileAttributeView.class);
+		final UserDefinedFileAttributeView view = Files.getFileAttributeView(file, UserDefinedFileAttributeView.class);
 		ByteBuffer readBuffer = null;
 		boolean success = false;
 		int count = 0;
-		while(count < FILE_PROPERTIES.properties.length && !success) {
-			
+		while (count < FILE_PROPERTIES.properties.length && !success) {
 
 			try {
 				readBuffer = ByteBuffer.allocate(view.size(FILE_PROPERTIES.properties[count]));
@@ -116,13 +138,13 @@ public class NodeMiniPanel extends JPanel {
 				view.read(FILE_PROPERTIES.properties[count], readBuffer);
 			} catch (IOException e) {
 			}
-		
+
 			try {
 				readBuffer.flip();
 				final String valueFromAttributes = new String(readBuffer.array(), "UTF-8");
 				if (valueFromAttributes.equals(FILE_PROPERTIES.properties[count])) {
 					switch (FILE_PROPERTIES.properties[count]) {
-						
+
 					case FILE_PROPERTIES.projectProperty:
 						returning = FILE_TYPE.PROJECT_FOLDER;
 						break;
@@ -134,31 +156,34 @@ public class NodeMiniPanel extends JPanel {
 						break;
 					default:
 						break;
-					
-					
+
 					}
-					success = true; 
-				}else {
+					success = true;
+				} else {
 					count++;
 				}
 			} catch (Exception e) {
 				count++;
 			}
-					
-		}	
-		return returning; 
+
+		}
+		return returning;
 	}
-	
-	
+
+	/**
+	 * Support method that gets either the folder or file type of whatever path it
+	 * receives , calls the other two private methods inside this class
+	 * 
+	 * @param path : The path to check
+	 * @return a FILE_TYPE enum with either a folder or file type
+	 */
 	private FILE_TYPE getFolderType(String path) {
 
-		
-		
 		FILE_TYPE returning = null;
 		File f = new File(path);
 		if (!f.isFile()) {
 			returning = getMetaData(path);
-			if(returning == null) {
+			if (returning == null) {
 				returning = FILE_TYPE.ANY_FOLDER;
 			}
 		} else {

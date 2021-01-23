@@ -1,10 +1,11 @@
 package console;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
 
+import network.WriteToConsoleMessage;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
+import userInterface.UIController;
 
 /**
  * 
@@ -28,6 +29,9 @@ public class ConsoleWrapper {
 
 	PrintStream stdout;
 	PrintStream stderr;
+	
+	private boolean global;
+	
 
 	public ConsoleWrapper() {
 
@@ -39,7 +43,9 @@ public class ConsoleWrapper {
 
 		outPrint = new OutStreamWrapper(this);
 		errPrint = new OutStreamWrapper(this);
-
+		
+		global = false;
+		
 	}
 
 	/**
@@ -87,10 +93,22 @@ public class ConsoleWrapper {
 
 	public void writeOutput(String out) {
 
-		ArrayList<Object> list = new ArrayList<Object>();
-		list.add(out);
-		support.notify(ObserverActions.CONSOLE_PANEL_CONTENTS, null, list);
+		
+		Object[] message = {out};
+		support.notify(ObserverActions.CONSOLE_PANEL_CONTENTS, message);
+		
 
+			
+			WriteToConsoleMessage writeMessage = new WriteToConsoleMessage(out);
+			UIController.developerComponent.sendMessageToEveryone(writeMessage);
+		
+
+	}
+
+	public void setGlobal() {
+		
+		this.global = true;
+		
 	}
 
 }
