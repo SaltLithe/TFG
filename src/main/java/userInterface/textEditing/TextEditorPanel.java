@@ -1,6 +1,8 @@
 package userInterface.textEditing;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeEvent;
@@ -38,7 +40,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 	public ArrayBlockingQueue<WriteMessage> sendBuffer = new ArrayBlockingQueue<WriteMessage>(200);
 	public ArrayBlockingQueue<HighLightMessage> highlightBuffer = new ArrayBlockingQueue<HighLightMessage>(200);
-	
+
 	private JTabbedPane tabPane;
 	private HashMap<String, TextEditorTab> tabCollection;
 	private PropertyChangeMessenger propertyChangeMessenger;
@@ -47,20 +49,17 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	private Thread highlighter;
 	private long sendDelay = 50;
 
-	
 	public TextEditorPanel() {
 		propertyChangeMessenger = PropertyChangeMessenger.getInstance();
 
 		tabCollection = new HashMap<String, TextEditorTab>();
 
-		
-		
 		messager = new Thread(() -> sendMessages());
 		highlighter = new Thread(() -> sendHighlights());
-		
+
 		messager.start();
 		highlighter.start();
-		
+
 		setLayout(new BorderLayout());
 		this.setSize(new Dimension(ImageObserver.WIDTH, ImageObserver.HEIGHT));
 
@@ -98,7 +97,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 		UIController.developerComponent.setProjectFocus(project);
 		TabMiniPanel mp1 = new TabMiniPanel(name, path, project);
-		TextEditorTab tab = new TextEditorTab(path, mp1, project, chosenName,this);
+		TextEditorTab tab = new TextEditorTab(path, mp1, project, chosenName, this);
 		tab.setTextEditorCode(contents);
 		mp1.setParent(tab);
 
@@ -170,6 +169,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		}
 		return returning;
 	}
+
 	/**
 	 * Method used by a special thread that sends highlights to other users TODO
 	 * VERY IMPORTANT HOLY FUCK THIS SHOULD NOT BE A TREAD PER TAB YOU ONLY
@@ -200,7 +200,6 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		}
 	}
 
-	
 	/**
 	 * Method used by a special thread that sends write updates to other users TODO
 	 * HOLY SHIT SAME AS ABOVE
@@ -237,8 +236,6 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		ArrayList<Object> results;
 		switch (action) {
 
-		case ENABLE_TEXT_EDITOR:
-			break;
 		case UPDATE_PANEL_CONTENTS:
 			synchronized (this) {
 				results = (ArrayList<Object>) evt.getNewValue();
@@ -258,7 +255,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			String key = findKeyFromPath(editingpath);
 			if (key != null) {
 
-				DEBUG.debugmessage("Got a highlight for name " + (String)results.get(3));
+				DEBUG.debugmessage("Got a highlight for name " + (String) results.get(3));
 				int color = -1;
 				try {
 					color = (int) results.get(2);
@@ -313,17 +310,24 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			setChosenName(newname);
 			break;
 		case DISABLE_TEXT_EDITOR:
-			setEnabled(false);
+
+			enableComponents(this, false);
 			break;
+		case ENABLE_TEXT_EDITOR:
+			enableComponents(this, true);
+			break;
+
 		default:
-			
+
 			break;
 		}
 	}
-	
+
 	/**
-	 * Support method that , given the path of a file , check if there is any tab that could match it
-	 * @param editingpath : The path to find a key from 
+	 * Support method that , given the path of a file , check if there is any tab
+	 * that could match it
+	 * 
+	 * @param editingpath : The path to find a key from
 	 * @return the key for this path if it exists
 	 */
 	private String findKeyFromPath(String editingpath) {
@@ -341,20 +345,30 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		return similar;
 	}
 
+	private void enableComponents(Container container, boolean enable) {
+		Component[] components = container.getComponents();
+		for (Component component : components) {
+			component.setEnabled(enable);
+			if (component instanceof Container) {
+				enableComponents((Container) component, enable);
+			}
+		}
+	}
+
 	/**
-	 * Used to update the users name in the sesion 
+	 * Used to update the users name in the sesion
+	 * 
 	 * @param chosenName : The new name
 	 */
 	private void setChosenName(String chosenName) {
 		this.chosenName = chosenName;
 	}
 
-	
-
 	/**
-	 * Support method used to update the focus as to indicate what tab is in focus 
-	 * @param currentProject : The project this tab belongs to 
-	 * @param currentTab : The tab that is in focus 
+	 * Support method used to update the focus as to indicate what tab is in focus
+	 * 
+	 * @param currentProject : The project this tab belongs to
+	 * @param currentTab     : The tab that is in focus
 	 */
 	private void updateContainer(String currentProject, String currentTab) {
 

@@ -1,6 +1,7 @@
 package userInterface.textEditing;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -103,6 +104,7 @@ public class TextEditorContainer extends JPanel implements PropertyChangeListene
 			currentTabName = (String) list.get(0);
 			currentProject = (String) list.get(1);
 			break;
+	
 		default:
 			break;
 		}

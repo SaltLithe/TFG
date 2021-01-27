@@ -16,6 +16,8 @@ import javax.swing.JLabel;
 
 import network.ServerHandler;
 import userInterface.UIController;
+import java.awt.Dialog.ModalityType;
+import java.awt.Dialog.ModalExclusionType;
 
 @SuppressWarnings("serial")
 /**
@@ -45,7 +47,6 @@ public class serverAwaitSync extends JDialog {
 		this.nClients = nClients;
 		clientsSynced = 0;
 		clientsConnected = 0;
-		setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 440, 0 };
 		gridBagLayout.rowHeights = new int[] { 37, 33, 0, 0, 0, 0 };

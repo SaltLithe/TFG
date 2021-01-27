@@ -8,11 +8,11 @@ public class DEBUG {
 	 * quitar las llamadas a debug en produccion y se pueden añadir otro tipo de
 	 * mensajes segun queramos
 	 */
-	public static boolean enabled = true;
+	public static boolean enabled = false;
 	public static boolean unsetStreams = false;
 	public static boolean executing = false;
 	public static boolean serverside = false;
-	public static boolean clientside = true; 
+	public static boolean clientside = false; 
 
 	public static void servermessage(String message) {
 		

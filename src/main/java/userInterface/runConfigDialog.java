@@ -6,18 +6,22 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 import core.CustomRunConfigSelector;
+import core.DEBUG;
 import core.URLData;
 
 /**
@@ -41,7 +45,7 @@ public class runConfigDialog extends JDialog {
 	private JScrollPane scrollPane;
 	private JLabel lblNewLabel;
 
-	public runConfigDialog(URLData[] classes) {
+	public runConfigDialog(URLData[] classes, boolean global) {
 		setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		selectorCollection = new HashMap<String, CustomRunConfigSelector>();
@@ -86,8 +90,13 @@ public class runConfigDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 
 				if (lastSelected != null) {
-					UIController.developerComponent.updateFocusedPair(lastSelected.name);
-					UIController.developerComponent.startLocalRunningThread();
+					if (!global) {
+						UIController.developerComponent.updateFocusedPair(lastSelected.name);
+						UIController.developerComponent.startLocalRunningThread();
+					} else {
+						UIController.developerComponent.updateFocusedPair(lastSelected.name);
+						UIController.developerComponent.startRunGlobal(false);
+					}
 					dispose();
 
 				}
@@ -120,6 +129,15 @@ public class runConfigDialog extends JDialog {
 
 		});
 
+		if (global) {
+			DEBUG.debugmessage("THIS IS A GLOBAL VERSION");
+			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+			ApplyButton.setEnabled(false);
+			CancelButton.setEnabled(false);
+			this.getRootPane().updateUI();
+
+		}
 		setVisible(true);
 	}
 

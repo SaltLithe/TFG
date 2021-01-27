@@ -13,7 +13,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import core.DEBUG;
 import userInterface.fileEditing.newProjectDialog;
 import userInterface.textEditing.TextEditorContainer;
 
@@ -30,7 +29,6 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 	JButton save;
 	JButton saveAll;
 
-	private UIController uiController;
 	private JButton runGlobalButton;
 	private JButton terminateProcessButton;
 	private JButton runLocalButton;
@@ -118,8 +116,10 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				support.notify(ObserverActions.DISABLE_TEXT_EDITOR,null);
+
 				saveAll();
-				disableSaveButtons(); 
+				
 				UIController.developerComponent.startLocalRunningThread();
 
 			}
@@ -130,7 +130,13 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				UIController.developerComponent.triggerRunConfig();
+			
+				if(UIController.developerComponent.server != null) {
+				UIController.developerComponent.triggerRunConfig(true);
+				}else {
+					UIController.developerComponent.triggerRunConfig(false);
+
+				}
 
 			}
 
@@ -140,15 +146,21 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				DEBUG.debugmessage("this is a global button ");
-				disableGlobalRun();
+				support.notify(ObserverActions.DISABLE_TEXT_EDITOR,null);
+
 				saveAll();
 				disableSaveButtons();
-				support.notify(ObserverActions.DISABLE_TEXT_EDITOR,null);
-				
-				UIController.developerComponent.startRunGlobal();
+				if(UIController.developerComponent.server != null) {
+				UIController.developerComponent.startRunGlobal(true);
 
 
+				}
+				else if (UIController.developerComponent.client != null) {
+					disableSaveButtons();
+					disableGlobalRun(); 
+					
+					UIController.developerComponent.requestGlobalRun(); 
+				}
 			}
 
 		});
@@ -195,6 +207,12 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			break;
 		case ENABLE_LOCAL_RUN:
 			enableLocalRun();
+			break;
+		case ENABLE_SAVE_BUTTONS:
+			enableSaveButtons();
+			break;
+		case DISABLE_SAVE_BUTTONS:
+			disableSaveButtons();
 			break;
 		case SAFETY_STOP:
 			terminateProcess();

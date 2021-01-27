@@ -1,38 +1,69 @@
 package userInterface.networkManagement;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import network.ClientHandler;
-import userInterface.UIController;
-import java.awt.Dialog.ModalityType;
+import network.GlobalRunRequestMessage;
+import network.ServerHandler;
 
 @SuppressWarnings("serial")
 public class AcceptGlobalDialog extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
-	private ClientHandler parent;
+	@SuppressWarnings("unused")
+	private ClientHandler clientParent;
+	private ServerHandler serverParent;
+	private String invokerName; 
+	private int invokerID;
+	private GlobalRunRequestMessage request;
+	
+	/**
+	 * @wbp.parser.constructor
+	 */
+	public AcceptGlobalDialog(String invokerName , ServerHandler parent, int invokerID, GlobalRunRequestMessage request) {
+		
+		this.serverParent = parent;
+		this.invokerName = invokerName;
+		this.invokerID = invokerID; 
+		this.request = request; 
+		construct(); 
+		
+		
+	}
 	
 	public AcceptGlobalDialog(String invokerName, ClientHandler parent) {
-		this.parent = parent; 
-		setModalityType(ModalityType.APPLICATION_MODAL);
+		this.clientParent = parent;
+		this.invokerName = invokerName;
+		construct(); 
+	
+	}
+	
+	public void construct() {
+		
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
-		contentPanel.setLayout(new FlowLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		{
-			JLabel lblNewLabel = new JLabel(invokerName + " is requesting a global run. Your work will be saved before running.");
+			JLabel lblNewLabel = new JLabel(invokerName + " is requesting a global run.");
+			lblNewLabel.setHorizontalAlignment(SwingConstants.LEFT);
+			JLabel savelbl = new JLabel("Your work will be saved before running.");
+			contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 			contentPanel.add(lblNewLabel);
+			contentPanel.add(savelbl);
 		}
 		{
 			JPanel buttonPane = new JPanel();
@@ -44,10 +75,14 @@ public class AcceptGlobalDialog extends JDialog {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						parent.acceptRun();
+						if(clientParent != null) {
+						clientParent.decideRun(true);
+					
+						}else {
+							serverParent.decideRun(true, invokerID, request);
+						}
+						
 						dispose();
-						
-						
 
 					}
 
@@ -62,7 +97,12 @@ public class AcceptGlobalDialog extends JDialog {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						parent.declineRun(); 
+						if(clientParent != null) {
+						clientParent.decideRun(false);
+						}
+						else {
+							serverParent.decideRun(false , invokerID ,  request);
+						}
 						dispose(); 
 						
 					}
@@ -73,8 +113,15 @@ public class AcceptGlobalDialog extends JDialog {
 				buttonPane.add(cancelButton);
 			}
 		}
-		setModal(false);
+		int width = 300;
+		int height = 150;
+		setMinimumSize(new Dimension(width,height));
+		setMaximumSize(new Dimension(width,height));
+		setPreferredSize(new Dimension(width,height));
+		setSize(width,height);
+		setAlwaysOnTop(true);
 		setVisible(true);
+		
 	}
 
 }

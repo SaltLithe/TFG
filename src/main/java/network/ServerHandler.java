@@ -19,6 +19,8 @@ import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
+import userInterface.runConfigDialog;
+import userInterface.networkManagement.AcceptGlobalDialog;
 import userInterface.networkManagement.serverAwaitSync;
 
 /**
@@ -252,11 +254,33 @@ public class ServerHandler implements ServerMessageHandler {
 				GlobalRunRequestResponse clientResponse = new GlobalRunRequestResponse();
 				clientResponse.canceled = true;
 				UIController.runOnThread(()-> UIController.developerComponent.sendMessageToEveryone(clientResponse));
+				JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
+					    runResponse.name + " did not agree to a global Run.",
+					    "Run was canceled",
+					    JOptionPane.ERROR_MESSAGE);
 			}
 			else {
+				
+				DEBUG.debugmessage("COUNTING DOWN");
 				UIController.developerComponent.waitingResponses.countDown();
+				
 			}
 			
+			break;
+		case "class network.GlobalRunRequestMessage":
+			GlobalRunRequestMessage runRequest = (GlobalRunRequestMessage) message;
+			if(UIController.developerComponent.focusedProject == null) {
+				GlobalRunRequestResponse serverResponse = new GlobalRunRequestResponse();
+				serverResponse.name = chosenName;
+				serverResponse.ok = false;
+				serverResponse.noProject = true; 
+				UIController.developerComponent.sendToClient(serverResponse, client.clientID);
+			}
+			else {
+			 new AcceptGlobalDialog(runRequest.name , this , client.clientID , runRequest);
+			}
+
+			 
 			break;
 		default:
 			break;
@@ -276,6 +300,9 @@ public class ServerHandler implements ServerMessageHandler {
 				"The server is ready, other users can join your sesion now.");
 		UIController.developerComponent.saveAllFull();
 		UIController.developerComponent.closeAllTabs();
+		support.notify(ObserverActions.DISABLE_TEXT_EDITOR, null);
+
+
 		sync = new serverAwaitSync(nClients, this);
 	}
 
@@ -330,7 +357,29 @@ public class ServerHandler implements ServerMessageHandler {
 	public void activateGlobal() {
 		support.notify(ObserverActions.DISABLE_LOCAL_RUN, null);
 		support.notify(ObserverActions.ENABLE_GLOBAL_RUN,null);
+		support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);
+	}
+
+	
+	public void decideRun(boolean decision , int invokerID , GlobalRunRequestMessage sent) {
+
+		if(decision) {
+			  
+			UIController.developerComponent.startRunGlobal(true);
+			UIController.developerComponent.waitingResponses.countDown();
+			
+		}
+		else {
+			GlobalRunRequestResponse message = new GlobalRunRequestResponse();
+			message.name = chosenName;
+			message.canceled = true;
+			UIController.developerComponent.sendToClient(message, invokerID);
+			
+			
+		}
 		
 	}
+
+	
 
 }

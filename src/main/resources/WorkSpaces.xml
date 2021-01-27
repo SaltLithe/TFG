@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <WorkSpaces>
     <WorkSpace>
-        <name>g</name>
-        <path>C:\Users\Usuario\Desktop\g</path>
+        <name>PRUEBASREALES</name>
+        <path>C:\Users\Usuario\Desktop\PRUEBASREALES</path>
     </WorkSpace>
     <WorkSpace>
-        <name>New Folder (2)</name>
-        <path>C:\Users\Usuario\Desktop\New Folder (2)</path>
+        <name>PRUEBASREALES</name>
+        <path>C:\Users\Usuario\Desktop\copiadepruebas\PRUEBASREALES</path>
     </WorkSpace>
     <WorkSpace>
-        <name>g</name>
-        <path>C:\Users\Usuario\Desktop\AQUIMISMO\g</path>
+        <name>PRUEBASREALES</name>
+        <path>C:\Users\Usuario\Desktop\AQUIMISMO\PRUEBASREALES</path>
     </WorkSpace>
     <WorkSpace>
-        <name>g</name>
-        <path>C:\Users\Usuario\Desktop\AQUIMISMO2\g</path>
+        <name>PRUEBASREALES</name>
+        <path>C:\Users\Usuario\Desktop\AQUIMISMO2\PRUEBASREALES</path>
+    </WorkSpace>
+    <WorkSpace>
+        <name>PRUEBASREALES</name>
+        <path>C:\Users\Usuario\Documents\GitHub\TFG\TFG\PRUEBASREALES</path>
     </WorkSpace>
 </WorkSpaces>

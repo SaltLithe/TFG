@@ -2,7 +2,6 @@ package console;
 
 import java.io.PrintStream;
 
-import network.WriteToConsoleMessage;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
@@ -30,7 +29,6 @@ public class ConsoleWrapper {
 	PrintStream stdout;
 	PrintStream stderr;
 	
-	private boolean global;
 	
 
 	public ConsoleWrapper() {
@@ -44,7 +42,6 @@ public class ConsoleWrapper {
 		outPrint = new OutStreamWrapper(this);
 		errPrint = new OutStreamWrapper(this);
 		
-		global = false;
 		
 	}
 
@@ -98,17 +95,16 @@ public class ConsoleWrapper {
 		support.notify(ObserverActions.CONSOLE_PANEL_CONTENTS, message);
 		
 
-			
-			WriteToConsoleMessage writeMessage = new WriteToConsoleMessage(out);
-			UIController.developerComponent.sendMessageToEveryone(writeMessage);
+			try {
+				UIController.developerComponent.consoleBuffer.put(out);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+	
 		
 
 	}
 
-	public void setGlobal() {
-		
-		this.global = true;
-		
-	}
+
 
 }

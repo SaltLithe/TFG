@@ -1,6 +1,8 @@
 package userInterface.fileNavigation;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.image.ImageObserver;
@@ -9,13 +11,16 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import javax.swing.JPanel;
+
 import userInterface.ObserverActions;
 
 /**
- * UI class that implements ui listener methods and contains the FileExplorerPanel calling its
- * methods when necessary
- * Keeps references to all of the navigation trees
+ * UI class that implements ui listener methods and contains the
+ * FileExplorerPanel calling its methods when necessary Keeps references to all
+ * of the navigation trees
+ * 
  * @author Carmen Gómez Moreno
  *
  */
@@ -40,10 +45,10 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 
 	}
 
-	
 	@SuppressWarnings("unchecked")
 	/**
-	 * Mehtod implementing propertyChange from propertyChangeEvent in order to listen to ui notifications
+	 * Mehtod implementing propertyChange from propertyChangeEvent in order to
+	 * listen to ui notifications
 	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
@@ -51,13 +56,13 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 		ArrayList<Object> results = (ArrayList<Object>) evt.getNewValue();
 		switch (action) {
 
-		//Clean the panel
+		// Clean the panel
 		case CLEAR_PANEL:
 
 			fileExplorerPanel.clean();
 
 			break;
-		//Add a tree
+		// Add a tree
 		case ADD_PROJECT_TREE:
 			File newProject = (File) results.get(0);
 			ProjectTree tree = new ProjectTree(newProject, newProject.getPath());
@@ -66,7 +71,7 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 			fileExplorerPanel.updateUI();
 
 			break;
-		//Add a node to a project tree
+		// Add a node to a project tree
 		case UPDATE_PROJECT_TREE_ADD:
 
 			String path = (String) results.get(0);
@@ -78,14 +83,14 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 
 			break;
 
-		//Delete a project tree
+		// Delete a project tree
 		case DELETE_PROJECT_TREE:
 			String projectPath2 = (String) results.get(0);
 			fileExplorerPanel.removeAndClear(trees.get(projectPath2));
 			fileExplorerPanel.updateUI();
 
 			break;
-		//Remove a node from a project tree
+		// Remove a node from a project tree
 		case UPDATE_PROJECT_TREE_REMOVE:
 
 			String projectPathDeleting = (String) results.get(0);
@@ -94,8 +99,24 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 			trees.get(projectPathDeleting).deleteTreeNode(node);
 
 			break;
+		case DISABLE_TEXT_EDITOR:
+			enableComponents(this, false);
+			break;
+		case ENABLE_TEXT_EDITOR:
+			enableComponents(this, true);
+			break;
 		default:
 			break;
+		}
+	}
+
+	private void enableComponents(Container container, boolean enable) {
+		Component[] components = container.getComponents();
+		for (Component component : components) {
+			component.setEnabled(enable);
+			if (component instanceof Container) {
+				enableComponents((Container) component, enable);
+			}
 		}
 	}
 

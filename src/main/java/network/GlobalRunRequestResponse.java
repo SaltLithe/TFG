@@ -14,12 +14,16 @@ public class GlobalRunRequestResponse implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -3905619381952337113L;
+	private static final long serialVersionUID = 8776767744223310271L;
+
+	
 
 	public GlobalRunRequestResponse() {
 	}
 
-	boolean ok;
+	public boolean ok;
 	boolean canceled;
+	public String name;
+	public boolean noProject = false;
 
 }

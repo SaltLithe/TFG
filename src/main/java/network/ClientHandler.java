@@ -5,8 +5,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.swing.JOptionPane;
 
@@ -39,13 +37,14 @@ public class ClientHandler implements ClientMessageHandler {
 	PropertyChangeMessenger support;
 	ArrayBlockingQueue<WriteMessage> processBuffer = new ArrayBlockingQueue<WriteMessage>(100);
 	ArrayBlockingQueue<HighLightMessage> highlightBuffer = new ArrayBlockingQueue<HighLightMessage>(100);
+	ArrayBlockingQueue<WriteToConsoleMessage> consoleBuffer = new ArrayBlockingQueue<WriteToConsoleMessage>(100);
 	boolean unFlag = false;
 	String chosenImage;
 	Color chosenColor;
 	LinkedList<ImageDataMessage> otherClients;
 	private HashMap<String, Integer> colorData;
 	private HashMap<String, ImageDataMessage> images;
-    ExecutorService consoleWriter;
+    
 
 	/**
 	 * 
@@ -59,7 +58,7 @@ public class ClientHandler implements ClientMessageHandler {
 		
 		images = new HashMap<String, ImageDataMessage>();
 		colorData = new HashMap<String, Integer>();
-		consoleWriter = Executors.newFixedThreadPool(1);
+		
 
 		otherClients = new LinkedList<ImageDataMessage>();
 		this.chosenImage = imageByteData;
@@ -68,6 +67,7 @@ public class ClientHandler implements ClientMessageHandler {
 		support = PropertyChangeMessenger.getInstance();
 		new Thread(() -> processMessage()).start();
 		new Thread(() -> processHighLights()).start();
+		new Thread(()-> processConsole()).start(); 
 
 	}
 
@@ -117,6 +117,21 @@ public class ClientHandler implements ClientMessageHandler {
 			}
 		}
 	}
+	
+	public void processConsole() {
+		while(true) {
+		WriteToConsoleMessage incoming = null;
+		
+		try {
+			incoming = consoleBuffer.take();
+		}catch(InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		Object[] message = {incoming.line};
+		support.notify(ObserverActions.CONSOLE_PANEL_CONTENTS,message);
+		}
+	}
 
 	/**
 	 * Implementation of the method that sends messages as they are received Behaves
@@ -158,10 +173,12 @@ public class ClientHandler implements ClientMessageHandler {
 				JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 						"Your chosen name is already in use by somebody else in this session, your username has been changed to : "
 								+ chosenName);
+			
 			}
 
 			// Set new name , reload workspace after sync and send the server image data for
 			// this client
+			support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);
 			support.notify(ObserverActions.ENABLE_GLOBAL_RUN, null);
 			UIController.developerComponent.setNewName(chosenName);
 			UIController.developerComponent.reloadWorkSpace();
@@ -188,6 +205,7 @@ public class ClientHandler implements ClientMessageHandler {
 
 				}
 				UIController.developerComponent.createWorkSpace(responseCreateFile.path);
+				support.notify(ObserverActions.DISABLE_TEXT_EDITOR,null);
 				sync = new awaitSyncDialog();
 			}
 
@@ -265,14 +283,46 @@ public class ClientHandler implements ClientMessageHandler {
 
 			break;
 		case "class network.GlobalRunRequestMessage":
+			
 			GlobalRunRequestMessage requestMessage = (GlobalRunRequestMessage) message;
+			if(!(requestMessage.name.equals(chosenName))) {
+			System.out.println("NAME FROM REQUEST IS : "+ chosenName  + " and own name is " + requestMessage.name);
 			new AcceptGlobalDialog(requestMessage.name, this);
+			}
 			break;
 		case "class network.WriteToConsoleMessage":
 			DEBUG.debugmessage("GOT WRITE TO CONSOLE");
 			WriteToConsoleMessage consoleMessage = (WriteToConsoleMessage) message;
-			Object[] line = {consoleMessage.line};
-			consoleWriter.execute(()-> support.notify(ObserverActions.CONSOLE_PANEL_CONTENTS,line));
+			try {
+				consoleBuffer.put(consoleMessage);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			break;
+		
+		case "class network.GlobalRunRequestResponse":
+			GlobalRunRequestResponse runResponse = (GlobalRunRequestResponse)message;
+			if(!runResponse.ok) {
+				
+				
+				if (runResponse.noProject) {
+					
+					JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
+						    runResponse.name + " does not have an available project to run from.",
+						    "Run was canceled",
+						    JOptionPane.ERROR_MESSAGE);
+					
+				}else {
+				JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
+					    runResponse.name + " did not agree to a global Run.",
+					    "Run was canceled",
+					    JOptionPane.ERROR_MESSAGE);
+				}
+			}
+			support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);
+			
+			
+			
 			break;
 
 		default:
@@ -314,6 +364,7 @@ public class ClientHandler implements ClientMessageHandler {
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 				"You have been disconnected! The server may have failed or kicked you out of the session.",
 				"Disconnected warning", JOptionPane.WARNING_MESSAGE);
+		
 		UIController.getInstance().getDeveloperComponent().client = null;
 		support.notify(ObserverActions.ENABLE_LOCAL_RUN, null);
 		support.notify(ObserverActions.DISABLE_GLOBAL_RUN, null);
@@ -355,15 +406,12 @@ public class ClientHandler implements ClientMessageHandler {
 		sync = new awaitSyncDialog();
 	}
 
-	public void declineRun() {
-		GlobalRunRequestResponse response = new GlobalRunRequestResponse();
-		response.ok = false;
-		UIController.developerComponent.sendMessageToServer(response);
-	}
 
-	public void acceptRun() {
+
+	public void decideRun(boolean decision) {
 		GlobalRunRequestResponse response = new GlobalRunRequestResponse();
-		response.ok = true;
+		response.name = chosenName;
+		response.ok = decision;
 		UIController.developerComponent.sendMessageToServer(response);
 
 	}

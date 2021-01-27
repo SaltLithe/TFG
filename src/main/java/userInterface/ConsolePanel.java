@@ -11,6 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import core.DEBUG;
+
 /**
  * UI class serving as the console for the user , uses a JPanel to write text
  * into it and read text from user as input
@@ -74,9 +76,8 @@ public class ConsolePanel extends JPanel implements PropertyChangeListener {
 	 * @param results : The output from the running process
 	 */
 	public void setContents(String results) {
-
+		
 		consoleTextArea.setText(consoleTextArea.getText() + results);
-
 	}
 
 	/**
@@ -88,6 +89,8 @@ public class ConsolePanel extends JPanel implements PropertyChangeListener {
 		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
 		switch (action) {
 		case CONSOLE_PANEL_CONTENTS:
+		
+			DEBUG.debugmessage("got a message for the console now");
 			@SuppressWarnings("unchecked")
 			ArrayList<Object> results = (ArrayList<Object>) evt.getNewValue();
 			this.setContents((String) results.get(0));

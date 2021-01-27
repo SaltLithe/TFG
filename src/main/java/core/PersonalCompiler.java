@@ -62,11 +62,9 @@ public class PersonalCompiler implements PropertyChangeListener {
 		console = new ConsoleWrapper();
 	}
 
-	public void run(String className, URLData[] added, boolean global) {
+	public void run(String className, URLData[] added) {
 
-		if(global) {
-		console.setGlobal();
-		}
+	
 		try {
 			// Get reference to the bin directory
 			File bindir = new File(added[0].project + "\\bin");

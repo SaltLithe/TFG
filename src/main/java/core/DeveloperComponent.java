@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JOptionPane;
@@ -23,8 +24,10 @@ import javaMiniSockets.clientSide.AsynchronousClient;
 import javaMiniSockets.serverSide.AsynchronousServer;
 import network.ClientHandler;
 import network.GlobalRunRequestMessage;
+import network.GlobalRunRequestResponse;
 import network.ResponseCreateFileMessage;
 import network.ServerHandler;
+import network.WriteToConsoleMessage;
 import userInterface.DeveloperMainFrame;
 import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
@@ -42,26 +45,28 @@ public class DeveloperComponent implements PropertyChangeListener {
 	public String expectedWorkSpaceLocation = null;
 	public boolean isConnected;
 
+	// Project to run code from
+	public String focusedProject;
+	// Structure that , given a project name will return the focused class from this
+	// project
+	// The focused class is the entrypoint of the program , for example , the main
+	// class
+	public HashMap<String, String> projectFocusPairs;
+	public CountDownLatch waitingResponses;
+	public ArrayBlockingQueue<String> consoleBuffer = new ArrayBlockingQueue<String>(100);
 	LinkedList<ResponseCreateFileMessage> responses = null;
 	private PersonalCompiler compiler;
 	private FileManager fileManager;
 	private PropertyChangeMessenger support;
 	private int defaultQueueSize = 100;
 	private ServerHandler handler;
-	// Project to run code from
-	private String focusedProject;
-	// Structure that , given a project name will return the focused class from this
-	// project
-	// The focused class is the entrypoint of the program , for example , the main
-	// class
-	private HashMap<String, String> projectFocusPairs;
 	// The workspace the user chose
 	private WorkSpace workSpace;
 	// Structure that saves classpaths and uses projects as its keys
 	private HashMap<String, ClassPath> classpaths;
 	private String separator = "pairLeap.codeString";
 	private String chosenName = null;
-	public CountDownLatch waitingResponses;
+	private Thread consoleSender;
 
 	public DeveloperComponent(WorkSpace workSpace) {
 
@@ -116,7 +121,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	public void setNewName(String newname) {
 
-		chosenName = newname;
+		this.chosenName = newname;
 		Object[] message = { newname };
 
 		support.notify(ObserverActions.SET_CHOSEN_NAME, message);
@@ -330,7 +335,11 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * @param message : A serializable object to be sent as a message
 	 */
 	public void sendMessageToEveryone(Serializable message) {
+
 		if (server != null) {
+			new Exception().printStackTrace();
+			System.out.println(message.toString());
+
 			Serializable[] messages = { message };
 			try {
 				server.broadcastAllMessage(messages);
@@ -500,12 +509,13 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * Method that triggers the Dialog used to configurate the entrypoint for
 	 * running code The dialog won't open unless there is a focused project
 	 */
-	public void triggerRunConfig() {
+	public void triggerRunConfig(boolean global) {
 		if (focusedProject == null || focusedProject == "" || !stillExists(focusedProject)) {
 
 			triggerNoProjectDialog();
 		} else {
-			new runConfigDialog(this.classpaths.get(focusedProject).getClassPath());
+			DEBUG.debugmessage("DEBUGA UNO : " + global);
+			new runConfigDialog(this.classpaths.get(focusedProject).getClassPath(), global);
 		}
 	}
 
@@ -732,21 +742,27 @@ public class DeveloperComponent implements PropertyChangeListener {
 	/**
 	 * Manages global runs
 	 */
-	public void startRunGlobal() {
-		if (server != null) {
+	public void startRunGlobal(boolean countdown) {
 
-			DEBUG.debugmessage("Starting running thread");
-			runningThread = new Thread(()-> localGlobalRunningThread());
-			runningThread.start();
-			GlobalRunRequestMessage message = new GlobalRunRequestMessage(chosenName);
-			sendMessageToEveryone(message);
+		if (focusedProject == null || focusedProject == "" || !stillExists(focusedProject)) {
+			triggerNoProjectDialog();
+		} else {
 
+			if (server != null) {
+				support.notify(ObserverActions.DISABLE_GLOBAL_RUN, null);
+				DEBUG.debugmessage("Starting running thread");
+				runningThread = new Thread(() -> localGlobalRunningThread(countdown));
+				runningThread.start();
+
+			}
 		}
 
 	}
 
 	/**
 	 * Launches the thread used for running code by calling the compileAndRun Method
+	 * 
+	 * @param popupDialog
 	 */
 	public void startLocalRunningThread() {
 		runningThread = new Thread(() -> {
@@ -757,6 +773,44 @@ public class DeveloperComponent implements PropertyChangeListener {
 			}
 		});
 		runningThread.start();
+	}
+
+	/**
+	 * Used by users acting as clients to request a global run from a server
+	 */
+	public void requestGlobalRun() {
+		support.notify(ObserverActions.DISABLE_TEXT_EDITOR, null);
+		GlobalRunRequestMessage message = new GlobalRunRequestMessage(this.chosenName);
+		sendMessageToServer(message);
+	}
+
+	public void alertCancel() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * Support method to check if a file still exists TODO is this a name or a path?
+	 * 
+	 * @param name : The name of the file to check
+	 * @return true if the file exists
+	 */
+	public boolean stillExists(String name) {
+
+		File f = new File(name);
+		return f.exists();
+	}
+
+	/**
+	 * Support method used to trigger the warning dialog indicating that there is no
+	 * focused project
+	 */
+	public void triggerNoProjectDialog() {
+
+		JOptionPane.showMessageDialog(this.developerMainFrame,
+				"There is no project selected or the project you are trying to run does not exist, choose a tab from a project to run.",
+				"Run error", JOptionPane.ERROR_MESSAGE);
+
 	}
 
 	/**
@@ -794,19 +848,42 @@ public class DeveloperComponent implements PropertyChangeListener {
 	}
 
 	/**
-	 * Starts the running thread set to a global run
+	 * Method used to send messages to other users consoles
 	 */
-	private void localGlobalRunningThread() {
-		try {
-			waitingResponses.await();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+	private void sendConsoleMessages() {
+		String message = null;
+
+		while (true) {
+			try {
+				DEBUG.debugmessage("PROCESSING MESSAGE");
+				message = consoleBuffer.take();
+				WriteToConsoleMessage out = new WriteToConsoleMessage(message);
+				sendMessageToEveryone(out);
+				Thread.sleep(50);
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
 		}
 
+	}
+
+	/**
+	 * Starts the running thread set to a global run
+	 */
+	private void localGlobalRunningThread(boolean countdown) {
+
 		try {
+			if (countdown) {
+				GlobalRunRequestMessage message = new GlobalRunRequestMessage(chosenName);
+				sendMessageToEveryone(message);
+				waitingResponses.await();
+			}
 			compileAndRun(true);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
@@ -841,29 +918,6 @@ public class DeveloperComponent implements PropertyChangeListener {
 	}
 
 	/**
-	 * Support method to check if a file still exists TODO is this a name or a path?
-	 * 
-	 * @param name : The name of the file to check
-	 * @return true if the file exists
-	 */
-	private boolean stillExists(String name) {
-
-		File f = new File(name);
-		return f.exists();
-	}
-
-	/**
-	 * Support method used to trigger the warning dialog indicating that there is no
-	 * focused project
-	 */
-	private void triggerNoProjectDialog() {
-		JOptionPane.showMessageDialog(this.developerMainFrame,
-				"There is no project selected or the project you are trying to run does not exist, choose a tab from a project to run.",
-				"Run error", JOptionPane.ERROR_MESSAGE);
-
-	}
-
-	/**
 	 * Method that calls the compiler to compile the class files and run code If
 	 * there is no project focused it will trigger a dialog message If there is no
 	 * entrypoint class selected it will trigger the configuration dialog Will
@@ -876,7 +930,11 @@ public class DeveloperComponent implements PropertyChangeListener {
 
 		// Check if there is no project focused
 		if (focusedProject == null || focusedProject == "" || !stillExists(focusedProject)) {
-			triggerNoProjectDialog();
+			if (!global) {
+				triggerNoProjectDialog();
+			} else {
+
+			}
 		} else {
 			// Get the classpath for the focused project
 			URLData[] files = classpaths.get(focusedProject).getClassPath();
@@ -887,6 +945,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 			if (focusedClassName != null && focusedClassName != "" && stillExists(focusedClassName)) {
 				// Disable run buttons
 				if (!global) {
+					support.notify(ObserverActions.DISABLE_SAVE_BUTTONS, null);
 					support.notify(ObserverActions.DISABLE_LOCAL_RUN, null);
 				}
 				// Get the name of the focused class
@@ -894,14 +953,25 @@ public class DeveloperComponent implements PropertyChangeListener {
 						focusedClassName.length());
 				// Call the compile function with the files from the classpath and the name of
 				// the entrypoint class
-				compile(files, subname, global);
+				consoleSender = new Thread(() -> sendConsoleMessages());
+				consoleSender.start();
+				compile(files, subname);
 				// After the code has run enable run buttons
+				DEBUG.debugmessage("GLOBAL BOOL IS " + global);
 				if (!global) {
 					support.notify(ObserverActions.ENABLE_LOCAL_RUN, null);
 				} else {
+					GlobalRunRequestResponse finished = new GlobalRunRequestResponse();
+					finished.ok = true;
+					sendMessageToEveryone(finished);
 					support.notify(ObserverActions.ENABLE_GLOBAL_RUN, null);
 
 				}
+
+				consoleSender.interrupt();
+				support.notify(ObserverActions.ENABLE_SAVE_BUTTONS, null);
+				support.notify(ObserverActions.ENABLE_TEXT_EDITOR, null);
+
 				// Disable the terminate button , this button is enabled by the compiler when
 				// terminating the
 				// running process is safe
@@ -911,7 +981,9 @@ public class DeveloperComponent implements PropertyChangeListener {
 
 				// If there is no entrypoint class selected the run configuration dialog is
 				// called
-				new runConfigDialog(files);
+				DEBUG.debugmessage("DEBUGA DOS : " + global);
+
+				new runConfigDialog(files, global);
 
 			}
 		}
@@ -926,9 +998,9 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * @param global
 	 * @return
 	 */
-	private void compile(URLData[] files, String className, boolean global) {
+	private void compile(URLData[] files, String className) {
 
-		compiler.run(className, files, global);
+		compiler.run(className, files);
 
 	}
 

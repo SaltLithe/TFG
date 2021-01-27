@@ -15,6 +15,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import userInterface.UIController;
+import java.awt.Dialog.ModalityType;
+import java.awt.Dialog.ModalExclusionType;
 
 @SuppressWarnings("serial")
 /**
@@ -25,7 +27,6 @@ import userInterface.UIController;
  */
 public class awaitSyncDialog extends JDialog {
 	public awaitSyncDialog() {
-		setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 440, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 44, 0, 0 };
