@@ -44,6 +44,7 @@ public class ClientHandler implements ClientMessageHandler {
 	LinkedList<ImageDataMessage> otherClients;
 	private HashMap<String, Integer> colorData;
 	private HashMap<String, ImageDataMessage> images;
+	public boolean blocked = false; 
     
 
 	/**
@@ -79,6 +80,8 @@ public class ClientHandler implements ClientMessageHandler {
 		while (true) {
 			WriteMessage incoming = null;
 			try {
+				
+				
 				incoming = processBuffer.take();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -287,8 +290,11 @@ public class ClientHandler implements ClientMessageHandler {
 			
 			GlobalRunRequestMessage requestMessage = (GlobalRunRequestMessage) message;
 			if(!(requestMessage.name.equals(chosenName))) {
+			if(!blocked) {
 			System.out.println("NAME FROM REQUEST IS : "+ chosenName  + " and own name is " + requestMessage.name);
+			disableAll();
 			new AcceptGlobalDialog(requestMessage.name, this);
+			}
 			}
 			break;
 		case "class network.WriteToConsoleMessage":
@@ -320,10 +326,15 @@ public class ClientHandler implements ClientMessageHandler {
 					    JOptionPane.ERROR_MESSAGE);
 				}
 			}
-			support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);
+		
+			activateAll(); 
 			
 			
+			break;
+		case "class network.GlobalRunDone":
 			
+			activateAll();
+
 			break;
 
 		default:
@@ -410,11 +421,27 @@ public class ClientHandler implements ClientMessageHandler {
 
 
 	public void decideRun(boolean decision) {
+		if(!decision) {
+			activateAll();
+		}
 		GlobalRunRequestResponse response = new GlobalRunRequestResponse();
 		response.name = chosenName;
 		response.ok = decision;
 		UIController.developerComponent.sendMessageToServer(response);
+		
 
 	}
-
+	
+	private void activateAll() {
+		blocked = false; 
+		support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);
+		support.notify(ObserverActions.ENABLE_GLOBAL_RUN,null);
+		support.notify(ObserverActions.ENABLE_SAVE_BUTTONS,null);
+	}
+	
+	private void disableAll() {
+		support.notify(ObserverActions.DISABLE_TEXT_EDITOR,null);
+		support.notify(ObserverActions.DISABLE_GLOBAL_RUN,null);
+		support.notify(ObserverActions.DISABLE_SAVE_BUTTONS,null);
+	}
 }

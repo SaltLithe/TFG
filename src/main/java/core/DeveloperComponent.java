@@ -23,6 +23,7 @@ import fileManagement.WorkSpaceManager;
 import javaMiniSockets.clientSide.AsynchronousClient;
 import javaMiniSockets.serverSide.AsynchronousServer;
 import network.ClientHandler;
+import network.GlobalRunDone;
 import network.GlobalRunRequestMessage;
 import network.GlobalRunRequestResponse;
 import network.ResponseCreateFileMessage;
@@ -60,6 +61,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	private PropertyChangeMessenger support;
 	private int defaultQueueSize = 100;
 	private ServerHandler handler;
+	private ClientHandler clientHandler; 
 	// The workspace the user chose
 	private WorkSpace workSpace;
 	// Structure that saves classpaths and uses projects as its keys
@@ -145,8 +147,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 			String chosenName, String imageByteData, Color chosenColor) {
 		this.chosenName = chosenName;
 
-		ClientHandler handler = new ClientHandler(chosenName, imageByteData, chosenColor);
-		client = new AsynchronousClient(serverAddress, ownAddress, serverPort, handler, separator);
+		clientHandler = new ClientHandler(chosenName, imageByteData, chosenColor);
+		client = new AsynchronousClient(serverAddress, ownAddress, serverPort, clientHandler, separator);
 		if (ownAddress == null) {
 
 			client.setAutomaticIP();
@@ -777,6 +779,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * Used by users acting as clients to request a global run from a server
 	 */
 	public void requestGlobalRun() {
+		clientHandler.blocked = true; 
 		support.notify(ObserverActions.DISABLE_TEXT_EDITOR, null);
 		GlobalRunRequestMessage message = new GlobalRunRequestMessage(this.chosenName);
 		sendMessageToServer(message);
@@ -933,6 +936,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 
 			}
 		} else {
+		
 			// Get the classpath for the focused project
 			URLData[] files = classpaths.get(focusedProject).getClassPath();
 
@@ -973,6 +977,13 @@ public class DeveloperComponent implements PropertyChangeListener {
 				// terminating the
 				// running process is safe
 				support.notify(ObserverActions.DISABLE_TERMINATE, null);
+				if(global) {
+				handler.running = false;
+				support.notify(ObserverActions.ENABLE_GLOBAL_RUN,null);
+				GlobalRunDone message = new GlobalRunDone(); 
+				sendMessageToEveryone(message);
+				
+				}
 
 			} else {
 

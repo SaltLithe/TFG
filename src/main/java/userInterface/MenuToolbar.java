@@ -147,6 +147,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				support.notify(ObserverActions.DISABLE_TEXT_EDITOR,null);
+				support.notify(ObserverActions.DISABLE_SAVE_BUTTONS,null);
 
 				saveAll();
 				disableSaveButtons();

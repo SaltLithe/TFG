@@ -36,8 +36,6 @@ public class ServerHandler implements ServerMessageHandler {
 	PropertyChangeMessenger support;
 	ArrayBlockingQueue<WriteMessage> processBuffer = new ArrayBlockingQueue<WriteMessage>(100);
 	ArrayBlockingQueue<HighLightMessage> highlightBuffer = new ArrayBlockingQueue<HighLightMessage>(100);
-	UIController controller;
-	DeveloperComponent component;
 	String chosenImage;
 	Color chosenColor;
 	String chosenName;
@@ -48,6 +46,10 @@ public class ServerHandler implements ServerMessageHandler {
 	private HashSet<ImageDataMessage> connectedClients;
 	private HashMap<String, Integer> colorData;
 	private AtomicInteger syncCount = new AtomicInteger();
+	private ArrayBlockingQueue <WriteMessage> backlog = new ArrayBlockingQueue<WriteMessage>(100);
+	
+	
+	public boolean running = false; 
 
 	/**
 	 * 
@@ -72,8 +74,7 @@ public class ServerHandler implements ServerMessageHandler {
 		t.start();
 
 		new Thread(() -> processHighLights()).start();
-		controller = UIController.getInstance();
-		component = controller.getDeveloperComponent();
+	
 
 	}
 
@@ -116,9 +117,17 @@ public class ServerHandler implements ServerMessageHandler {
 	public void processMessage() {
 
 		while (true) {
+		
+			
 			WriteMessage incoming = null;
+			
 			try {
+				if(backlog.size() >0 ) {
+					incoming = backlog.take();
+					UIController.developerComponent.sendMessageToEveryone(incoming);
+				}else {
 				incoming = processBuffer.take();
+				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -167,12 +176,17 @@ public class ServerHandler implements ServerMessageHandler {
 		// Message is a write order
 		case "class network.WriteMessage":
 
+		
 			WriteMessage incoming = (WriteMessage) message;
 
+			
 			try {
-
+				if(!running) {
 				processBuffer.put(incoming);
-				component.sendMessageToEveryone(incoming);
+				UIController.developerComponent.sendMessageToEveryone(incoming);
+				}else {
+					backlog.put(incoming);
+				}
 			} catch (Exception e) {
 
 				e.printStackTrace();
@@ -202,7 +216,7 @@ public class ServerHandler implements ServerMessageHandler {
 				response.newname = null;
 			}
 
-			response.path = component.getWorkSpaceName();
+			response.path = UIController.developerComponent.getWorkSpaceName();
 			response.type = FILE_PROPERTIES.workspaceProperty.toString();
 
 			UIController.runOnThread(() -> UIController.developerComponent.sendSyncToClient(response, client.clientID));
@@ -242,7 +256,7 @@ public class ServerHandler implements ServerMessageHandler {
 			HighLightMessage highlightData = (HighLightMessage) message;
 			try {
 				highlightBuffer.put(highlightData);
-				component.sendMessageToEveryone(highlightData);
+				UIController.developerComponent.sendMessageToEveryone(highlightData);
 
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -271,6 +285,8 @@ public class ServerHandler implements ServerMessageHandler {
 			
 			break;
 		case "class network.GlobalRunRequestMessage":
+			if(!running) {
+			running = true; 
 			GlobalRunRequestMessage runRequest = (GlobalRunRequestMessage) message;
 			if(UIController.developerComponent.focusedProject == null) {
 				GlobalRunRequestResponse serverResponse = new GlobalRunRequestResponse();
@@ -283,7 +299,7 @@ public class ServerHandler implements ServerMessageHandler {
 			 new AcceptGlobalDialog(runRequest.name , this , client.clientID , runRequest);
 			}
 
-			 
+			}
 			break;
 		default:
 			break;
@@ -377,11 +393,14 @@ public class ServerHandler implements ServerMessageHandler {
 			message.name = chosenName;
 			message.canceled = true;
 			UIController.developerComponent.sendToClient(message, invokerID);
+			running = false; 
 			
 			
 		}
 		
 	}
+	
+	
 
 	
 
