@@ -217,12 +217,15 @@ public class ServerHandler implements ServerMessageHandler {
 			colorData.put(imageData.name, imageData.color);
 			try {
 				UIController.developerComponent.sendToClient(returnData, client.clientID);
-				UIController.developerComponent.sendMessageToEveryone(imageData);
+			
+				
 				for (ImageDataMessage clientData : connectedClients) {
 				
 						UIController.developerComponent.sendToClient(clientData, client.clientID);
 					
 				}
+				
+				UIController.developerComponent.sendMessageToEveryone(imageData);
 			} catch (Exception e) {
 			}
 			if (!(connectedClients.contains(imageData))) {
@@ -361,7 +364,7 @@ public class ServerHandler implements ServerMessageHandler {
 	}
 
 	
-	public void decideRun(boolean decision , int invokerID , GlobalRunRequestMessage sent) {
+	public void decideRun(boolean decision , int invokerID ,String invokerName, GlobalRunRequestMessage sent) {
 
 		if(decision) {
 			  

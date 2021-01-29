@@ -337,8 +337,6 @@ public class DeveloperComponent implements PropertyChangeListener {
 	public void sendMessageToEveryone(Serializable message) {
 
 		if (server != null) {
-			new Exception().printStackTrace();
-			System.out.println(message.toString());
 
 			Serializable[] messages = { message };
 			try {
@@ -862,7 +860,6 @@ public class DeveloperComponent implements PropertyChangeListener {
 				Thread.sleep(50);
 
 			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
 
 		}

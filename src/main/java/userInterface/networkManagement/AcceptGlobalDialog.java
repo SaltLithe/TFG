@@ -79,7 +79,7 @@ public class AcceptGlobalDialog extends JDialog {
 						clientParent.decideRun(true);
 					
 						}else {
-							serverParent.decideRun(true, invokerID, request);
+							serverParent.decideRun(true, invokerID, invokerName, request);
 						}
 						
 						dispose();
@@ -101,7 +101,7 @@ public class AcceptGlobalDialog extends JDialog {
 						clientParent.decideRun(false);
 						}
 						else {
-							serverParent.decideRun(false , invokerID ,  request);
+							serverParent.decideRun(false , invokerID , invokerName, request);
 						}
 						dispose(); 
 						

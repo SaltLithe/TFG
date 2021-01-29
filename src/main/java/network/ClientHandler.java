@@ -176,6 +176,7 @@ public class ClientHandler implements ClientMessageHandler {
 			
 			}
 
+			System.out.println("ChosenName is " + chosenName);
 			// Set new name , reload workspace after sync and send the server image data for
 			// this client
 			support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);

@@ -196,7 +196,7 @@ public class ConnectionDialog extends JFrame {
 								UIController.developerComponent.setAsClient(ipField_C.getText(), clientIPField_C.getText(),
 										Integer.valueOf(serverPortField_C.getText()),
 										autoconnect , clientNameField_C.getText(), imageLabelClient.ImageByteData, colorChoosercl.getColor() );
-								dp.setIcon(colorChoosercl.getColor(), imageLabelClient.imagepath , clientNameField_C.getText());
+								//dp.setIcon(colorChoosercl.getColor(), imageLabelClient.imagepath , clientNameField_C.getText());
 
 							}
 							dispose(); 
