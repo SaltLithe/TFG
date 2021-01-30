@@ -399,9 +399,10 @@ public class ClientHandler implements ClientMessageHandler {
 	public void onDisconnect() {
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 				"You have disconnected from the current session.", "Disconnected warning", JOptionPane.WARNING_MESSAGE);
-		UIController.getInstance().getDeveloperComponent().client = null;
+		UIController.developerComponent.disconnect(); 
 		support.notify(ObserverActions.ENABLE_LOCAL_RUN, null);
 		support.notify(ObserverActions.DISABLE_GLOBAL_RUN, null);
+		
 
 	}
 
