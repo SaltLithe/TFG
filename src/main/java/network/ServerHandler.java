@@ -104,10 +104,12 @@ public class ServerHandler implements ServerMessageHandler {
 	 * Method called when the user decides to close this server from receiving more
 	 * clients
 	 */
-	public void closeServer() {
-		UIController.developerComponent.closeServer();
+	public void closeServer(int newclients) {
+		this.nClients = newclients; 
+		UIController.developerComponent.closeServer(nClients);
 		SyncEndedMessage syncEnded = new SyncEndedMessage();
 		UIController.developerComponent.sendMessageToEveryone(syncEnded);
+		support.notify(ObserverActions.ENABLE_TEXT_EDITOR, null);
 
 	}
 
@@ -280,6 +282,7 @@ public class ServerHandler implements ServerMessageHandler {
 				
 				DEBUG.debugmessage("COUNTING DOWN");
 				UIController.developerComponent.waitingResponses.countDown();
+				
 				
 			}
 			

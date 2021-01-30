@@ -173,7 +173,6 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * 
 	 * @param name          : The username of this server
 	 * @param ip            : The ip address this server will be open at
-	 * @param maxClients    : The maximum number of clients this server will accept
 	 * @param port          : The port this server will listen at
 	 * @param queueSize     : The size of the queue the server uses to process
 	 *                      messages
@@ -700,10 +699,14 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * Method used by users acting as servers to prevent more clients from
 	 * connecting to the session
 	 */
-	public void closeServer() {
+	public void closeServer(int newClients) {
 		if (server != null) {
+			System.out.println("REINITIALIZING LATCH TO " + newClients);
+			waitingResponses = new CountDownLatch(newClients);
+
 			server.close();
 		}
+		
 	}
 
 	/**

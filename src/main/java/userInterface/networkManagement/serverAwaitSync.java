@@ -29,9 +29,9 @@ import java.awt.Dialog.ModalExclusionType;
  */
 public class serverAwaitSync extends JDialog {
 
-	int nClients;
+	public int nClients;
 	int clientsSynced;
-	int clientsConnected;
+	public int clientsConnected;
 	JLabel syncCountLabel;
 	JLabel clientsConnectedLabel;
 	ServerHandler parent;
@@ -94,15 +94,17 @@ public class serverAwaitSync extends JDialog {
 			}
 
 		});
-
 		closeSessionButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				parent.closeServer();
-				closeNumberOfClients();
+
+				System.out.println("NCLIENTs is now  : " + nClients);
+				parent.closeServer(clientsConnected);
+
 				updateSyncCount(0);
+				dispose(); 
 
 			}
 
@@ -131,6 +133,7 @@ public class serverAwaitSync extends JDialog {
 	public void updateConnectCount(int adding) {
 		if (!((clientsConnected + adding) < 0)) {
 			clientsConnected += adding;
+			System.out.println("Clients connected is now  "+ clientsConnected);
 			clientsConnectedLabel.setText(clientsConnected + " Clients connected.");
 
 		}
@@ -158,7 +161,13 @@ public class serverAwaitSync extends JDialog {
 	 * clients currently connected when the server closes the session
 	 */
 	private void closeNumberOfClients() {
-		nClients = clientsConnected;
+		System.out.println("NCLients now  "+ nClients);
+		System.out.println("Clients connected is now  "+ clientsConnected);
+
+
+		this.nClients = clientsConnected;
+		System.out.println("NCLients now  "+ nClients);
+
 
 	}
 }
