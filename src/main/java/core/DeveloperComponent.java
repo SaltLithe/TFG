@@ -858,6 +858,10 @@ public class DeveloperComponent implements PropertyChangeListener {
 		case SAVE_FULL:
 			saveAllFull();
 			break;
+		case SAFETY_STOP:
+			disconnect();
+			
+			break;
 		default:
 			break;
 		}

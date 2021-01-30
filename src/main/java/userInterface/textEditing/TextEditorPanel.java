@@ -10,11 +10,19 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import com.google.common.util.concurrent.MoreExecutors;
+
+import com.google.common.util.concurrent.MoreExecutors;
 
 import core.DEBUG;
 import network.HighLightMessage;
@@ -45,8 +53,9 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	private HashMap<String, TextEditorTab> tabCollection;
 	private PropertyChangeMessenger propertyChangeMessenger;
 	private String chosenName = null;
-	private Thread messager;
-	private Thread highlighter;
+
+	ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
+	ExecutorService executorService = MoreExecutors.getExitingExecutorService(executor, 100, TimeUnit.MILLISECONDS);
 	private long sendDelay = 50;
 
 	public TextEditorPanel() {
@@ -54,11 +63,13 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 		tabCollection = new HashMap<String, TextEditorTab>();
 
-		messager = new Thread(() -> sendMessages());
-		highlighter = new Thread(() -> sendHighlights());
-
-		messager.start();
-		highlighter.start();
+	
+		
+		
+		executorService.submit(()-> sendMessages());
+		executorService.submit(()->sendHighlights());
+		
+	
 
 		setLayout(new BorderLayout());
 		this.setSize(new Dimension(ImageObserver.WIDTH, ImageObserver.HEIGHT));
@@ -315,6 +326,11 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			break;
 		case ENABLE_TEXT_EDITOR:
 			enableComponents(this, true);
+			break;
+		case SAFETY_STOP:
+			
+			executorService.shutdown();
+			
 			break;
 
 		default:
