@@ -63,7 +63,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	private ServerHandler handler;
 	private ClientHandler clientHandler; 
 	// The workspace the user chose
-	private WorkSpace workSpace;
+	public WorkSpace workSpace = null; 
 	// Structure that saves classpaths and uses projects as its keys
 	private HashMap<String, ClassPath> classpaths;
 	private String separator = "pairLeap.codeString";
@@ -165,6 +165,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		support.notify(ObserverActions.ENABLE_DISCONNECT_BUTTON,null);
 
 		setNewName(chosenName);
 	}
@@ -203,6 +204,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 		support.notify(ObserverActions.DISABLE_JOIN_BUTTON, null);
 		server.Start();
 		isConnected = true;
+		support.notify(ObserverActions.ENABLE_DISCONNECT_BUTTON,null);
 
 		setNewName(name);
 
@@ -583,6 +585,11 @@ public class DeveloperComponent implements PropertyChangeListener {
 		support.notify(ObserverActions.ENABLE_LOCAL_RUN,null);
 		support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);
 		support.notify(ObserverActions.ENABLE_SAVE_BUTTONS,null);
+		support.notify(ObserverActions.ENABLE_NEW_PROJECT, null);
+		support.notify(ObserverActions.ENABLE_JOIN_BUTTON,null);
+		support.notify(ObserverActions.DISABLE_DISCONNECT_BUTTON,null);
+
+		
 
 	}
 

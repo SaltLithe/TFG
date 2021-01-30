@@ -178,6 +178,14 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 		disableTerminate();
 		disableGlobalRun();
+		
+		if(UIController.developerComponent.workSpace == null) {
+			this.disableLocalRun();
+			this.disableSaveButtons();
+			this.disableRunConfig();
+			newProjectButton.setEnabled(false);
+
+		}
 		this.setVisible(true);
 
 	}
@@ -191,6 +199,8 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
 		switch (action) {
 
+		
+		
 		case DISABLE_TERMINATE:
 			disableTerminate();
 			break;

@@ -13,10 +13,13 @@ import java.util.LinkedList;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
+import userInterface.UIController;
 
 /**
  * Ui class that contains functionality to join and disconnect from sessions as
@@ -67,17 +70,41 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 		createSessionButton = new JButton("Create");
 		toolBar.add(createSessionButton);
 		createSessionButton.addActionListener(new ActionListener() {
+			
+			
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				if(UIController.developerComponent.workSpace == null) {
+					JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
+						    "You are trying to create a session without a workspace loaded , restart this software and choose a workspace to create"
+						    + "a session.",
+						    "No Workspace error",
+						    JOptionPane.ERROR_MESSAGE);
+				}else {
+					new createSessionDialog(); 
 
-				new createSessionDialog(); 
+				}
 			}
 
 		});
 
 		disconnectButton = new JButton("Disconnect");
+	
 		toolBar.add(disconnectButton);
+		disconnectButton.setEnabled(false);
+		disconnectButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				UIController.developerComponent.disconnect();
+			}
+
+		});
+		
+		
+		
 
 		userIconsPanel = new JPanel();
 		add(userIconsPanel, BorderLayout.WEST);
@@ -118,9 +145,11 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 
 		case DISABLE_JOIN_BUTTON:
 			joinSessionButton.setEnabled(false);
+			createSessionButton.setEnabled(false);
 			break;
 		case ENABLE_JOIN_BUTTON:
 			joinSessionButton.setEnabled(true);
+			createSessionButton.setEnabled(true);
 			break;
 		case ENABLE_DISCONNECT_BUTTON:
 			disconnectButton.setEnabled(true);
