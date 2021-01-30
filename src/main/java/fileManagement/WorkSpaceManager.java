@@ -168,7 +168,6 @@ public class WorkSpaceManager {
 			if (fileChooser.getSelectedFile().isDirectory()) {
 				File filepath = fileChooser.getSelectedFile();
 				path = filepath.getAbsolutePath();
-				System.out.println("You selected the directory: " + fileChooser.getSelectedFile());
 			}
 		}
 

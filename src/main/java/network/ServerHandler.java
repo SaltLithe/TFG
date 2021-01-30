@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JOptionPane;
 
 import core.DEBUG;
-import core.DeveloperComponent;
 import fileManagement.FILE_PROPERTIES;
 import javaMiniSockets.serverSide.ClientInfo;
 import javaMiniSockets.serverSide.ServerMessageHandler;
@@ -19,7 +18,6 @@ import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
-import userInterface.runConfigDialog;
 import userInterface.networkManagement.AcceptGlobalDialog;
 import userInterface.networkManagement.serverAwaitSync;
 
@@ -41,13 +39,13 @@ public class ServerHandler implements ServerMessageHandler {
 	String chosenName;
 	private HashSet<String> sessionNames = new HashSet<String>();
 	private serverAwaitSync sync;
-	private int nClients;
+	public int nClients;
 	private Semaphore syncSem;
 	private HashSet<ImageDataMessage> connectedClients;
 	private HashMap<String, Integer> colorData;
 	private AtomicInteger syncCount = new AtomicInteger();
 	private ArrayBlockingQueue <WriteMessage> backlog = new ArrayBlockingQueue<WriteMessage>(100);
-	
+	private Semaphore messageSem; 
 	
 	public boolean running = false; 
 
@@ -61,6 +59,7 @@ public class ServerHandler implements ServerMessageHandler {
 	 */
 	public ServerHandler(String chosenName, int nClients, String chosenImage, Color chosenColor) {
 
+		messageSem  = new Semaphore(1);
 		connectedClients = new HashSet<ImageDataMessage>();
 		colorData = new HashMap<String, Integer>();
 		this.chosenImage = chosenImage;
@@ -70,9 +69,7 @@ public class ServerHandler implements ServerMessageHandler {
 		this.nClients = nClients;
 		sessionNames.add(chosenName);
 		support = PropertyChangeMessenger.getInstance();
-		Thread t = new Thread(() -> processMessage());
-		t.start();
-
+		 new Thread(() -> processMessage()).start();;
 		new Thread(() -> processHighLights()).start();
 	
 
@@ -172,6 +169,9 @@ public class ServerHandler implements ServerMessageHandler {
 	@Override
 	public void onMessageSent(Serializable message, ClientInfo client) {
 
+		try {
+			
+		messageSem.acquire(); 
 		String messageclass = message.getClass().toString();
 
 		switch (messageclass) {
@@ -267,6 +267,7 @@ public class ServerHandler implements ServerMessageHandler {
 			break;
 		
 		case "class network.GlobalRunRequestResponse":
+			System.out.println("GOT A RUN RESPONSE");
 			GlobalRunRequestResponse runResponse = (GlobalRunRequestResponse) message;
 			if(!runResponse.ok) {
 				UIController.developerComponent.runningThread.interrupt();
@@ -307,6 +308,11 @@ public class ServerHandler implements ServerMessageHandler {
 		default:
 			break;
 
+		}
+		}catch(Exception e) {
+			
+		}finally {
+			messageSem.release(); 
 		}
 	}
 

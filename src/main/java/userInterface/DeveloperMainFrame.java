@@ -55,7 +55,6 @@ public class DeveloperMainFrame extends JFrame implements PropertyChangeListener
 		try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
 		} catch (Exception ex) {
-			System.err.println("Failed to initialize LaF");
 		}
 
 		this.controller = UIController.getInstance();

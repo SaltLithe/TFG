@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 import javax.swing.JOptionPane;
 
@@ -45,6 +46,7 @@ public class ClientHandler implements ClientMessageHandler {
 	private HashMap<String, Integer> colorData;
 	private HashMap<String, ImageDataMessage> images;
 	public boolean blocked = false; 
+	private Semaphore messageSem; 
     
 
 	/**
@@ -57,6 +59,7 @@ public class ClientHandler implements ClientMessageHandler {
 	public ClientHandler(String chosenName, String imageByteData, Color chosenColor) {
 
 		
+		messageSem = new Semaphore(1);
 		images = new HashMap<String, ImageDataMessage>();
 		colorData = new HashMap<String, Integer>();
 		
@@ -142,7 +145,11 @@ public class ClientHandler implements ClientMessageHandler {
 	 */
 	@Override
 	public void onMessageSent(Serializable message, ServerInfo serverInfo) {
+		
+	
+		try {
 
+			messageSem.acquire(); 
 		// Get the class name
 		String messageclass = message.getClass().toString();
 
@@ -179,7 +186,6 @@ public class ClientHandler implements ClientMessageHandler {
 			
 			}
 
-			System.out.println("ChosenName is " + chosenName);
 			// Set new name , reload workspace after sync and send the server image data for
 			// this client
 			support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);
@@ -291,7 +297,6 @@ public class ClientHandler implements ClientMessageHandler {
 			GlobalRunRequestMessage requestMessage = (GlobalRunRequestMessage) message;
 			if(!(requestMessage.name.equals(chosenName))) {
 			if(!blocked) {
-			System.out.println("NAME FROM REQUEST IS : "+ chosenName  + " and own name is " + requestMessage.name);
 			disableAll();
 			new AcceptGlobalDialog(requestMessage.name, this);
 			}
@@ -340,7 +345,11 @@ public class ClientHandler implements ClientMessageHandler {
 		default:
 			break;
 		}
-
+		}catch(Exception e) {
+			
+		}finally {
+			messageSem.release(); 
+		}
 	}
 
 	/**
@@ -377,9 +386,8 @@ public class ClientHandler implements ClientMessageHandler {
 				"You have been disconnected! The server may have failed or kicked you out of the session.",
 				"Disconnected warning", JOptionPane.WARNING_MESSAGE);
 		
-		UIController.getInstance().getDeveloperComponent().client = null;
-		support.notify(ObserverActions.ENABLE_LOCAL_RUN, null);
-		support.notify(ObserverActions.DISABLE_GLOBAL_RUN, null);
+		UIController.developerComponent.disconnect();
+		
 
 	}
 

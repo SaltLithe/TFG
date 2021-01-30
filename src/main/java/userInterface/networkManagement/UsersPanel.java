@@ -31,12 +31,13 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 
 	JLabel sessionowner;
 	JLabel ipIndicator;
-	JButton sessionButton;
+	JButton joinSessionButton;
 	JButton disconnectButton;
 	JPanel userIconsPanel;
 	ProfileIIconComponent self;
 	ProfileIIconComponent server;
 	LinkedList<ProfileIIconComponent> icons;
+	private JButton createSessionButton;
 
 	public UsersPanel() {
 
@@ -50,19 +51,30 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 		JToolBar toolBar = new JToolBar();
 		panel.add(toolBar);
 
-		sessionButton = new JButton("Join/Create");
-		sessionButton.addActionListener(new ActionListener() {
+		joinSessionButton = new JButton("Join");
+		joinSessionButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				new ConnectionDialog();
-
+				new joinSessionDialog();
 			}
 
 		});
 
-		toolBar.add(sessionButton);
+		toolBar.add(joinSessionButton);
+		
+		createSessionButton = new JButton("Create");
+		toolBar.add(createSessionButton);
+		createSessionButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				new createSessionDialog(); 
+			}
+
+		});
 
 		disconnectButton = new JButton("Disconnect");
 		toolBar.add(disconnectButton);
@@ -105,10 +117,10 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 			break;
 
 		case DISABLE_JOIN_BUTTON:
-			sessionButton.setEnabled(false);
+			joinSessionButton.setEnabled(false);
 			break;
 		case ENABLE_JOIN_BUTTON:
-			sessionButton.setEnabled(true);
+			joinSessionButton.setEnabled(true);
 			break;
 		case ENABLE_DISCONNECT_BUTTON:
 			disconnectButton.setEnabled(true);

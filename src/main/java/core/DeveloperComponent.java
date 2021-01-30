@@ -145,6 +145,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	public void setAsClient(String serverAddress, String ownAddress, int serverPort, boolean autoConnect,
 			String chosenName, String imageByteData, Color chosenColor) {
+		support.notify(ObserverActions.DISABLE_RUN_CONFIG,null);
 		this.chosenName = chosenName;
 
 		clientHandler = new ClientHandler(chosenName, imageByteData, chosenColor);
@@ -569,13 +570,19 @@ public class DeveloperComponent implements PropertyChangeListener {
 			if (client != null) {
 				client.disconnect();
 				client = null;
+				clientHandler = null;
 			} else if (server != null) {
 				server.Stop();
 				server = null;
+				handler = null; 
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		support.notify(ObserverActions.DISABLE_GLOBAL_RUN,null);
+		support.notify(ObserverActions.ENABLE_LOCAL_RUN,null);
+		support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);
+		support.notify(ObserverActions.ENABLE_SAVE_BUTTONS,null);
 
 	}
 
@@ -701,7 +708,6 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	public void closeServer(int newClients) {
 		if (server != null) {
-			System.out.println("REINITIALIZING LATCH TO " + newClients);
 			waitingResponses = new CountDownLatch(newClients);
 
 			server.close();
@@ -931,6 +937,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	private void compileAndRun(boolean global) throws IOException {
 
+		support.notify(ObserverActions.CLEAR_CONSOLE, null);
 		// Check if there is no project focused
 		if (focusedProject == null || focusedProject == "" || !stillExists(focusedProject)) {
 			if (!global) {
@@ -961,14 +968,18 @@ public class DeveloperComponent implements PropertyChangeListener {
 				consoleSender.start();
 				compile(files, subname);
 				// After the code has run enable run buttons
-				DEBUG.debugmessage("GLOBAL BOOL IS " + global);
 				if (!global) {
 					support.notify(ObserverActions.ENABLE_LOCAL_RUN, null);
 				} else {
+					waitingResponses = new CountDownLatch(handler.nClients);
 					GlobalRunRequestResponse finished = new GlobalRunRequestResponse();
 					finished.ok = true;
 					sendMessageToEveryone(finished);
-					support.notify(ObserverActions.ENABLE_GLOBAL_RUN, null);
+					handler.running = false;
+					support.notify(ObserverActions.ENABLE_GLOBAL_RUN,null);
+					GlobalRunDone message = new GlobalRunDone(); 
+					sendMessageToEveryone(message);
+					
 
 				}
 
@@ -980,13 +991,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 				// terminating the
 				// running process is safe
 				support.notify(ObserverActions.DISABLE_TERMINATE, null);
-				if(global) {
-				handler.running = false;
-				support.notify(ObserverActions.ENABLE_GLOBAL_RUN,null);
-				GlobalRunDone message = new GlobalRunDone(); 
-				sendMessageToEveryone(message);
-				
-				}
+			
 
 			} else {
 

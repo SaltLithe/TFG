@@ -14,6 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import core.DEBUG;
 import network.ServerHandler;
 import userInterface.UIController;
 import java.awt.Dialog.ModalityType;
@@ -100,7 +101,6 @@ public class serverAwaitSync extends JDialog {
 			public void actionPerformed(ActionEvent arg0) {
 
 
-				System.out.println("NCLIENTs is now  : " + nClients);
 				parent.closeServer(clientsConnected);
 
 				updateSyncCount(0);
@@ -133,7 +133,6 @@ public class serverAwaitSync extends JDialog {
 	public void updateConnectCount(int adding) {
 		if (!((clientsConnected + adding) < 0)) {
 			clientsConnected += adding;
-			System.out.println("Clients connected is now  "+ clientsConnected);
 			clientsConnectedLabel.setText(clientsConnected + " Clients connected.");
 
 		}
@@ -156,18 +155,5 @@ public class serverAwaitSync extends JDialog {
 
 	}
 
-	/**
-	 * Support method used to set the number of expected clients to the number of
-	 * clients currently connected when the server closes the session
-	 */
-	private void closeNumberOfClients() {
-		System.out.println("NCLients now  "+ nClients);
-		System.out.println("Clients connected is now  "+ clientsConnected);
 
-
-		this.nClients = clientsConnected;
-		System.out.println("NCLients now  "+ nClients);
-
-
-	}
 }

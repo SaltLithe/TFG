@@ -180,9 +180,7 @@ public class ProfileIIconComponent extends JPanel {
 			ByteArrayInputStream bais = new ByteArrayInputStream(imageByteArray);
 			raw = ImageIO.read(bais);
 		} catch (FileNotFoundException e) {
-			System.out.println("Image not found" + e);
 		} catch (IOException ioe) {
-			System.out.println("Exception while reading the Image " + ioe);
 		}
 	}
 

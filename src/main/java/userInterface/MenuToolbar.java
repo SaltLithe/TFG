@@ -208,11 +208,17 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			break;
 		case ENABLE_LOCAL_RUN:
 			enableLocalRun();
+			enableRunConfig();
+			break;
+		case DISABLE_RUN_CONFIG:
+			disableRunConfig();
 			break;
 		case ENABLE_SAVE_BUTTONS:
+			enableRunConfig();
 			enableSaveButtons();
 			break;
 		case DISABLE_SAVE_BUTTONS:
+			disableRunConfig(); 
 			disableSaveButtons();
 			break;
 		case SAFETY_STOP:
@@ -232,6 +238,18 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 		}
 
 	}
+	
+	private void enableRunConfig() {
+		runConfigButton.setEnabled(true);
+		
+	}
+	
+	private void disableRunConfig() {
+		
+		runConfigButton.setEnabled(false);
+
+	}
+	
 
 	private void disableSaveButtons() {
 		save.setEnabled(false);

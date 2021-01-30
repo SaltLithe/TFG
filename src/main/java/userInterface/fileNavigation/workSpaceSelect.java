@@ -66,7 +66,6 @@ public class workSpaceSelect extends JFrame {
 		try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
 		} catch (Exception ex) {
-			System.err.println("Failed to initialize LaF");
 		}
 
 		selectPanelComponents = new LinkedList<Component>();

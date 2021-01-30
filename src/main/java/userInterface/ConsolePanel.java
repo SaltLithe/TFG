@@ -102,6 +102,9 @@ public class ConsolePanel extends JPanel implements PropertyChangeListener {
 		case ENABLE_CONSOLE_PANEL:
 			consoleTextArea.setEnabled(true);
 			break;
+		case CLEAR_CONSOLE:
+			consoleTextArea.setText("");
+			break; 
 		default:
 			break;
 		}
