@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
@@ -43,7 +44,6 @@ public class DeveloperMainFrame extends JFrame implements PropertyChangeListener
 	private PropertyChangeMessenger support;
 	private JFrame instance;
 	private boolean somethingHasChanged;
-	private UIController controller;
 
 	DeveloperMainFrame() {
 
@@ -55,10 +55,10 @@ public class DeveloperMainFrame extends JFrame implements PropertyChangeListener
 		try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
 		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 
-		this.controller = UIController.getInstance();
-		controller.setDeveloperMainFrame(this);
+		
 
 		screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		setLayout(new BorderLayout());
@@ -79,13 +79,15 @@ public class DeveloperMainFrame extends JFrame implements PropertyChangeListener
 
 		setSize(screenSize.width, screenSize.height);
 
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		// Configure the program's behaviour when the user tries to close it
 		// In this case it displays a dialog if there are changes left to save , stops
 		// any running process that
 		// may still be running and deletes copies of java files from bin directory
 		addWindowListener(new WindowAdapter() {
+			@Override
 			public void windowClosing(WindowEvent e) {
+				System.out.println("CLOSING CORRECTLY");
 
 				support.notify(ObserverActions.SAFETY_STOP, null);
 				support.notify(ObserverActions.SAFETY_DELETE, null);

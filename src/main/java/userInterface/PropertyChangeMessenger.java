@@ -32,8 +32,9 @@ public class PropertyChangeMessenger {
 	 * @param newvalue : The objects to send alongside the notification
 	 */
 	public void notify(ObserverActions action, Object[] newvalue) {
-		ArrayList<Object> message = new ArrayList<Object>();
+		ArrayList<Object> message = new ArrayList<>();
 		if(newvalue != null) {
+		
 		for (int i = 0; i < newvalue.length; i++) {
 			message.add(newvalue[i]);
 		}

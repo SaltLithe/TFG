@@ -13,6 +13,7 @@ public class FILE_PROPERTIES {
 	public static final String packageProperty = "pairleap.packagefolder";
 	public static final String workspaceProperty = "pairleap.workspacefolder";
 	public static final String singleSlash = "/";
+	public static final String doubleSlash = "\\";
 
 
 	public static final  String[] properties = {

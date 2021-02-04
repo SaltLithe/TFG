@@ -131,21 +131,21 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 		case SET_SELF_ICON:
 
 			setSelf((Color) result.get(0), (String) result.get(1), (String) result.get(2));
-			Rearange();
+			rearange();
 			break;
 		case SET_SERVER_ICON:
 			setServer((String) result.get(0), (int) result.get(1), (String) result.get(2));
-			Rearange();
+			rearange();
 
 			break;
 		case SET_CLIENT_ICON:
 
 			setClient((String) result.get(0), (int) result.get(1), (String) result.get(2), (int) result.get(3));
-			Rearange();
+			rearange();
 			break;
 		case REMOVE_CLIENT_ICON:
 			removeClient((int) result.get(0));
-			Rearange();
+			rearange();
 			break;
 
 		case DISABLE_JOIN_BUTTON:
@@ -187,7 +187,7 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 		if (index != -1) {
 			icons.remove(index);
 
-			Rearange();
+			rearange();
 		}
 
 	}
@@ -209,7 +209,7 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 
 	}
 
-	private void Rearange() {
+	private void rearange() {
 
 		this.userIconsPanel.removeAll();
 		for (ProfileIIconComponent c : icons) {

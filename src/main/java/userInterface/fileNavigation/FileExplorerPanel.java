@@ -10,8 +10,6 @@ import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.DefaultTreeModel;
 
-import core.DEBUG;
-
 /**
  * UI class containing the elements neccessary to navigate through the workspace
  * 
@@ -21,7 +19,7 @@ import core.DEBUG;
 @SuppressWarnings("serial")
 public class FileExplorerPanel extends JPanel {
 	JScrollPane scrollPane;
-	LinkedList<JTree> treeList = new LinkedList<JTree>();
+	LinkedList<JTree> treeList = new LinkedList<>();
 	JPanel newpane;
 
 	public FileExplorerPanel() {

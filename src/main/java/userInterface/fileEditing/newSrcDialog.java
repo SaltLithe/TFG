@@ -30,6 +30,8 @@ public class newSrcDialog extends JDialog {
 
 	
 	public newSrcDialog(String parentpath, String project) {
+		
+		setTitle("Create a new source folder");
 	
 		this.parentpath = parentpath; 
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -122,7 +124,7 @@ public class newSrcDialog extends JDialog {
 
 	
 			
-		setSize(600,300);
+		setSize(600,200);
 			
 	setVisible(true);
 	}

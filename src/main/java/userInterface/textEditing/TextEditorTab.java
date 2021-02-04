@@ -73,8 +73,8 @@ public class TextEditorTab extends JPanel {
 		lasthighlight = new Highlight[1];
 		LastLine = -1;
 
-		painters = new HashMap<Integer, HighlightPainter>();
-		highlights = new HashMap<String, HighlightData>();
+		painters = new HashMap<>();
+		highlights = new HashMap<>();
 		this.chosenName = chosenName;
 		editingLock = new Semaphore(1);
 
@@ -113,10 +113,7 @@ public class TextEditorTab extends JPanel {
 		textEditorArea.addCaretListener(new CaretListener() {
 			public void caretUpdate(CaretEvent e) {
 
-				/*
-				 * try { editingLock.acquire(); } catch (InterruptedException e3) {
-				 * e3.printStackTrace(); }
-				 */
+				
 				if (developerComponent.isConnected) {
 
 					int caretline = textEditorArea.getCaretLineNumber();
@@ -130,13 +127,13 @@ public class TextEditorTab extends JPanel {
 					}
 
 					if (caretline != LastLine && linestart != lineend) {
-						DEBUG.debugmessage("LASTLINECHANGED");
 						LastLine = caretline;
 						HighLightMessage highlightmessage = new HighLightMessage(linestart, lineend, chosenName,
 								keypath);
 						try {
 							parent.highlightBuffer.put(highlightmessage);
 						} catch (InterruptedException e1) {
+		
 							e1.printStackTrace();
 						}
 
@@ -144,7 +141,6 @@ public class TextEditorTab extends JPanel {
 
 				}
 
-				// editingLock.release();
 
 			}
 

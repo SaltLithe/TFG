@@ -54,10 +54,11 @@ public class WorkSpaceManager {
 		try {
 			ws = getAllWorkSpaces();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		if (ws == null) {
 
-			ws = new ArrayList<WorkSpace>();
+			ws = new ArrayList<>();
 		}
 		boolean repeated = false;
 		int counter = 0;
@@ -91,10 +92,11 @@ public class WorkSpaceManager {
 		try {
 			ws = getAllWorkSpaces();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		if (ws == null) {
 
-			ws = new ArrayList<WorkSpace>();
+			ws = new ArrayList<>();
 		}
 		boolean repeated = false;
 		int counter = 0;

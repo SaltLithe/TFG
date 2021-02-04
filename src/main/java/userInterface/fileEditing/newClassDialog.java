@@ -30,6 +30,7 @@ public class newClassDialog extends JDialog {
 	private JCheckBox mainCheckBox;
 
 	public newClassDialog(String path, String project) {
+		setTitle("Create a new class");
 
 		this.path = path;
 		this.project = project;

@@ -40,8 +40,8 @@ public class ConsolePanel extends JPanel implements PropertyChangeListener {
 			@Override
 			public void keyReleased(KeyEvent e) {
 
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					if (readingListener) {
+				if ((e.getKeyCode() == KeyEvent.VK_ENTER) && readingListener) {
+					
 
 						String retrieved = consoleTextArea.getText().substring(lastlenght,
 								consoleTextArea.getText().length());
@@ -49,20 +49,19 @@ public class ConsolePanel extends JPanel implements PropertyChangeListener {
 						UIController.developerComponent.reactivateRunningProccess(retrieved);
 						readingListener = false;
 						consoleTextArea.setEnabled(false);
-					}
+					
 				}
 
 			}
 
 			@Override
 			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-
+				//We dont need to implement this method
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
+				//We dont need to implement this method
 
 			}
 

@@ -18,7 +18,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import userInterface.DeveloperMainFrame;
+import fileManagement.FILE_PROPERTIES;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
@@ -35,7 +35,6 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 	public JTree internalTree;
 	private CustomTreeNode lastParent = null;
 	private String project;
-	private DeveloperMainFrame frame;
 	private ArrayList<String> baseClassPath;
 	private PropertyChangeMessenger support = PropertyChangeMessenger.getInstance();
 
@@ -46,9 +45,8 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 	 */
 	public ProjectTree(File dir, String project) {
 
-		baseClassPath = new ArrayList<String>();
+		baseClassPath = new ArrayList<>();
 		this.project = project;
-		frame = UIController.developerMainFrame;
 		setLayout(new BorderLayout());
 
 		internalTree = new JTree(scanAndAdd(null, dir, project, true));
@@ -61,6 +59,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 		// Adding functionality for the nodes right here
 
 		internalTree.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseClicked(MouseEvent me) {
 				CustomTreeNode node = null;
 				int selRow = internalTree.getRowForLocation(me.getX(), me.getY());
@@ -69,6 +68,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 				try {
 					node = (CustomTreeNode) internalTree.getSelectionPath().getLastPathComponent();
 				} catch (Exception e) {
+					e.printStackTrace();
 				}
 
 				if (SwingUtilities.isLeftMouseButton(me)) {
@@ -111,6 +111,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 	/**
 	 * Define the minimum size of the panel containing this tree
 	 */
+	@Override
 	public Dimension getMinimumSize() {
 		return new Dimension(200, 400);
 	}
@@ -118,6 +119,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 	/**
 	 * efine the maximum size of the panel containing this tree
 	 */
+	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension(200, 400);
 	}
@@ -125,8 +127,9 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 	/**
 	 * Implementation of an inherited method
 	 */
+	@Override
 	public void valueChanged(TreeSelectionEvent e) {
-
+		//We do not need to implement this method
 	}
 
 	/**
@@ -156,19 +159,19 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 
 		// Get all the files for the current directory
 		String[] fileArray = dir.list();
-		ArrayList<File> files = new ArrayList<File>();
+		ArrayList<File> files = new ArrayList<>();
 
 		// Add them to the list if they are not hidden
 		if (!currentNode.hideContents) {
 
 			for (String filename : fileArray) {
-				File newfile = new File(path + "//" + filename);
+				File newfile = new File(path + FILE_PROPERTIES.doubleSlash + filename);
 				files.add(newfile);
 			}
 		}
 
 		// Check if what we scanned are files or directories
-		ArrayList<File> addLater = new ArrayList<File>();
+		ArrayList<File> addLater = new ArrayList<>();
 		for (File f : files) {
 
 			// If they are directories , start the method again
@@ -241,7 +244,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 		DefaultTreeModel model = (DefaultTreeModel) internalTree.getModel();
 		CustomTreeNode root = (CustomTreeNode) model.getRoot();
 		// If we are deleting the root , just delete the whole tree
-		if (root.path == node.path) {
+		if (root.path.equals( node.path)) {
 			Object[] message = { node.path };
 			support.notify(ObserverActions.DELETE_PROJECT_TREE, message);
 

@@ -32,7 +32,7 @@ public class FileExplorerToolbar extends JPanel implements PropertyChangeListene
 
 	public FileExplorerToolbar() {
 
-		trees = new HashMap<String, ProjectTree>();
+		trees = new HashMap<>();
 		fileExplorerPanel = new FileExplorerPanel();
 
 		JPanel toolbarspace = new JPanel();

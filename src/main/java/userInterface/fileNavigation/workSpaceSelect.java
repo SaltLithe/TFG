@@ -22,14 +22,15 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
 import core.DEBUG;
+import fileManagement.CustomWorkSpaceElement;
 import fileManagement.WorkSpace;
 import fileManagement.WorkSpaceManager;
-import fileManagement.CustomWorkSpaceElement;
 import userInterface.fileEditing.AddWorkSpaceDialog;
 
 @SuppressWarnings("serial")
@@ -68,8 +69,8 @@ public class workSpaceSelect extends JFrame {
 		} catch (Exception ex) {
 		}
 
-		selectPanelComponents = new LinkedList<Component>();
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		selectPanelComponents = new LinkedList<>();
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

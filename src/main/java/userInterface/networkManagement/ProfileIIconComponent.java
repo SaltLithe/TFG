@@ -188,7 +188,9 @@ public class ProfileIIconComponent extends JPanel {
 			ByteArrayInputStream bais = new ByteArrayInputStream(imageByteArray);
 			raw = ImageIO.read(bais);
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		} catch (IOException ioe) {
+			ioe.printStackTrace();
 		}
 	}
 
@@ -199,8 +201,8 @@ public class ProfileIIconComponent extends JPanel {
 	private void encoder(byte[] image) {
 		String base64Image = "";
 		try {
-			byte imageData[] = image;
-			base64Image = Base64.getEncoder().encodeToString(imageData);
+			
+			base64Image = Base64.getEncoder().encodeToString(image);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

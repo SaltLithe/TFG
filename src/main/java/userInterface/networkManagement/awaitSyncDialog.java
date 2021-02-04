@@ -11,17 +11,13 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.WindowConstants;
 
 import userInterface.UIController;
 
-import java.awt.Dialog.ModalityType;
-import java.awt.Dialog.ModalExclusionType;
-
 @SuppressWarnings("serial")
 /**
- * UI class that pops a dialog TODO blocking the ui?  for users acting as clients to signal that there is an 
  * ongoing syncing operation with the server
  * @author Carmen Gómez Moreno
  *
@@ -48,7 +44,7 @@ public class awaitSyncDialog extends JDialog {
 		gbc_cancelButton.gridy = 2;
 		getContentPane().add(cancelButton, gbc_cancelButton);
 
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
 		cancelButton.addActionListener(new ActionListener() {
 

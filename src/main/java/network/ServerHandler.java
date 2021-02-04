@@ -38,19 +38,19 @@ import userInterface.networkManagement.serverAwaitSync;
 public class ServerHandler implements ServerMessageHandler {
 
 	PropertyChangeMessenger support;
-	ArrayBlockingQueue<WriteMessage> processBuffer = new ArrayBlockingQueue<WriteMessage>(100);
-	ArrayBlockingQueue<HighLightMessage> highlightBuffer = new ArrayBlockingQueue<HighLightMessage>(100);
+	ArrayBlockingQueue<WriteMessage> processBuffer = new ArrayBlockingQueue<>(100);
+	ArrayBlockingQueue<HighLightMessage> highlightBuffer = new ArrayBlockingQueue<>(100);
 	String chosenImage;
 	Color chosenColor;
 	String chosenName;
-	private HashSet<String> sessionNames = new HashSet<String>();
+	private HashSet<String> sessionNames = new HashSet<>();
 	private serverAwaitSync sync;
 	public int nClients;
 	private Semaphore syncSem;
 	private HashSet<ImageDataMessage> connectedClients;
 	private HashMap<String, Integer> colorData;
 	private AtomicInteger syncCount = new AtomicInteger();
-	private ArrayBlockingQueue <WriteMessage> backlog = new ArrayBlockingQueue<WriteMessage>(100);
+	private ArrayBlockingQueue <WriteMessage> backlog = new ArrayBlockingQueue<>(100);
 	private Semaphore messageSem; 
 	
 	public boolean running = false; 
@@ -70,8 +70,8 @@ public class ServerHandler implements ServerMessageHandler {
 	public ServerHandler(String chosenName, int nClients, String chosenImage, Color chosenColor) {
 
 		messageSem  = new Semaphore(1);
-		connectedClients = new HashSet<ImageDataMessage>();
-		colorData = new HashMap<String, Integer>();
+		connectedClients = new HashSet<>();
+		colorData = new HashMap<>();
 		this.chosenImage = chosenImage;
 		this.chosenColor = chosenColor;
 		this.chosenName = chosenName;
@@ -94,6 +94,7 @@ public class ServerHandler implements ServerMessageHandler {
 		try {
 			syncSem.acquire();
 		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 			e.printStackTrace();
 		}
 		if (sync != null) {
@@ -127,7 +128,8 @@ public class ServerHandler implements ServerMessageHandler {
 	 */
 	public void processMessage() {
 
-		while (true) {
+		boolean loopAround = true;
+		while (loopAround) {
 		
 			
 			WriteMessage incoming = null;
@@ -140,10 +142,11 @@ public class ServerHandler implements ServerMessageHandler {
 				incoming = processBuffer.take();
 				}
 			} catch (InterruptedException e) {
+				Thread.interrupted();
+				loopAround = false;
 				e.printStackTrace();
 			}
 
-			DEBUG.debugmessage("GOT A WRITEMESSAGE");
 			Object[] message = { incoming.path, incoming };
 			support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, message);
 
@@ -156,12 +159,14 @@ public class ServerHandler implements ServerMessageHandler {
 	 * send
 	 */
 	public void processHighLights() {
-
-		while (true) {
+		boolean loopAround = true; 
+		while (loopAround) {
 			HighLightMessage incoming = null;
 			try {
 				incoming = highlightBuffer.take();
 			} catch (InterruptedException e) {
+				loopAround = false;
+				Thread.currentThread().interrupt();
 				e.printStackTrace();
 			}
 			if (!incoming.name.equals(chosenName)) {
@@ -231,7 +236,7 @@ public class ServerHandler implements ServerMessageHandler {
 			}
 
 			response.path = UIController.developerComponent.getWorkSpaceName();
-			response.type = FILE_PROPERTIES.workspaceProperty.toString();
+			response.type = FILE_PROPERTIES.workspaceProperty;
 
 			UIController.runOnThread(() -> UIController.developerComponent.sendSyncToClient(response, client.clientID));
 
@@ -273,6 +278,7 @@ public class ServerHandler implements ServerMessageHandler {
 				UIController.developerComponent.sendMessageToEveryone(highlightData);
 
 			} catch (InterruptedException e) {
+				
 				e.printStackTrace();
 			}
 
@@ -322,6 +328,7 @@ public class ServerHandler implements ServerMessageHandler {
 
 		}
 		}catch(Exception e) {
+			e.printStackTrace();
 			
 		}finally {
 			messageSem.release(); 
@@ -335,7 +342,6 @@ public class ServerHandler implements ServerMessageHandler {
 	@Override
 	public void onReady() {
 
-		// TODO check if this dialog blocks
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 				"The server is ready, other users can join your sesion now.");
 		UIController.developerComponent.saveAllFull();
@@ -368,7 +374,6 @@ public class ServerHandler implements ServerMessageHandler {
 	 */
 	@Override
 	public void onClientConnect(ClientInfo client) {
-		// TODO , MAYBE THIS SHOULD GO IN THE METHOD ABOVE
 
 		if (sync != null) {
 			sync.updateConnectCount(1);
@@ -401,7 +406,7 @@ public class ServerHandler implements ServerMessageHandler {
 	}
 
 	
-	public void decideRun(boolean decision , int invokerID ,String invokerName, GlobalRunRequestMessage sent) {
+	public void decideRun(boolean decision , int invokerID , GlobalRunRequestMessage sent) {
 
 		if(decision) {
 			  

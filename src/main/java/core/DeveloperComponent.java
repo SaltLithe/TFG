@@ -16,6 +16,7 @@ import java.util.concurrent.CountDownLatch;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import fileManagement.FILE_PROPERTIES;
 import fileManagement.FILE_TYPE;
 import fileManagement.FileManager;
 import fileManagement.WorkSpace;
@@ -663,7 +664,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 		String firsthalf = writingpath.replace(workSpace.getPath(), "");
 		firsthalf = firsthalf.substring(1, firsthalf.length());
 		firsthalf = firsthalf.substring(0, firsthalf.indexOf("\\"));
-		String projectpath = workSpace.getPath() + File.pathSeparator + firsthalf;
+		String projectpath = workSpace.getPath() + FILE_PROPERTIES.doubleSlash+ firsthalf;
 		fileManager.writeFolder(writingpath, property, false, writingname, projectpath);
 
 	}

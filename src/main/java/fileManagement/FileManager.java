@@ -3,7 +3,6 @@ package fileManagement;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -18,7 +17,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.FileUtils;
 
-import core.DEBUG;
 import network.ResponseCreateFileMessage;
 import network.WriteMessage;
 import userInterface.ObserverActions;
@@ -192,6 +190,9 @@ public class FileManager {
 			Object[] messageTwo = { path, project };
 
 			support.notify(ObserverActions.DELETE_CLASS_PATH, messageTwo);
+			
+			Object[] messageThree = {path};
+			support.notify(ObserverActions.CLOSE_TAB,messageThree);
 
 		} else {
 			Object[] message = { path };
@@ -280,16 +281,16 @@ public class FileManager {
 	 */
 	public void newProject(String name, WorkSpace workSpace, boolean includeHelpFolders, boolean updateEditor) {
 		// Create the project folder
-		String newpath = workSpace.getPath() + File.pathSeparator + name;
+		String newpath = workSpace.getPath() + FILE_PROPERTIES.doubleSlash + name;
 
 		writeFolder(newpath, FILE_TYPE.PROJECT_FOLDER, false, null, null);
 		// Write the help folders if needed
 		if (includeHelpFolders) {
-			String srcpath = newpath + File.pathSeparator + "src";
+			String srcpath = newpath + FILE_PROPERTIES.doubleSlash + "src";
 
 			writeFolder(srcpath, FILE_TYPE.SRC_FOLDER, false, null, null);
 
-			String binpath = newpath + File.pathSeparator + "bin";
+			String binpath = newpath + FILE_PROPERTIES.doubleSlash + "bin";
 
 			writeFolder(binpath, FILE_TYPE.BIN_FOLDER, false, null, null);
 		}
@@ -507,7 +508,7 @@ public class FileManager {
 		if (!editorFiles.keySet().contains(editingpath)) {
 
 			File f = new File(editingpath);
-			if (f != null) {
+			if (f.exists()) {
 
 				String contents = null;
 				try {
@@ -584,8 +585,8 @@ public class FileManager {
 	 * @return the string declaring the class
 	 */
 	private String returnBase(String name) {
-		String base = "public class " + name + "{" + System.lineSeparator() + "} ";
-		return base;
+	
+		return "public class " + name + "{" + System.lineSeparator() + "} ";
 	}
 
 	/**
@@ -608,6 +609,7 @@ public class FileManager {
 				}
 
 			}
+			
 			file.delete();
 		}
 
@@ -622,9 +624,9 @@ public class FileManager {
 	 */
 	private String returnMain(String name) {
 
-		String base = "public class " + name + "{" + System.lineSeparator() + "public static void main(String[] args) {"
+		return "public class " + name + "{" + System.lineSeparator() + "public static void main(String[] args) {"
 				+ System.lineSeparator() + "}" + System.lineSeparator() + "} ";
-		return base;
+		
 	}
 
 	/**
@@ -634,21 +636,28 @@ public class FileManager {
 	 * @return
 	 */
 	private String typeOfExtension(String path) {
-		String extension = null;
+		String extensionType = null;
 		try {
-			extension = path.substring(path.lastIndexOf(".") + 1);
+			extensionType = path.substring(path.lastIndexOf(".") + 1);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		switch (extension) {
+		if (extensionType != null) {
+		switch (extensionType) {
 		case "java":
 			return FILE_TYPE.JAVA_FILE.toString();
 
 		case "class":
 			return FILE_TYPE.CLASS_FILE.toString();
-
+		
+			
 		default:
 			return FILE_TYPE.ANY_FILE.toString();
 
+		}
+		}
+		else {
+			return FILE_TYPE.ANY_FILE.toString();
 		}
 	}
 
@@ -674,6 +683,7 @@ public class FileManager {
 			try {
 				readBuffer = ByteBuffer.allocate(view.size(FILE_PROPERTIES.properties[count]));
 			} catch (IOException e) {
+				
 			}
 			try {
 				view.read(FILE_PROPERTIES.properties[count], readBuffer);
@@ -682,20 +692,22 @@ public class FileManager {
 
 			try {
 				// Read metadata and return the corresponding value
+				
 				readBuffer.flip();
-				final String valueFromAttributes = new String(readBuffer.array(), "UTF-8");
+				
+				final String valueFromAttributes = new String(readBuffer.array(), StandardCharsets.UTF_8);
 				if (valueFromAttributes.equals(FILE_PROPERTIES.properties[count])) {
 					switch (FILE_PROPERTIES.properties[count]) {
 
 					case FILE_PROPERTIES.projectProperty:
-						returning = FILE_PROPERTIES.projectProperty.toString();
+						returning = FILE_PROPERTIES.projectProperty;
 						break;
 					case FILE_PROPERTIES.srcProperty:
-						returning = FILE_PROPERTIES.srcProperty.toString();
+						returning = FILE_PROPERTIES.srcProperty;
 
 						break;
 					case FILE_PROPERTIES.binProperty:
-						returning = FILE_PROPERTIES.binProperty.toString();
+						returning = FILE_PROPERTIES.binProperty;
 
 						break;
 					default:
@@ -706,6 +718,7 @@ public class FileManager {
 				} else {
 					count++;
 				}
+			
 			} catch (Exception e) {
 				count++;
 			}
@@ -769,7 +782,6 @@ public class FileManager {
 					try {
 						encoded = Files.readAllBytes(Paths.get(currentpath));
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					String contents = new String(encoded, StandardCharsets.UTF_8);

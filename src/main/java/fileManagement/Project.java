@@ -1,13 +1,6 @@
 package fileManagement;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.UserDefinedFileAttributeView;
 
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
@@ -23,7 +16,6 @@ public class Project {
 
 	private File dir;
 	private PropertyChangeMessenger support;
-	private final String srcFolderProperty = FILE_PROPERTIES.srcProperty;
 	private String fullPath;
 	private String name;
 
@@ -95,39 +87,6 @@ public class Project {
 		this.name = name;
 	}
 
-//TODO do we use this? 
-	private void scanProject() {
-		File path = new File(fullPath);
 
-		File[] files;
-
-		files = path.listFiles();
-		for (File dir : files) {
-			final Path file = Paths.get(dir.getAbsolutePath());
-			final UserDefinedFileAttributeView view = Files.getFileAttributeView(file,
-					UserDefinedFileAttributeView.class);
-			ByteBuffer readBuffer = null;
-			try {
-				readBuffer = ByteBuffer.allocate(view.size(srcFolderProperty));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			try {
-				view.read(srcFolderProperty, readBuffer);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			readBuffer.flip();
-			try {
-				final String valueFromAttributes = new String(readBuffer.array(), "UTF-8");
-				if (valueFromAttributes.equals(this.srcFolderProperty)) {
-				}
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-
-		}
-
-	}
 
 }

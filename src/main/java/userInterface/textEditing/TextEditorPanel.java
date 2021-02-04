@@ -44,8 +44,8 @@ import userInterface.UIController;
 @SuppressWarnings("serial")
 public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
-	public ArrayBlockingQueue<WriteMessage> sendBuffer = new ArrayBlockingQueue<WriteMessage>(200);
-	public ArrayBlockingQueue<HighLightMessage> highlightBuffer = new ArrayBlockingQueue<HighLightMessage>(200);
+	public ArrayBlockingQueue<WriteMessage> sendBuffer = new ArrayBlockingQueue<>(200);
+	public ArrayBlockingQueue<HighLightMessage> highlightBuffer = new ArrayBlockingQueue<>(200);
 
 	private JTabbedPane tabPane;
 	private HashMap<String, TextEditorTab> tabCollection;
@@ -59,7 +59,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	public TextEditorPanel() {
 		propertyChangeMessenger = PropertyChangeMessenger.getInstance();
 
-		tabCollection = new HashMap<String, TextEditorTab>();
+		tabCollection = new HashMap<>();
 
 	
 		
@@ -124,6 +124,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 					updateContainer(tab.getProject(), tab.getPath());
 
 				} catch (Exception excp) {
+					excp.printStackTrace();
 				}
 			}
 
@@ -142,7 +143,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	 * 
 	 * @param name : The name of this tab
 	 */
-	public void CloseTab(String name) {
+	public void closeTab(String name) {
 		this.tabPane.remove(tabPane.indexOfComponent(tabCollection.get(name)));
 
 	}
@@ -180,13 +181,12 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	}
 
 	/**
-	 * Method used by a special thread that sends highlights to other users TODO
-	 * VERY IMPORTANT HOLY FUCK THIS SHOULD NOT BE A TREAD PER TAB YOU ONLY
-	 * REALISTICALLY EDIT ONE TAB AT A TIME ARE YOU CRAZY
+	 * Method used by a special thread that sends highlights to other users 
 	 */
 	public void sendHighlights() {
 
-		while (true) {
+		boolean loopAround = true;
+		while (loopAround) {
 			HighLightMessage message = null;
 
 			try {
@@ -194,7 +194,8 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 				message = highlightBuffer.take();
 
 			} catch (InterruptedException e) {
-
+				loopAround = false;
+				Thread.currentThread().interrupt();
 				e.printStackTrace();
 			}
 
@@ -203,6 +204,8 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			try {
 				Thread.sleep(sendDelay);
 			} catch (InterruptedException e) {
+				loopAround = false;
+				Thread.currentThread().interrupt();
 				e.printStackTrace();
 			}
 
@@ -210,17 +213,19 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	}
 
 	/**
-	 * Method used by a special thread that sends write updates to other users TODO
-	 * HOLY SHIT SAME AS ABOVE
+	 * Method used by a special thread that sends write updates to other users 
 	 */
 	public void sendMessages() {
 
-		while (true) {
+		boolean loopAround = true;
+		while (loopAround) {
 			WriteMessage message = null;
 			try {
 				message = sendBuffer.take();
 
 			} catch (InterruptedException e) {
+				loopAround = false;
+				Thread.currentThread().interrupt();
 				e.printStackTrace();
 			}
 			final WriteMessage finalMessage = message;
@@ -228,6 +233,8 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			try {
 				Thread.sleep(sendDelay);
 			} catch (InterruptedException e) {
+				loopAround = false;
+				Thread.currentThread().interrupt();
 				e.printStackTrace();
 			}
 		}
@@ -269,6 +276,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 				try {
 					color = (int) results.get(2);
 				} catch (Exception uwu) {
+					uwu.printStackTrace();
 				}
 				this.tabCollection.get(key).paintHighLight((int) results.get(0), (int) results.get(1), color,
 						(String) results.get(3));
@@ -312,6 +320,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			tabCollection.clear();
 
 			break;
+		
 
 		case SET_CHOSEN_NAME:
 			results = (ArrayList<Object>) evt.getNewValue();
@@ -346,7 +355,6 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	 */
 	private String findKeyFromPath(String editingpath) {
 
-		// TODO put a lock here
 		String similar = null;
 		for (String key : tabCollection.keySet()) {
 

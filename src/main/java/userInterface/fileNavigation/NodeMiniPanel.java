@@ -1,32 +1,20 @@
 package userInterface.fileNavigation;
 
-import javax.swing.JPanel;
-
-import core.DEBUG;
-import fileManagement.FILE_PROPERTIES;
-import fileManagement.FILE_TYPE;
-import fileManagement.Project;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
-import java.util.Optional;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JButton;
-import javax.swing.SwingConstants;
+import javax.swing.JPanel;
+
+import fileManagement.FILE_PROPERTIES;
+import fileManagement.FILE_TYPE;
 
 /**
  * UI class that contains a panel for the graphical part of the tree nodes This
@@ -101,14 +89,15 @@ public class NodeMiniPanel extends JPanel {
 	 * Support method used to get the extension from the nodes path
 	 * 
 	 * @param path : The path for this node
-	 * @return a String containing the extension TODO this method could go in a
-	 *         static class
+	 * @return a String containing the extension
+	 * 
 	 */
 	private String getExtension(String path) {
 		String returning = null;
 		try {
 			returning = path.substring(path.lastIndexOf(".") + 1);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return returning;
 	}
@@ -133,35 +122,39 @@ public class NodeMiniPanel extends JPanel {
 			try {
 				readBuffer = ByteBuffer.allocate(view.size(FILE_PROPERTIES.properties[count]));
 			} catch (IOException e) {
+
 			}
 			try {
 				view.read(FILE_PROPERTIES.properties[count], readBuffer);
 			} catch (IOException e) {
+
 			}
 
 			try {
-				readBuffer.flip();
-				final String valueFromAttributes = new String(readBuffer.array(), "UTF-8");
-				if (valueFromAttributes.equals(FILE_PROPERTIES.properties[count])) {
-					switch (FILE_PROPERTIES.properties[count]) {
+			
+					readBuffer.flip();
+					final String valueFromAttributes = new String(readBuffer.array(), StandardCharsets.UTF_8);
+					if (valueFromAttributes.equals(FILE_PROPERTIES.properties[count])) {
+						switch (FILE_PROPERTIES.properties[count]) {
 
-					case FILE_PROPERTIES.projectProperty:
-						returning = FILE_TYPE.PROJECT_FOLDER;
-						break;
-					case FILE_PROPERTIES.srcProperty:
-						returning = FILE_TYPE.SRC_FOLDER;
-						break;
-					case FILE_PROPERTIES.binProperty:
-						returning = FILE_TYPE.BIN_FOLDER;
-						break;
-					default:
-						break;
+						case FILE_PROPERTIES.projectProperty:
+							returning = FILE_TYPE.PROJECT_FOLDER;
+							break;
+						case FILE_PROPERTIES.srcProperty:
+							returning = FILE_TYPE.SRC_FOLDER;
+							break;
+						case FILE_PROPERTIES.binProperty:
+							returning = FILE_TYPE.BIN_FOLDER;
+							break;
+						default:
+							break;
 
+						}
+						success = true;
+					} else {
+						count++;
 					}
-					success = true;
-				} else {
-					count++;
-				}
+				
 			} catch (Exception e) {
 				count++;
 			}

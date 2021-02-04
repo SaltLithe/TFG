@@ -12,6 +12,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import network.ClientHandler;
@@ -52,7 +53,7 @@ public class AcceptGlobalDialog extends JDialog {
 	
 	public void construct() {
 		
-		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -79,7 +80,7 @@ public class AcceptGlobalDialog extends JDialog {
 						clientParent.decideRun(true);
 					
 						}else {
-							serverParent.decideRun(true, invokerID, invokerName, request);
+							serverParent.decideRun(true, invokerID,  request);
 						}
 						
 						dispose();
@@ -101,7 +102,7 @@ public class AcceptGlobalDialog extends JDialog {
 						clientParent.decideRun(false);
 						}
 						else {
-							serverParent.decideRun(false , invokerID , invokerName, request);
+							serverParent.decideRun(false , invokerID ,request);
 						}
 						dispose(); 
 						

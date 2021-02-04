@@ -6,7 +6,6 @@ package fileManagement;
  * @author Carmen Gómez Moreno
  *
  */
-//TODO you dont need this but are you going to refactor the code? nope
 public enum FileType {
 	CLASS, SCRIPT
 }

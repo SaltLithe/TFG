@@ -14,19 +14,16 @@ import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import network.ClientHandler;
 import network.RequestWorkspaceMessage;
 import userInterface.DeveloperMainFrameWrapper;
 import userInterface.UIController;
-
-import java.awt.Dialog.ModalityType;
-import java.awt.Dialog.ModalExclusionType;
 
 @SuppressWarnings("serial")
 /**
@@ -161,7 +158,7 @@ public class acceptSyncDialog extends JDialog {
 			}
 		}
 
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {

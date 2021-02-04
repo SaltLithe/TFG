@@ -242,6 +242,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 			break;
 		case ENABLE_NEW_PROJECT:
 			newProjectButton.setEnabled(true);
+			break; 
 
 		default:
 			break;

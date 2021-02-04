@@ -12,10 +12,10 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import core.CustomRunConfigSelector;
@@ -46,7 +46,7 @@ public class RunConfigDialog extends JDialog {
 	public RunConfigDialog(URLData[] classes, boolean global) {
 		setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		selectorCollection = new HashMap<String, CustomRunConfigSelector>();
+		selectorCollection = new HashMap<>();
 		lastSelected = null;
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
@@ -129,7 +129,7 @@ public class RunConfigDialog extends JDialog {
 
 		if (global) {
 			DEBUG.debugmessage("THIS IS A GLOBAL VERSION");
-			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+			setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
 			ApplyButton.setEnabled(false);
 			CancelButton.setEnabled(false);

@@ -71,11 +71,11 @@ public class ClientHandler implements ClientMessageHandler {
 
 		
 		messageSem = new Semaphore(1);
-		images = new HashMap<String, ImageDataMessage>();
-		colorData = new HashMap<String, Integer>();
+		images = new HashMap<>();
+		colorData = new HashMap<>();
 		
 
-		otherClients = new LinkedList<ImageDataMessage>();
+		otherClients = new LinkedList<>();
 		this.chosenImage = imageByteData;
 		this.chosenColor = chosenColor;
 		this.chosenName = chosenName;
@@ -93,13 +93,16 @@ public class ClientHandler implements ClientMessageHandler {
 	 */
 	public void processMessage() {
 
-		while (true) {
+		boolean loopAround = true;
+		while (loopAround) {
 			WriteMessage incoming = null;
 			try {
 				
 				
 				incoming = processBuffer.take();
 			} catch (InterruptedException e) {
+				loopAround = false;
+				Thread.currentThread().interrupt();
 				e.printStackTrace();
 			}
 
@@ -116,11 +119,14 @@ public class ClientHandler implements ClientMessageHandler {
 	 */
 	public void processHighLights() {
 
-		while (true) {
+		boolean loopAround = true; 
+		while (loopAround) {
 			HighLightMessage incoming = null;
 			try {
 				incoming = highlightBuffer.take();
 			} catch (InterruptedException e) {
+				loopAround = false;
+				Thread.currentThread().interrupt();
 				e.printStackTrace();
 			}
 			DEBUG.debugmessage("Message name is " + incoming.name);
@@ -138,12 +144,15 @@ public class ClientHandler implements ClientMessageHandler {
 	}
 	
 	public void processConsole() {
-		while(true) {
+		boolean loopAround = true ;
+		while(loopAround) {
 		WriteToConsoleMessage incoming = null;
 		
 		try {
 			incoming = consoleBuffer.take();
 		}catch(InterruptedException e) {
+			loopAround = false;
+			Thread.currentThread();
 			e.printStackTrace();
 		}
 		
@@ -216,7 +225,7 @@ public class ClientHandler implements ClientMessageHandler {
 
 			// Behaviour changes if this message is indicating that the client should create
 			// a workspace
-			if (responseCreateFile.type.equals(FILE_PROPERTIES.workspaceProperty.toString())) {
+			if (responseCreateFile.type.equals(FILE_PROPERTIES.workspaceProperty)) {
 
 				ResponseCreateFileMessage response = (ResponseCreateFileMessage) message;
 				// Here the client checks if the server has sent a new name it should change
@@ -235,17 +244,16 @@ public class ClientHandler implements ClientMessageHandler {
 			// If this message does not have to create a workspace , it checks now for the
 			// rest of the file types
 			// the user can create
-			// TODO , PUT THIS IN A QUEUE GOD DAMN IT
 
-			else if (responseCreateFile.type.equals(FILE_PROPERTIES.projectProperty.toString())) {
+			else if (responseCreateFile.type.equals(FILE_PROPERTIES.projectProperty)) {
 				String name = responseCreateFile.path.substring(responseCreateFile.path.lastIndexOf("\\"),
 						responseCreateFile.path.length());
 				UIController.developerComponent.createNewProject(name, false, false);
 			}
 
-			else if (responseCreateFile.type.equals(FILE_PROPERTIES.srcProperty.toString())) {
+			else if (responseCreateFile.type.equals(FILE_PROPERTIES.srcProperty)) {
 				UIController.developerComponent.writeFolder(responseCreateFile.path, FILE_TYPE.SRC_FOLDER);
-			} else if (responseCreateFile.type.equals(FILE_PROPERTIES.binProperty.toString())) {
+			} else if (responseCreateFile.type.equals(FILE_PROPERTIES.binProperty)) {
 				UIController.developerComponent.writeFolder(responseCreateFile.path, FILE_TYPE.BIN_FOLDER);
 
 			}
@@ -308,11 +316,11 @@ public class ClientHandler implements ClientMessageHandler {
 		case "class network.GlobalRunRequestMessage":
 			
 			GlobalRunRequestMessage requestMessage = (GlobalRunRequestMessage) message;
-			if(!(requestMessage.name.equals(chosenName))) {
-			if(!blocked) {
+			if(!(requestMessage.name.equals(chosenName)) && !blocked) {
+			
 			disableAll();
 			new AcceptGlobalDialog(requestMessage.name, this);
-			}
+			
 			}
 			break;
 		case "class network.WriteToConsoleMessage":
@@ -359,7 +367,7 @@ public class ClientHandler implements ClientMessageHandler {
 			break;
 		}
 		}catch(Exception e) {
-			
+			e.printStackTrace();
 		}finally {
 			messageSem.release(); 
 		}
@@ -385,7 +393,7 @@ public class ClientHandler implements ClientMessageHandler {
 
 	@Override
 	public void onConnect() {
-
+		//We dont need to implement this method this time
 	}
 
 	/**
