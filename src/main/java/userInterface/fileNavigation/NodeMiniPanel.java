@@ -49,7 +49,7 @@ public class NodeMiniPanel extends JPanel {
 	public NodeMiniPanel(String name, Boolean hasFocus, Boolean sel, Boolean leaf, String path) {
 
 		FILE_TYPE type = getFolderType(path);
-		String iconpath = "Icons/";
+		String iconpath = "/resources/images/";
 
 		switch (type) {
 		case PROJECT_FOLDER:
@@ -86,7 +86,7 @@ public class NodeMiniPanel extends JPanel {
 
 		}
 
-		ImageIcon icon = new ImageIcon(iconpath);
+		ImageIcon icon = new ImageIcon(NodeMiniPanel.class.getResource(iconpath));
 		JLabel iconLabel = new JLabel(icon);
 		JLabel nameLabel = new JLabel(name);
 		add(iconLabel);

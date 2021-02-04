@@ -21,6 +21,8 @@ import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
 import userInterface.UIController;
 
+import javax.swing.ImageIcon;
+
 /**
  * Ui class that contains functionality to join and disconnect from sessions as
  * well as a list rendering the users connected a session represented with
@@ -55,12 +57,13 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 		panel.add(toolBar);
 
 		joinSessionButton = new JButton("Join");
+		joinSessionButton.setIcon(new ImageIcon(UsersPanel.class.getResource("/resources/images/joinSession_Icon.png")));
 		joinSessionButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				new joinSessionDialog();
+				new JoinSessionDialog();
 			}
 
 		});
@@ -68,6 +71,7 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 		toolBar.add(joinSessionButton);
 		
 		createSessionButton = new JButton("Create");
+		createSessionButton.setIcon(new ImageIcon(UsersPanel.class.getResource("/resources/images/createSession_Icon.png")));
 		toolBar.add(createSessionButton);
 		createSessionButton.addActionListener(new ActionListener() {
 			
@@ -82,7 +86,7 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 						    "No Workspace error",
 						    JOptionPane.ERROR_MESSAGE);
 				}else {
-					new createSessionDialog(); 
+					new CreateSessionDialog(); 
 
 				}
 			}
@@ -90,6 +94,7 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 		});
 
 		disconnectButton = new JButton("Disconnect");
+		disconnectButton.setIcon(new ImageIcon(UsersPanel.class.getResource("/resources/images/disconnect_Icon.png")));
 	
 		toolBar.add(disconnectButton);
 		disconnectButton.setEnabled(false);

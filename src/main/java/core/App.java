@@ -1,7 +1,5 @@
 package core;
 
-import java.net.UnknownHostException;
-
 import userInterface.fileNavigation.workSpaceSelect;
 
 /**
@@ -11,7 +9,7 @@ import userInterface.fileNavigation.workSpaceSelect;
  */
 public class App {
 
-	public static void main(String[] args) throws UnknownHostException {
+	public static void main(String[] args) {
 
 
 		new workSpaceSelect();

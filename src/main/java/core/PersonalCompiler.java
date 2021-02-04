@@ -134,9 +134,9 @@ public class PersonalCompiler implements PropertyChangeListener {
 			compiling = new String[copied.length];
 			DEBUG.setExecuting();
 			// Divert the standard streams
-			System.setOut(console.outPrint);
-			System.setErr(console.errPrint);
-			System.setIn(console.inStream);
+			System.setOut(console.getOutPrint());
+			System.setErr(console.getErrPrint());
+			System.setIn(console.getInStream());
 			boolean cantcompile = false;
 
 			// Fill this array

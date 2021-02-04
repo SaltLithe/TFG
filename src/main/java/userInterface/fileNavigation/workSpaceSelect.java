@@ -29,7 +29,7 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import core.DEBUG;
 import fileManagement.WorkSpace;
 import fileManagement.WorkSpaceManager;
-import fileManagement.customWorkSpaceElement;
+import fileManagement.CustomWorkSpaceElement;
 import userInterface.fileEditing.AddWorkSpaceDialog;
 
 @SuppressWarnings("serial")
@@ -179,7 +179,7 @@ public class workSpaceSelect extends JFrame {
 		if (ws != null) {
 			for (int i = 0; i < ws.size(); i++) {
 				WorkSpace workspace = ws.get(i);
-				customWorkSpaceElement cwse = new customWorkSpaceElement(workspace.getName(), workspace.getPath(),
+				CustomWorkSpaceElement cwse = new CustomWorkSpaceElement(workspace.getName(), workspace.getPath(),
 						this);
 				cwse.tempID = i;
 				cwse.setAlignmentY(Component.TOP_ALIGNMENT);

@@ -49,18 +49,7 @@ public class UIController {
 		return developerComponent;
 	}
 
-	//TODO remove error catcher
-	/**
-	 * Method that runs a lambda expression
-	 * @param command The lambda expression to run 
-	 */
-	public static void run(Runnable command , int errorcatcher) {
 	
-		
-		command.run();
-
-	}
-	//TODO remove error catcher
 	/**
 	 * Method that runs a lambda expression on a new thread
 	 * @param command The lambda expression to run 

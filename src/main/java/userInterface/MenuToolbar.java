@@ -55,31 +55,31 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 		// Prepare all of the buttons
 		save = new JButton("Save");
-		save.setIcon(new ImageIcon("Icons\\save_icon.png"));
+		save.setIcon(new ImageIcon(MenuToolbar.class.getResource("/resources/images/save_icon.png")));
 		toolBar.add(save);
 
 		saveAll = new JButton("Save All");
-		saveAll.setIcon(new ImageIcon("Icons\\saveAll_icon.png"));
+		saveAll.setIcon(new ImageIcon(MenuToolbar.class.getResource("/resources/images/saveAll_icon.png")));
 		toolBar.add(saveAll);
 
 		runLocalButton = new JButton("Run Locally");
-		runLocalButton.setIcon(new ImageIcon("Icons\\runLocal_icon.png"));
+		runLocalButton.setIcon(new ImageIcon(MenuToolbar.class.getResource("/resources/images/runLocal_icon.png")));
 		toolBar.add(runLocalButton);
 
 		runGlobalButton = new JButton("Run Globally");
-		runGlobalButton.setIcon(new ImageIcon("Icons\\runGlobal_icon.png"));
+		runGlobalButton.setIcon(new ImageIcon(MenuToolbar.class.getResource("/resources/images/runGlobal_icon.png")));
 		toolBar.add(runGlobalButton);
 
 		terminateProcessButton = new JButton("Terminate Run");
-		terminateProcessButton.setIcon(new ImageIcon("Icons\\terminateProcess_icon.png"));
+		terminateProcessButton.setIcon(new ImageIcon(MenuToolbar.class.getResource("/resources/images/terminateProcess_icon.png")));
 		toolBar.add(terminateProcessButton);
 
 		runConfigButton = new JButton("Run configuration");
-		runConfigButton.setIcon(new ImageIcon("Icons\\runConfig_icon.png"));
+		runConfigButton.setIcon(new ImageIcon(MenuToolbar.class.getResource("/resources/images/runConfig_icon.png")));
 		toolBar.add(runConfigButton);
 
 		newProjectButton = new JButton("Add Project");
-		newProjectButton.setIcon(new ImageIcon("Icons\\projectFolder_icon.png"));
+		newProjectButton.setIcon(new ImageIcon(MenuToolbar.class.getResource("/resources/images/projectFolder_icon.png")));
 		toolBar.add(newProjectButton);
 
 		newProjectButton.addActionListener(new ActionListener() {
@@ -355,12 +355,9 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 		String[] names = textEditorContainer.getAllNames();
 		if (names.length != 0 && contents.length != 0) {
 
-			try {
+		
 				UIController.developerComponent.saveAllFiles(names, contents);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
+		
 		}
 	}
 }

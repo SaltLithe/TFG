@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Semaphore;
 
 import userInterface.ObserverActions;
@@ -48,7 +48,7 @@ public class InStreamWrapper extends InputStream {
 	 */
 	protected void setLastRead(String lastRead) {
 
-		input = new ByteArrayInputStream(lastRead.getBytes(Charset.forName("UTF-8")));
+		input = new ByteArrayInputStream(lastRead.getBytes(StandardCharsets.UTF_8));
 
 	}
 
@@ -84,6 +84,7 @@ public class InStreamWrapper extends InputStream {
 
 			System.setOut(stdout);
 			System.setErr(stderr);
+			Thread.currentThread().interrupt();
 			e.printStackTrace();
 		}
 
@@ -110,8 +111,7 @@ public class InStreamWrapper extends InputStream {
 
 		console.support.notify(ObserverActions.ENABLE_CONSOLE_PANEL, null);
 		console.support.notify(ObserverActions.ENABLE_READING_LISTENER, null);
-		int nread = input.read();
-		return nread;
+		return  input.read();
 
 	}
 

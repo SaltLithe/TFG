@@ -5,9 +5,15 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JOptionPane;
+
+import com.google.common.util.concurrent.MoreExecutors;
 
 import core.DEBUG;
 import fileManagement.FILE_PROPERTIES;
@@ -47,6 +53,11 @@ public class ClientHandler implements ClientMessageHandler {
 	private HashMap<String, ImageDataMessage> images;
 	public boolean blocked = false; 
 	private Semaphore messageSem; 
+	
+	
+	
+	ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(3);
+	ExecutorService executorService = MoreExecutors.getExitingExecutorService(executor, 100, TimeUnit.MILLISECONDS);
     
 
 	/**
@@ -69,9 +80,11 @@ public class ClientHandler implements ClientMessageHandler {
 		this.chosenColor = chosenColor;
 		this.chosenName = chosenName;
 		support = PropertyChangeMessenger.getInstance();
-		new Thread(() -> processMessage()).start();
-		new Thread(() -> processHighLights()).start();
-		new Thread(()-> processConsole()).start(); 
+		
+		executorService.submit(() -> processMessage());
+		executorService.submit(() -> processHighLights());
+	
+		executorService.submit(()->this.processConsole());
 
 	}
 
@@ -210,7 +223,7 @@ public class ClientHandler implements ClientMessageHandler {
 				// it's name to
 				if (response.newname != null) {
 					chosenName = response.newname;
-					UIController.developerComponent.changeUserName();
+					
 					unFlag = true;
 
 				}
@@ -423,12 +436,15 @@ public class ClientHandler implements ClientMessageHandler {
 	 * progress
 	 */
 	public void startAwaitSync() {
-//TODO CHECK IF THIS BLOCKS OR NOT
 		sync = new awaitSyncDialog();
 	}
 
 
 
+	/**
+	 * Called in order to send responses to the server when asked permission to run the process globally
+	 * @param decision
+	 */
 	public void decideRun(boolean decision) {
 		if(!decision) {
 			activateAll();
@@ -440,7 +456,18 @@ public class ClientHandler implements ClientMessageHandler {
 		
 
 	}
+	/**
+	 * Turns off the threads that process messages 
+	 */
+	public void shutdownProcessors() {
+
+		executorService.shutdown();
+		
+	}
 	
+	/**
+	 * Returns functionality to edition in this program
+	 */
 	private void activateAll() {
 		blocked = false; 
 		support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);
@@ -448,9 +475,14 @@ public class ClientHandler implements ClientMessageHandler {
 		support.notify(ObserverActions.ENABLE_SAVE_BUTTONS,null);
 	}
 	
+	/**
+	 * Disables functionality to edition in this program
+	 */
 	private void disableAll() {
 		support.notify(ObserverActions.DISABLE_TEXT_EDITOR,null);
 		support.notify(ObserverActions.DISABLE_GLOBAL_RUN,null);
 		support.notify(ObserverActions.DISABLE_SAVE_BUTTONS,null);
 	}
+
+
 }

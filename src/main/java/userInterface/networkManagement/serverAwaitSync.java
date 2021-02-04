@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import core.DEBUG;
 import network.ServerHandler;
 import userInterface.UIController;
+
 import java.awt.Dialog.ModalityType;
 import java.awt.Dialog.ModalExclusionType;
 

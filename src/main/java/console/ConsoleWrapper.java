@@ -19,12 +19,12 @@ import userInterface.UIController;
  */
 public class ConsoleWrapper {
 
-	public PropertyChangeMessenger support;
-	public InStreamWrapper inStream;
-	public OutStreamWrapper outStream;
-	public OutStreamWrapper errStream;
-	public PrintStream outPrint;
-	public PrintStream errPrint;
+	PropertyChangeMessenger support;
+	private InStreamWrapper inStream;
+	private OutStreamWrapper outStream;
+	private OutStreamWrapper errStream;
+	private PrintStream outPrint;
+	private PrintStream errPrint;
 
 	PrintStream stdout;
 	PrintStream stderr;
@@ -37,10 +37,10 @@ public class ConsoleWrapper {
 		stderr = System.err;
 
 		support = PropertyChangeMessenger.getInstance();
-		inStream = new InStreamWrapper(this);
+		setInStream(new InStreamWrapper(this));
 
-		outPrint = new OutStreamWrapper(this);
-		errPrint = new OutStreamWrapper(this);
+		setOutPrint(new OutStreamWrapper(this));
+		setErrPrint(new OutStreamWrapper(this));
 		
 		
 	}
@@ -50,9 +50,9 @@ public class ConsoleWrapper {
 	 */
 	public void reset() {
 
-		inStream = new InStreamWrapper(this);
-		outPrint = new OutStreamWrapper(this);
-		errPrint = new OutStreamWrapper(this);
+		setInStream(new InStreamWrapper(this));
+		setOutPrint(new OutStreamWrapper(this));
+		setErrPrint(new OutStreamWrapper(this));
 
 	}
 
@@ -62,7 +62,7 @@ public class ConsoleWrapper {
 	 */
 	public void releaseSemaphore() {
 
-		inStream.releaseSemaphore();
+		getInStream().releaseSemaphore();
 
 	}
 
@@ -75,7 +75,7 @@ public class ConsoleWrapper {
 	 */
 	public void setLastRead(String lastread) {
 
-		inStream.setLastRead(lastread);
+		getInStream().setLastRead(lastread);
 
 	}
 
@@ -98,11 +98,52 @@ public class ConsoleWrapper {
 			try {
 				UIController.developerComponent.consoleBuffer.put(out);
 			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 				e.printStackTrace();
 			}
 	
 		
 
+	}
+
+	public OutStreamWrapper getErrStream() {
+		return errStream;
+	}
+
+	public void setErrStream(OutStreamWrapper errStream) {
+		this.errStream = errStream;
+	}
+
+	public OutStreamWrapper getOutStream() {
+		return outStream;
+	}
+
+	public void setOutStream(OutStreamWrapper outStream) {
+		this.outStream = outStream;
+	}
+
+	public PrintStream getOutPrint() {
+		return outPrint;
+	}
+
+	public void setOutPrint(PrintStream outPrint) {
+		this.outPrint = outPrint;
+	}
+
+	public PrintStream getErrPrint() {
+		return errPrint;
+	}
+
+	public void setErrPrint(PrintStream errPrint) {
+		this.errPrint = errPrint;
+	}
+
+	public InStreamWrapper getInStream() {
+		return inStream;
+	}
+
+	public void setInStream(InStreamWrapper inStream) {
+		this.inStream = inStream;
 	}
 
 

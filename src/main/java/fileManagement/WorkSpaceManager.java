@@ -1,8 +1,10 @@
 package fileManagement;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -11,6 +13,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
+
+import org.apache.commons.io.FileUtils;
+
 import core.DeveloperComponent;
 
 /**
@@ -138,8 +143,11 @@ public class WorkSpaceManager {
 		}
 
 		try {
-			ws = (WorkSpaces) jaxbUnmarshaller.unmarshal(new File("src/main/resources/WorkSpaces.xml"));
-		} catch (JAXBException e) {
+		InputStream wsStream = WorkSpaceManager.class.getResourceAsStream("/resources/workspaces/WorkSpaces.xml");
+		File tempWS = new File("src/main/resources/workSpaces.tmp");
+	    FileUtils.copyInputStreamToFile(wsStream, tempWS);
+			ws = (WorkSpaces) jaxbUnmarshaller.unmarshal(tempWS);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

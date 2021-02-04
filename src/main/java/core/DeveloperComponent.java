@@ -34,7 +34,7 @@ import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
 import userInterface.PropertyChangeMessenger;
 import userInterface.UIController;
-import userInterface.runConfigDialog;
+import userInterface.RunConfigDialog;
 import userInterface.fileNavigation.CustomTreeNode;
 
 public class DeveloperComponent implements PropertyChangeListener {
@@ -54,16 +54,16 @@ public class DeveloperComponent implements PropertyChangeListener {
 	// class
 	public HashMap<String, String> projectFocusPairs;
 	public CountDownLatch waitingResponses;
-	public ArrayBlockingQueue<String> consoleBuffer = new ArrayBlockingQueue<String>(100);
+	public ArrayBlockingQueue<String> consoleBuffer = new ArrayBlockingQueue<>(100);
 	LinkedList<ResponseCreateFileMessage> responses = null;
 	private PersonalCompiler compiler;
 	private FileManager fileManager;
 	private PropertyChangeMessenger support;
 	private int defaultQueueSize = 100;
 	private ServerHandler handler;
-	private ClientHandler clientHandler; 
+	private ClientHandler clientHandler;
 	// The workspace the user chose
-	public WorkSpace workSpace = null; 
+	public WorkSpace workSpace = null;
 	// Structure that saves classpaths and uses projects as its keys
 	private HashMap<String, ClassPath> classpaths;
 	private String separator = "pairLeap.codeString";
@@ -78,8 +78,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 		support = PropertyChangeMessenger.getInstance();
 		this.workSpace = workSpace;
 
-		projectFocusPairs = new HashMap<String, String>();
-		classpaths = new HashMap<String, ClassPath>();
+		projectFocusPairs = new HashMap<>();
+		classpaths = new HashMap<>();
 		fileManager = new FileManager();
 		compiler = new PersonalCompiler();
 
@@ -93,6 +93,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 			e.printStackTrace();
 		}
 
@@ -136,16 +137,14 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * @param serverAddress : The address the server is open at
 	 * @param ownAddress    : Your own ip address the server will connect back to
 	 * @param serverPort    : The port the server is open at
-	 * @param autoConnect   : A boolean that I will TODO REMOVE THIS SERVER STARTS
-	 *                      ON DEFAULT
 	 * @param chosenName    : The username of this client
 	 * @param imageByteData : The data of the profile picture chosen by the user
 	 * @param chosenColor   : The Color object representing the color that the user
 	 *                      chose
 	 */
-	public void setAsClient(String serverAddress, String ownAddress, int serverPort, boolean autoConnect,
-			String chosenName, String imageByteData, Color chosenColor) {
-		support.notify(ObserverActions.DISABLE_RUN_CONFIG,null);
+	public void setAsClient(String serverAddress, String ownAddress, int serverPort, String chosenName,
+			String imageByteData, Color chosenColor) {
+		support.notify(ObserverActions.DISABLE_RUN_CONFIG, null);
 		this.chosenName = chosenName;
 
 		clientHandler = new ClientHandler(chosenName, imageByteData, chosenColor);
@@ -165,7 +164,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		support.notify(ObserverActions.ENABLE_DISCONNECT_BUTTON,null);
+		support.notify(ObserverActions.ENABLE_DISCONNECT_BUTTON, null);
 
 		setNewName(chosenName);
 	}
@@ -178,18 +177,17 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * @param port          : The port this server will listen at
 	 * @param queueSize     : The size of the queue the server uses to process
 	 *                      messages
-	 * @param autoConnect   : TODO remove this
 	 * @param imageByteData : The data of the profile picture chosen by the user
 	 * @param chosenColor   : The Color object representing the color that the user
 	 *                      chose
 	 */
-	public void setAsServer(String name, String ip, int maxClients, int port, int queueSize, boolean autoConnect,
-			String imageByteData, Color chosenColor) {
+	public void setAsServer(String name, String ip, int maxClients, int port, int queueSize, String imageByteData,
+			Color chosenColor) {
 
 		waitingResponses = new CountDownLatch(maxClients);
 		chosenName = name;
 
-		responses = fileManager.scanAndReturn(workSpace.getPath(), workSpace.getName());
+		responses = (LinkedList<ResponseCreateFileMessage>) fileManager.scanAndReturn(workSpace.getPath(), workSpace.getName());
 		handler = new ServerHandler(name, maxClients, imageByteData, chosenColor);
 		if (queueSize == -1) {
 			queueSize = defaultQueueSize;
@@ -204,7 +202,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 		support.notify(ObserverActions.DISABLE_JOIN_BUTTON, null);
 		server.Start();
 		isConnected = true;
-		support.notify(ObserverActions.ENABLE_DISCONNECT_BUTTON,null);
+		support.notify(ObserverActions.ENABLE_DISCONNECT_BUTTON, null);
 
 		setNewName(name);
 
@@ -263,7 +261,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	public void createNewClassFile(String name, String path, String project, boolean isMain) {
 
 		// Create the class file in the system
-		fileManager.createClassFile(name, path, project, true, isMain);
+		fileManager.createClassFile(name, path, project, isMain);
 		// Compose the path of the file where the filemanager added it
 		String adding = path + "\\" + name + ".java";
 		// Add the class file to the classpath for its project
@@ -291,27 +289,25 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * the fileManager The filemanager will notify the gui with a message containing
 	 * the contents of the file to open
 	 *
-	 * @param name     : Name of the file to open
-	 * @param path     : Path of the file to pen
-	 * @param contents : TODO check if this is necessary , not necessary
-	 * @param project  : Project the file belongs to
+	 * @param name    : Name of the file to open
+	 * @param path    : Path of the file to pen
+	 * @param project : Project the file belongs to
 	 * @return : not necessary
 	 */
-	public String openFile(String name, String path, String contents, String project) {
+	public String openFile(String name, String path, String project) {
 
-		return fileManager.openTextFile(name, path, contents, project);
+		return fileManager.openTextFile(name, path, project);
 
 	}
 
 	/**
 	 * Method used to save all of the files that are opened in the editor
 	 * 
-	 * @param names    : Array containing the paths of the files to saveTODO check
-	 *                 if they are names of paths
+	 * @param names    : Array containing the paths of the files to save
 	 * @param contents : Array containing the contents of the files to be saved
 	 * @throws IOException
 	 */
-	public void saveAllFiles(String[] names, String[] contents) throws IOException {
+	public void saveAllFiles(String[] names, String[] contents) {
 
 		fileManager.saveAllOpen(names, contents);
 
@@ -446,8 +442,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	/**
 	 * Method used to delete a file or folder from the file system
 	 * 
-	 * @param name     : Name of the file to be deleted TODO is this a name or a
-	 *                 path?
+	 * @param name     : Name of the file to be deleted
 	 * @param path     : Path of the file to be deleted
 	 * @param isFolder : Flag to tell the fileManager if we are deleting a file or a
 	 *                 folder , the deletion process has to behave differently
@@ -476,11 +471,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 *             a main class
 	 */
 	public void updateFocusedPair(String name) {
-		try {
-			projectFocusPairs.put(this.focusedProject, name);
-		} catch (Exception e) {
 
-		}
+		projectFocusPairs.put(this.focusedProject, name);
 
 	}
 
@@ -491,10 +483,9 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	@SuppressWarnings("deprecation")
 	public void terminateProcess() {
-		if (runningThread != null) {
-			if (runningThread.isAlive()) {
-				runningThread.stop();
-			}
+		if (runningThread != null && runningThread.isAlive()) {
+			runningThread.stop();
+
 		}
 
 	}
@@ -512,12 +503,12 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * running code The dialog won't open unless there is a focused project
 	 */
 	public void triggerRunConfig(boolean global) {
-		if (focusedProject == null || focusedProject == "" || !stillExists(focusedProject)) {
+		if (focusedProject == null || focusedProject.equals("") || !stillExists(focusedProject)) {
 
 			triggerNoProjectDialog();
 		} else {
 			DEBUG.debugmessage("DEBUGA UNO : " + global);
-			new runConfigDialog(this.classpaths.get(focusedProject).getClassPath(), global);
+			new RunConfigDialog(this.classpaths.get(focusedProject).getClassPath(), global);
 		}
 	}
 
@@ -576,20 +567,18 @@ public class DeveloperComponent implements PropertyChangeListener {
 			} else if (server != null) {
 				server.Stop();
 				server = null;
-				handler = null; 
+				handler = null;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		support.notify(ObserverActions.DISABLE_GLOBAL_RUN,null);
-		support.notify(ObserverActions.ENABLE_LOCAL_RUN,null);
-		support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);
-		support.notify(ObserverActions.ENABLE_SAVE_BUTTONS,null);
+		support.notify(ObserverActions.DISABLE_GLOBAL_RUN, null);
+		support.notify(ObserverActions.ENABLE_LOCAL_RUN, null);
+		support.notify(ObserverActions.ENABLE_TEXT_EDITOR, null);
+		support.notify(ObserverActions.ENABLE_SAVE_BUTTONS, null);
 		support.notify(ObserverActions.ENABLE_NEW_PROJECT, null);
-		support.notify(ObserverActions.ENABLE_JOIN_BUTTON,null);
-		support.notify(ObserverActions.DISABLE_DISCONNECT_BUTTON,null);
-
-		
+		support.notify(ObserverActions.ENABLE_JOIN_BUTTON, null);
+		support.notify(ObserverActions.DISABLE_DISCONNECT_BUTTON, null);
 
 	}
 
@@ -674,7 +663,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 		String firsthalf = writingpath.replace(workSpace.getPath(), "");
 		firsthalf = firsthalf.substring(1, firsthalf.length());
 		firsthalf = firsthalf.substring(0, firsthalf.indexOf("\\"));
-		String projectpath = workSpace.getPath() + "\\" + firsthalf;
+		String projectpath = workSpace.getPath() + File.pathSeparator + firsthalf;
 		fileManager.writeFolder(writingpath, property, false, writingname, projectpath);
 
 	}
@@ -704,11 +693,6 @@ public class DeveloperComponent implements PropertyChangeListener {
 
 	}
 
-	public void changeUserName() {
-		// TODO que cambie el nombre de usuario en el panel de users
-
-	}
-
 	/**
 	 * Method used by users acting as servers to prevent more clients from
 	 * connecting to the session
@@ -719,7 +703,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 
 			server.close();
 		}
-		
+
 	}
 
 	/**
@@ -760,7 +744,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	public void startRunGlobal(boolean countdown) {
 
-		if (focusedProject == null || focusedProject == "" || !stillExists(focusedProject)) {
+		if (focusedProject == null || focusedProject.equals("") || !stillExists(focusedProject)) {
 			triggerNoProjectDialog();
 		} else {
 
@@ -781,13 +765,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * @param popupDialog
 	 */
 	public void startLocalRunningThread() {
-		runningThread = new Thread(() -> {
-			try {
-				compileAndRun(false);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
+		runningThread = new Thread(() -> compileAndRun(false));
 		runningThread.start();
 	}
 
@@ -795,19 +773,14 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * Used by users acting as clients to request a global run from a server
 	 */
 	public void requestGlobalRun() {
-		clientHandler.blocked = true; 
+		clientHandler.blocked = true;
 		support.notify(ObserverActions.DISABLE_TEXT_EDITOR, null);
 		GlobalRunRequestMessage message = new GlobalRunRequestMessage(this.chosenName);
 		sendMessageToServer(message);
 	}
 
-	public void alertCancel() {
-		// TODO Auto-generated method stub
-
-	}
-
 	/**
-	 * Support method to check if a file still exists TODO is this a name or a path?
+	 * Support method to check if a file still exists
 	 * 
 	 * @param name : The name of the file to check
 	 * @return true if the file exists
@@ -859,8 +832,14 @@ public class DeveloperComponent implements PropertyChangeListener {
 			saveAllFull();
 			break;
 		case SAFETY_STOP:
+
+			if (server != null) {
+				handler.shutdownProcessors();
+			} else if (client != null) {
+				clientHandler.shutdownProcessors();
+			}
 			disconnect();
-			
+
 			break;
 		default:
 			break;
@@ -873,8 +852,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	private void sendConsoleMessages() {
 		String message = null;
-
-		while (true) {
+		boolean loopAround = true;
+		while (loopAround) {
 			try {
 				DEBUG.debugmessage("PROCESSING MESSAGE");
 				message = consoleBuffer.take();
@@ -883,6 +862,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 				Thread.sleep(50);
 
 			} catch (InterruptedException e) {
+				loopAround = false;
+				Thread.currentThread().interrupt();
 			}
 
 		}
@@ -901,9 +882,9 @@ public class DeveloperComponent implements PropertyChangeListener {
 				waitingResponses.await();
 			}
 			compileAndRun(true);
-		} catch (IOException e) {
-			e.printStackTrace();
+
 		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 			e.printStackTrace();
 		}
 
@@ -912,8 +893,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	/**
 	 * Method used by users acting as server to scan their workspace for files and
 	 * folders and send special messages that the clients will use to recreate the
-	 * server's workspace TODO THIS METHOD INCLUDES A SEND DELAY THERE IS ALSO A
-	 * SYNCBUG IF TWO CLIENTS TRY TO SYNC CLOSE TO ONE ANOTHER
+	 * server's workspace 
 	 * 
 	 * @param clientID
 	 */
@@ -928,6 +908,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
 					e.printStackTrace();
 				}
 
@@ -946,25 +927,23 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 * @param global : Flag to indicate if this is a local or global run
 	 * @throws IOException
 	 */
-	private void compileAndRun(boolean global) throws IOException {
+	private void compileAndRun(boolean global) {
 
+		support.notify(ObserverActions.SAVE_FULL,null);
 		support.notify(ObserverActions.CLEAR_CONSOLE, null);
 		// Check if there is no project focused
-		if (focusedProject == null || focusedProject == "" || !stillExists(focusedProject)) {
+		if (focusedProject == null || focusedProject.equals("") || !stillExists(focusedProject)) {
 			if (!global) {
 				triggerNoProjectDialog();
-			} else {
-
 			}
 		} else {
-		
+
 			// Get the classpath for the focused project
 			URLData[] files = classpaths.get(focusedProject).getClassPath();
-
 			// Try to get an entrypoint class
 			String focusedClassName = projectFocusPairs.get(focusedProject);
 			// If there is an entrypoint class configured
-			if (focusedClassName != null && focusedClassName != "" && stillExists(focusedClassName)) {
+			if (focusedClassName != null && !focusedClassName.equals("") && stillExists(focusedClassName)) {
 				// Disable run buttons
 				if (!global) {
 					support.notify(ObserverActions.DISABLE_SAVE_BUTTONS, null);
@@ -987,30 +966,26 @@ public class DeveloperComponent implements PropertyChangeListener {
 					finished.ok = true;
 					sendMessageToEveryone(finished);
 					handler.running = false;
-					support.notify(ObserverActions.ENABLE_GLOBAL_RUN,null);
-					GlobalRunDone message = new GlobalRunDone(); 
+					support.notify(ObserverActions.ENABLE_GLOBAL_RUN, null);
+					GlobalRunDone message = new GlobalRunDone();
 					sendMessageToEveryone(message);
-					
 
 				}
 
 				consoleSender.interrupt();
 				support.notify(ObserverActions.ENABLE_SAVE_BUTTONS, null);
 				support.notify(ObserverActions.ENABLE_TEXT_EDITOR, null);
-
 				// Disable the terminate button , this button is enabled by the compiler when
 				// terminating the
 				// running process is safe
 				support.notify(ObserverActions.DISABLE_TERMINATE, null);
-			
 
 			} else {
 
 				// If there is no entrypoint class selected the run configuration dialog is
 				// called
-				DEBUG.debugmessage("DEBUGA DOS : " + global);
 
-				new runConfigDialog(files, global);
+				new RunConfigDialog(files, global);
 
 			}
 		}

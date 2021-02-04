@@ -5,10 +5,16 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JOptionPane;
+
+import com.google.common.util.concurrent.MoreExecutors;
 
 import core.DEBUG;
 import fileManagement.FILE_PROPERTIES;
@@ -48,6 +54,10 @@ public class ServerHandler implements ServerMessageHandler {
 	private Semaphore messageSem; 
 	
 	public boolean running = false; 
+	
+
+	ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
+	ExecutorService executorService = MoreExecutors.getExitingExecutorService(executor, 100, TimeUnit.MILLISECONDS);
 
 	/**
 	 * 
@@ -69,8 +79,10 @@ public class ServerHandler implements ServerMessageHandler {
 		this.nClients = nClients;
 		sessionNames.add(chosenName);
 		support = PropertyChangeMessenger.getInstance();
-		 new Thread(() -> processMessage()).start();;
-		new Thread(() -> processHighLights()).start();
+		
+		
+		executorService.submit(() -> processMessage());
+		executorService.submit(() -> processHighLights());
 	
 
 	}
@@ -407,6 +419,11 @@ public class ServerHandler implements ServerMessageHandler {
 			
 		}
 		
+	}
+	
+	public void shutdownProcessors() {
+		
+		executorService.shutdown();
 	}
 	
 	

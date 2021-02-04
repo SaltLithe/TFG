@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import userInterface.UIController;
+
 import java.awt.Dialog.ModalityType;
 import java.awt.Dialog.ModalExclusionType;
 

@@ -7,7 +7,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import userInterface.runConfigDialog;
+
+import userInterface.RunConfigDialog;
 
 @SuppressWarnings("serial")
 /**
@@ -21,7 +22,7 @@ import userInterface.runConfigDialog;
 public class CustomRunConfigSelector extends JPanel {
 
 	public String name;
-	public runConfigDialog parent;
+	public RunConfigDialog componentParent;
 	JLabel nameLabel;
 
 	/**
@@ -30,9 +31,9 @@ public class CustomRunConfigSelector extends JPanel {
 	 * @param parent : The dialog that is using this class in a list of selectable
 	 *               class files
 	 */
-	public CustomRunConfigSelector(String name, runConfigDialog parent) {
+	public CustomRunConfigSelector(String name, RunConfigDialog parent) {
 
-		this.parent = parent;
+		this.componentParent = parent;
 		// We use a flowlayout to ensure this element is displayed properly in the
 		// dialog that creates it
 		FlowLayout flowLayout = (FlowLayout) getLayout();
@@ -58,27 +59,35 @@ public class CustomRunConfigSelector extends JPanel {
 			public void mouseClicked(MouseEvent evt) {
 
 				CustomRunConfigSelector component = (CustomRunConfigSelector) evt.getComponent();
-				component.parent.clickedOption(name);
+				component.componentParent.clickedOption(name);
 
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent evt) {
+				// We will not be implementing methods that we don't need but we still need to
+				// override them
 
 			}
 
 			@Override
 			public void mouseExited(MouseEvent evt) {
+				// We will not be implementing methods that we don't need but we still need to
+				// override them
 
 			}
 
 			@Override
 			public void mousePressed(MouseEvent evt) {
+				// We will not be implementing methods that we don't need but we still need to
+				// override them
 
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent evt) {
+				// We will not be implementing methods that we don't need but we still need to
+				// override them
 
 			}
 

@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Base64;
 
 import javax.imageio.ImageIO;
@@ -19,19 +20,23 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.apache.commons.io.FileUtils;
+
+import fileManagement.WorkSpaceManager;
+
 @SuppressWarnings("serial")
 /**
  * UI class that represents the profile icon of the users , contains methods for
  * adding images from file paths and base64 Strings and displays it alongside a
- * color and a name for each use TODO RENAME THIS
+ * color and a name for each use 
  * 
  * @author Usuario
  *
  */
 public class ProfileIIconComponent extends JPanel {
 
-	public String imagepath = "Icons\\default_Profile.png";
-	public String iconpath = "Icons\\";
+	public String imagepath = "/resources/images/default_Profile.png";
+	public String iconpath = "/resources/images/";
 
 	public String chosenName = "Kermit";
 	public Color chosenColor = Color.BLUE;
@@ -55,7 +60,10 @@ public class ProfileIIconComponent extends JPanel {
 		}
 	
 		try {
-			File f = new File(imagepath);
+			InputStream imageStream = WorkSpaceManager.class.getResourceAsStream(imagepath);
+			File f = new File("src/main/resources/tempImage.tmp");
+		    FileUtils.copyInputStreamToFile(imageStream, f);
+
 			raw = ImageIO.read(f);
 			Image rawRescale = raw.getScaledInstance(60, 60, Image.SCALE_FAST);
 			BufferedImage bimage = new BufferedImage(rawRescale.getWidth(null), rawRescale.getHeight(null),

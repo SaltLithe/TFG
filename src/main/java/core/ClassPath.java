@@ -23,15 +23,17 @@ public class ClassPath {
 	 */
 	public ClassPath(String project, String[] classes) {
 		this.project = project;
-		classPaths = new HashSet<String>();
+		classPaths = new HashSet<>();
 		edit(classes, null);
 
 	}
 
-/**
- * Returns the url data needed for running code.
- * @return URLData[] containing the effective path of the files of the project this classpath represents
- */
+	/**
+	 * Returns the url data needed for running code.
+	 * 
+	 * @return URLData[] containing the effective path of the files of the project
+	 *         this classpath represents
+	 */
 	public URLData[] getClassPath() {
 		URLData[] files = new URLData[classPaths.size()];
 		Iterator<String> i = classPaths.iterator();
@@ -47,43 +49,31 @@ public class ClassPath {
 		}
 		return files;
 	}
-/**
- * Method that simultaneously adds and removes classes , used in constructor to fill the classpath
- * This method will avoid any file that is not a .java file
- * 
- * @param addedclasses : Array of classes to add. Can be null
- * @param removedclasses : Array of classes to remove. Can be null
- */
+
+	/**
+	 * Method that simultaneously adds and removes classes , used in constructor to
+	 * fill the classpath This method will avoid any file that is not a .java file
+	 * 
+	 * @param addedclasses   : Array of classes to add. Can be null
+	 * @param removedclasses : Array of classes to remove. Can be null
+	 */
 	public void edit(String[] addedclasses, String[] removedclasses) {
 
-		//Add classes if there are any available
+		// Add classes if there are any available
 		if (addedclasses != null) {
-			for (String added : addedclasses) {
-				String extension = checkExtension(added);
-
-				if (extension != null && extension.equals(".java")) {
-
-					if (!classPaths.contains(added)) {
-						classPaths.add(added);
-					}
-				}
-
-			}
+			add(addedclasses);
 		}
-		//Remove classes if there are any to remove
+		// Remove classes if there are any to remove
 		if (removedclasses != null) {
-
-			for (String removed : removedclasses) {
-				if (classPaths.contains(removed)) {
-					classPaths.remove(removed);
-				}
-			}
+			remove(removedclasses);
 		}
 
 	}
 
 	/**
-	 * Support method that, given a path , returns the extension of the file it points to 
+	 * Support method that, given a path , returns the extension of the file it
+	 * points to
+	 * 
 	 * @param path
 	 * @return
 	 */
@@ -94,8 +84,32 @@ public class ClassPath {
 			String extension = path.substring(path.lastIndexOf("."), path.length());
 			returning = extension;
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return returning;
 	}
 
+	/**
+	 * Support method for edit
+	 */
+	private void add(String[] addedClasses) {
+		for (String added : addedClasses) {
+			String extension = checkExtension(added);
+
+			if (extension != null && extension.equals(".java") && !classPaths.contains(added)) {
+
+				classPaths.add(added);
+			}
+
+		}
+	}
+
+	private void remove(String[] removedClasses) {
+
+		for (String removed : removedClasses) {
+			if (classPaths.contains(removed)) {
+				classPaths.remove(removed);
+			}
+		}
+	}
 }

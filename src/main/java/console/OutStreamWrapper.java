@@ -47,7 +47,6 @@ public class OutStreamWrapper extends PrintStream {
 	public void write(byte[] b) throws IOException {
 
 		realPrint.write(b);
-		sendToConsole(null, null);
 
 	}
 
@@ -61,11 +60,11 @@ public class OutStreamWrapper extends PrintStream {
 	public void write(byte[] buf, int off, int len) {
 
 		OutputStream output = new ByteArrayOutputStream();
-		PrintStream realPrint = new PrintStream(output);
-		realPrint.write(buf, off, len);
-		realPrint.close();
+		PrintStream outPrint = new PrintStream(output);
+		outPrint.write(buf, off, len);
+		outPrint.close();
 
-		sendToConsole(realPrint, output);
+		sendToConsole(output);
 	}
 
 	/*
@@ -78,7 +77,6 @@ public class OutStreamWrapper extends PrintStream {
 	public void write(int b) {
 
 		realPrint.write(b);
-		sendToConsole(null, null);
 
 	}
 	
@@ -90,8 +88,7 @@ public class OutStreamWrapper extends PrintStream {
 	 * @param outputStream
 	 */
 	
-	//SERIOUS TODO , YOU MAY NOT NEED THE REALPRINT HERE
-	private void sendToConsole(PrintStream realPrint, OutputStream outputStream) {
+	private void sendToConsole( OutputStream outputStream) {
 		//Prevent multiple writing at the same time
 		writeLock.lock();
 		//We put the output of the console into a a byte array
@@ -103,14 +100,12 @@ public class OutStreamWrapper extends PrintStream {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		realPrint.flush();
 		try {
 			outputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	
-		realPrint.close();
 		//We send the string we created to the gui 
 		console.writeOutput(s);
 		writeLock.unlock();

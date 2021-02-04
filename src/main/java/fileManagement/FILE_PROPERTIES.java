@@ -7,14 +7,15 @@ package fileManagement;
  */
 public class FILE_PROPERTIES {
 
-	public final static String projectProperty = "pairleap.projectfolder";
-	public final static String srcProperty = "pairleap.srcfolder";
-	public final static String binProperty = "pairleap.binfolder";
-	public final static String packageProperty = "pairleap.packagefolder";
-	public final static String workspaceProperty = "pairleap.workspacefolder";
+	public static final String projectProperty = "pairleap.projectfolder";
+	public static final String srcProperty = "pairleap.srcfolder";
+	public static final String binProperty = "pairleap.binfolder";
+	public static final String packageProperty = "pairleap.packagefolder";
+	public static final String workspaceProperty = "pairleap.workspacefolder";
+	public static final String singleSlash = "/";
 
 
-	public final static String[] properties = {
+	public static final  String[] properties = {
 
 			"pairleap.projectfolder", "pairleap.srcfolder", "pairleap.binfolder", "pairleap.packagefolder"
 

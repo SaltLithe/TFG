@@ -22,8 +22,6 @@ import javax.swing.event.ChangeListener;
 
 import com.google.common.util.concurrent.MoreExecutors;
 
-import com.google.common.util.concurrent.MoreExecutors;
-
 import core.DEBUG;
 import network.HighLightMessage;
 import network.WriteMessage;

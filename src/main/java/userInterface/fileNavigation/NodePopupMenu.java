@@ -90,7 +90,8 @@ public class NodePopupMenu extends JPopupMenu {
 							"Delete this Folder?", "Delete", JOptionPane.OK_CANCEL_OPTION);
 					if (result == JOptionPane.OK_OPTION) {
 
-						UIController.developerComponent.deleteFile(parent.name, parent.path, parent.isFile,
+						System.out.println("isfile is  : "+ parent.isFile);
+						UIController.developerComponent.deleteFile(parent.name, parent.path, !parent.isFile,
 								parent.project, parent);
 					}
 				}
@@ -112,7 +113,8 @@ public class NodePopupMenu extends JPopupMenu {
 							"Delete this class?", "Delete", JOptionPane.OK_CANCEL_OPTION);
 					if (result == JOptionPane.OK_OPTION) {
 
-						UIController.developerComponent.deleteFile(parent.name, parent.path, parent.isFile,
+						System.out.println("isfile is  : "+ parent.isFile);
+						UIController.developerComponent.deleteFile(parent.name, parent.path, !parent.isFile,
 								parent.project, parent);
 					}
 				}

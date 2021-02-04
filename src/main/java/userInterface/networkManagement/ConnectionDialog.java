@@ -180,25 +180,7 @@ public class ConnectionDialog extends JFrame {
 						@Override
 						public void actionPerformed(ActionEvent event) {
 
-							if (setServerCheck.isSelected()) {
-								boolean autostart = autoStartCheck.isSelected();
-
-								UIController.developerComponent.setAsServer(serverNameField_S.getText(), ipField_S.getText(),
-										Integer.valueOf(maxClientsField_S.getText()),
-										Integer.valueOf(serverPortField_S.getText()),
-									
-										Integer.valueOf(maxClientsField_S.getText()), autostart ,serverImageLabel.ImageByteData ,  colorChoosersv.getColor());
-										dp.setIcon(colorChoosersv.getColor(), serverImageLabel.imagepath , serverNameField_S.getText());
-
-							} else if (setClientCheck.isSelected()) {
-
-								boolean autoconnect = autoConnectCheck.isSelected();
-								UIController.developerComponent.setAsClient(ipField_C.getText(), clientIPField_C.getText(),
-										Integer.valueOf(serverPortField_C.getText()),
-										autoconnect , clientNameField_C.getText(), imageLabelClient.ImageByteData, colorChoosercl.getColor() );
-								//dp.setIcon(colorChoosercl.getColor(), imageLabelClient.imagepath , clientNameField_C.getText());
-
-							}
+							
 							dispose(); 
 						}
 					});

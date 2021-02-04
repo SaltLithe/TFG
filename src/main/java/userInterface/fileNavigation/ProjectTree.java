@@ -78,7 +78,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 						String path = node.path;
 
 						if (node.isFile) {
-							UIController.developerComponent.openFile(name, path, null, project);
+							UIController.developerComponent.openFile(name, path, project);
 						}
 					}
 				} else if (SwingUtilities.isRightMouseButton(me)) {

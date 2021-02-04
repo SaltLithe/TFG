@@ -13,7 +13,9 @@ import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+
 import org.apache.commons.io.FileUtils;
 
 import core.DEBUG;
@@ -36,7 +38,6 @@ public class FileManager {
 	private HashMap<String, TextFile> editorFiles;
 
 	private HashMap<String, Project> editorProjects;
-	private String currentFocus = null;
 	private String extension = ".java";
 	private PropertyChangeMessenger support;
 	private ReentrantLock saveWriteLock;
@@ -46,8 +47,8 @@ public class FileManager {
 
 		saveWriteLock = new ReentrantLock();
 		support = PropertyChangeMessenger.getInstance();
-		editorFiles = new HashMap<String, TextFile>();
-		editorProjects = new HashMap<String, Project>();
+		editorFiles = new HashMap<>();
+		editorProjects = new HashMap<>();
 
 	}
 
@@ -61,16 +62,21 @@ public class FileManager {
 	public void writeFile(String path, String contents, FILE_TYPE type) {
 
 		File newFile = new File(path);
-
+		FileWriter fw = null;
 		try {
-			FileWriter fw = new FileWriter(newFile);
-
+			fw = new FileWriter(newFile);
 			fw.write(contents);
-
-			fw.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (fw != null) {
+					fw.close();
+				}
+			} catch (IOException | NullPointerException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -82,11 +88,11 @@ public class FileManager {
 	 * @param workspaceName : The workspace name
 	 * @return a list containing messages that condense file and folder information
 	 */
-	public LinkedList<ResponseCreateFileMessage> scanAndReturn(String workspacepath, String workspaceName) {
+	public List<ResponseCreateFileMessage> scanAndReturn(String workspacepath, String workspaceName) {
 		saveAllFull();
 		saveWriteLock.lock();
 
-		returningList = new LinkedList<ResponseCreateFileMessage>();
+		returningList = new LinkedList<>();
 		workspaceName += "\\";
 		scanAndReturnRecursive(workspacepath, true, workspacepath, workspaceName);
 
@@ -103,17 +109,17 @@ public class FileManager {
 	 * @param name         : The name of the class to be created
 	 * @param path         : The path of the class to be created
 	 * @param project      : The project this class belongs to
-	 * @param isfromeditor TODO do you need this?
 	 * @param isMain       : Flag indicating if this class should contain a main
 	 *                     method
 	 */
-	public void createClassFile(String name, String path, String project, Boolean isfromeditor, boolean isMain) {
+	public void createClassFile(String name, String path, String project,  boolean isMain) {
 
-		String nameandpath = path + "/" + name + extension;
+		String nameandpath = path + FILE_PROPERTIES.singleSlash + name + extension;
 		File newFile = new File(nameandpath);
 		// Create a file if this class file does not exist
+		FileWriter fw = null;
 		try {
-			FileWriter fw = new FileWriter(newFile);
+			 fw = new FileWriter(newFile);
 
 			// Write a base string for this class
 			if (isMain) {
@@ -130,8 +136,17 @@ public class FileManager {
 			editorFiles.put(newfile.getPath(), newfile);
 			Object[] message = { path, name + extension, project, true };
 			support.notify(ObserverActions.UPDATE_PROJECT_TREE_ADD, message);
-		} catch (IOException e) {
+		} catch (IOException  e) {
+			
 			e.printStackTrace();
+		}finally {
+			if(fw != null) {
+				try {
+					fw.close();
+				} catch (IOException  | NullPointerException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 	}
@@ -158,7 +173,7 @@ public class FileManager {
 			if (!isFolder) {
 				Files.deleteIfExists(Paths.get(path));
 				// If its not , delete recursively
-			} else if (isFolder) {
+			} else  {
 				File f = new File(path);
 				deleteInsides(f);
 
@@ -225,11 +240,14 @@ public class FileManager {
 			byte[] bytes = null;
 
 			try {
-				bytes = property.getBytes("UTF-8");
-			} catch (UnsupportedEncodingException e1) {
+				if(property != null) {
+				bytes = property.getBytes(StandardCharsets.UTF_8);
+				}
+			} catch (NullPointerException e1) {
 				e1.printStackTrace();
 			}
 
+			
 			final ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);
 			writeBuffer.put(bytes);
 			writeBuffer.flip();
@@ -262,16 +280,16 @@ public class FileManager {
 	 */
 	public void newProject(String name, WorkSpace workSpace, boolean includeHelpFolders, boolean updateEditor) {
 		// Create the project folder
-		String newpath = workSpace.getPath() + "\\" + name;
+		String newpath = workSpace.getPath() + File.pathSeparator + name;
 
 		writeFolder(newpath, FILE_TYPE.PROJECT_FOLDER, false, null, null);
 		// Write the help folders if needed
 		if (includeHelpFolders) {
-			String srcpath = newpath + "\\" + "src";
+			String srcpath = newpath + File.pathSeparator + "src";
 
 			writeFolder(srcpath, FILE_TYPE.SRC_FOLDER, false, null, null);
 
-			String binpath = newpath + "\\" + "bin";
+			String binpath = newpath + File.pathSeparator + "bin";
 
 			writeFolder(binpath, FILE_TYPE.BIN_FOLDER, false, null, null);
 		}
@@ -311,15 +329,17 @@ public class FileManager {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			if(readBuffer != null) {
 			readBuffer.flip();
+			}
 			// If they are projeccts , create an object representing the project and add it
 			// to a collection
 			try {
-				final String valueFromAttributes = new String(readBuffer.array(), "UTF-8");
+				final String valueFromAttributes = new String(readBuffer.array(), StandardCharsets.UTF_8);
 				if (valueFromAttributes.equals(FILE_PROPERTIES.projectProperty)) {
 					this.editorProjects.put(dir.getAbsolutePath(), new Project(dir.getAbsolutePath(), dir.getName()));
 				}
-			} catch (UnsupportedEncodingException e) {
+			} catch (NullPointerException e) {
 				e.printStackTrace();
 			}
 
@@ -330,32 +350,25 @@ public class FileManager {
 	/**
 	 * Method that gets the content of a file given its name and file , this method
 	 * will create a textfile object and add it to the collection if it does not
-	 * exist and return the contents of the file that needs to be opened TODO this
-	 * method is extremely confusing
-	 * 
+	 * exist and return the contents of the file that needs to be opened
 	 * @param name     : The name of the textfile to open
 	 * @param path     : The path of the file to be opened if necessary
 	 * @param contents : The contents of the file to be opened if necesary
 	 * @param project  : The project this file belongs to
 	 * @return a string with the contents of the file
 	 */
-	public String openTextFile(String name, String path, String contents, String project) {
+	public String openTextFile(String name, String path, String project) {
 
-		DEBUG.debugmessage("CALLED OPENTEXTFILE");
-	
+
 		String returningcontents = null;
 		if (!editorFiles.containsKey(path)) {
-			TextFile tf = new TextFile(name, path, contents, FileType.CLASS);
+			TextFile tf = new TextFile(name, path, null, FileType.CLASS);
 			editorFiles.put(path, tf);
 
 			try {
 
-				byte[] encoded = null;
-				try {
-					encoded = Files.readAllBytes(Paths.get(path));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				byte[] encoded = this.readFromTextFiles(path);
+				
 				returningcontents = new String(encoded, StandardCharsets.UTF_8);
 				editorFiles.get(path).setContent(returningcontents);
 
@@ -417,6 +430,8 @@ public class FileManager {
 			editorFiles.get(path).setContent(content);
 
 		} catch (Exception e) {
+			e.printStackTrace();
+			
 		} finally {
 
 			saveWriteLock.unlock();
@@ -435,18 +450,12 @@ public class FileManager {
 			for (String key : editorFiles.keySet()) {
 
 				File file = new File(editorFiles.get(key).getPath());
-				if (file != null) {
-					FileWriter fw = null;
-					try {
-						fw = new FileWriter(file);
-						fw.write(editorFiles.get(key).getContent());
-						fw.close();
-
-					} catch (IOException e) {
-					}
+				if(file.exists()) {
+					saveFileSupport(file , key);
 				}
-			}
+				}
 		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			saveWriteLock.unlock();
 		}
@@ -461,11 +470,14 @@ public class FileManager {
 	 */
 	public void saveCurrentFile(String path, String editorcontents) throws IOException {
 		saveWriteLock.lock();
+		FileWriter fw = null;
+
 		try {
+			
 			File file = new File(path);
-			if (file != null) {
+			if (file.exists()) {
 				editorFiles.get(path).setContent(editorcontents);
-				FileWriter fw = new FileWriter(file);
+				fw = new FileWriter(file);
 				fw.write(editorcontents);
 				fw.close();
 				Object[] message = { path };
@@ -473,7 +485,11 @@ public class FileManager {
 
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
+			if(fw != null) {
+			fw.close(); 
+			}
 			saveWriteLock.unlock();
 		}
 	}
@@ -518,6 +534,47 @@ public class FileManager {
 
 		saveWriteLock.unlock();
 
+	}
+
+	/**
+	 * Support method for openTextFile , reduces nesting
+	 * @param path
+	 */
+	private byte[] readFromTextFiles (String path) {
+		try {
+			return Files.readAllBytes(Paths.get(path));
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new byte[0];
+		}
+		
+		
+	}
+
+	/**
+	 * Support method for saveAllFull , reduces complexity 
+	 * @param file
+	 */
+	private void saveFileSupport (File file, String key ) {
+	
+		FileWriter fw = null;
+		
+		try {
+			fw = new FileWriter(file);
+			fw.write(editorFiles.get(key).getContent());
+			fw.close();
+	
+		} catch (IOException e) {
+		}finally {
+			if(fw!= null) {
+			try {
+				fw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			}
+			
+		}
 	}
 
 	/**
