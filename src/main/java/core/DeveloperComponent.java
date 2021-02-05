@@ -462,7 +462,16 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	public void setProjectFocus(String project) {
 
+		
 		this.focusedProject = project;
+	}
+	
+	public void setProjectFocus(String name ,String project, String path) {
+		this.focusedProject = project;
+		String retrieveContents = fileManager.openTextFile(name, path, project);
+		Object[] message = {path , retrieveContents};
+		support.notify(ObserverActions.FULL_SET_TEXT,message);
+		
 	}
 
 	/**
@@ -818,6 +827,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 		case UPDATE_PANEL_CONTENTS:
 			String editingpath = (String) results.get(0);
 			String partialPath = workSpace.getPath().substring(0, workSpace.getPath().lastIndexOf("\\"));
+			System.out.println("CLOSE EDIT ON :" + partialPath+editingpath);
 			fileManager.updatePanelContents(partialPath + editingpath, results);
 			break;
 		case DELETE_CLASS_PATH:
@@ -1006,5 +1016,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 		compiler.run(className, files);
 
 	}
+
+
 
 }

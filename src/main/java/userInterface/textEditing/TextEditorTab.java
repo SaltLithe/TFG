@@ -109,6 +109,8 @@ public class TextEditorTab extends JPanel {
 		}
 		textEditorScrollPane = new RTextScrollPane(textEditorArea);
 		add(textEditorScrollPane, BorderLayout.CENTER);
+		
+		
 
 		textEditorArea.addCaretListener(new CaretListener() {
 			public void caretUpdate(CaretEvent e) {

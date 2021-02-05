@@ -121,6 +121,7 @@ public class TextFile {
 			String secondhalf = content.substring(offset, content.length());
 			content = firsthalf + changes + secondhalf;
 		} catch (Exception e) {
+			System.out.println("PATH IS :" + path);
 			e.printStackTrace();
 		} finally {
 

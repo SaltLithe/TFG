@@ -68,7 +68,7 @@ public class ProjectTree extends JPanel implements TreeSelectionListener {
 				try {
 					node = (CustomTreeNode) internalTree.getSelectionPath().getLastPathComponent();
 				} catch (Exception e) {
-					e.printStackTrace();
+					
 				}
 
 				if (SwingUtilities.isLeftMouseButton(me)) {

@@ -111,17 +111,26 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		mp1.setParent(tab);
 
 		tabPane.addTab("", tab);
+		
+	
 		tabPane.addChangeListener(new ChangeListener() {
+
+			
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
 
 				try {
-
-					JTabbedPane tabbedPane = (JTabbedPane) e.getSource();
-					TextEditorTab selected = (TextEditorTab) tabbedPane.getSelectedComponent();
-					UIController.developerComponent.setProjectFocus(selected.getProject());
+					
+					if(tab == tabPane.getSelectedComponent()) {
+					System.out.println("THIS ONE SELECTED");
+					UIController.developerComponent.setProjectFocus(name,tab.getProject(),path);
 					updateContainer(tab.getProject(), tab.getPath());
+					}else {
+						System.out.println("THIS ONE NOT");
+
+					}
+					
 
 				} catch (Exception excp) {
 					excp.printStackTrace();
@@ -264,6 +273,15 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 				}
 			}
 			break;
+		case FULL_SET_TEXT:
+			results = (ArrayList<Object>) evt.getNewValue();
+			String searchpath = (String) results.get(0);
+			String searchkey = findKeyFromPath(searchpath);
+			System.out.println("SEARCHED PATH IS : " + searchpath);
+			if(searchkey != null) {
+				this.tabCollection.get(searchkey).setTextEditorCode((String)results.get(1));
+			}
+			break;
 
 		case UPDATE_HIGHLIGHT:
 			results = (ArrayList<Object>) evt.getNewValue();
@@ -276,7 +294,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 				try {
 					color = (int) results.get(2);
 				} catch (Exception uwu) {
-					uwu.printStackTrace();
+					
 				}
 				this.tabCollection.get(key).paintHighLight((int) results.get(0), (int) results.get(1), color,
 						(String) results.get(3));
@@ -358,13 +376,15 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		String similar = null;
 		for (String key : tabCollection.keySet()) {
 
-			if (key.contains(editingpath))
-				;
+			if (key.contains(editingpath)) {
+				
 			similar = key;
 
 		}
 
+	}
 		return similar;
+
 	}
 
 	private void enableComponents(Container container, boolean enable) {

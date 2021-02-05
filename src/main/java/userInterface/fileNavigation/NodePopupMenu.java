@@ -46,6 +46,7 @@ public class NodePopupMenu extends JPopupMenu {
 
 		if (UIController.developerComponent.isConnected) {
 
+			addClass.setEnabled(false);
 			addFolder.setEnabled(false);
 			delete.setEnabled(false);
 
@@ -55,8 +56,11 @@ public class NodePopupMenu extends JPopupMenu {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				
+				if(!UIController.developerComponent.isConnected) {
 
 				new newClassDialog(parent.path, parent.project);
+				}
 
 			}
 
