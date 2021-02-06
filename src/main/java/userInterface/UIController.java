@@ -50,6 +50,8 @@ public class UIController {
 	 */
 	public void setDeveloperComponent(DeveloperComponent developerComponent) {
 		UIController.developerComponent = developerComponent;
+		
+		
 	}
 
 	/**
