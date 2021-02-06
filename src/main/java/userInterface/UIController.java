@@ -2,6 +2,13 @@ package userInterface;
 
 
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import com.google.common.util.concurrent.MoreExecutors;
+
 import core.DeveloperComponent;
 
 /**
@@ -18,6 +25,8 @@ public class UIController {
 	private static UIController instance;
 	public static DeveloperComponent developerComponent;
 	public static DeveloperMainFrame developerMainFrame;
+	private static ExecutorService threadRunnerPool; 
+	private static ExecutorService threadRunner; 
 	
 	
 
@@ -28,6 +37,8 @@ public class UIController {
 	public static UIController getInstance() {
 
 		if (instance == null) {
+			threadRunnerPool = Executors.newFixedThreadPool(1);
+			threadRunner = MoreExecutors.getExitingExecutorService((ThreadPoolExecutor) threadRunnerPool , 100 , TimeUnit.MILLISECONDS);
 			instance = new UIController();
 		}
 		return instance;
@@ -55,7 +66,7 @@ public class UIController {
 	 * @param command The lambda expression to run 
 	 */
 	public static void runOnThread (Runnable command) {
-		new Thread(command).start();
+		threadRunner.execute(command);
 
 	}
 
