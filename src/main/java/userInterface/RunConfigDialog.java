@@ -31,6 +31,8 @@ import core.URLData;
  */
 @SuppressWarnings("serial")
 public class RunConfigDialog extends JDialog {
+	
+	
 
 	JButton ApplyButton;
 	JButton ApplyRunButton;
@@ -44,6 +46,10 @@ public class RunConfigDialog extends JDialog {
 	private JLabel lblNewLabel;
 
 	public RunConfigDialog(URLData[] classes, boolean global) {
+		
+		this.setTitle("Select a class with a main method");
+		this.setIconImage(DeveloperMainFrameWrapper.windowIcon);
+
 		setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		selectorCollection = new HashMap<>();

@@ -12,6 +12,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import userInterface.DeveloperMainFrameWrapper;
 import userInterface.UIController;
 /**
  * Class used to create a new project taking input from the user for the project name 
@@ -23,6 +24,8 @@ public class newProjectDialog extends JDialog{
 	private JTextField nameField;
 	public newProjectDialog() {
 		setTitle("Create a new Project");
+		this.setIconImage(DeveloperMainFrameWrapper.windowIcon);
+
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0, 265, 0, 0, 0};
 		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};

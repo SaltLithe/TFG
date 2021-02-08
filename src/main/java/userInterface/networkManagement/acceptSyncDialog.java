@@ -45,6 +45,9 @@ public class acceptSyncDialog extends JDialog {
 	 * @param name : The name of this user in the session
 	 */
 	public acceptSyncDialog(ClientHandler parent, String name) {
+		
+		this.setIconImage(DeveloperMainFrameWrapper.windowIcon);
+		this.setTitle("Choose a location where you wan't to sync the server's workspace");
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());

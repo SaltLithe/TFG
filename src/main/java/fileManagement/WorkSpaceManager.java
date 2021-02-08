@@ -37,6 +37,7 @@ public class WorkSpaceManager {
 	 */
 	public static WorkSpaceManager getInstance() {
 		if (instance == null) {
+			
 
 			instance = new WorkSpaceManager();
 		}

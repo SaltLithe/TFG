@@ -60,9 +60,18 @@ public class ProfileIIconComponent extends JPanel {
 		}
 	
 		try {
+			File f; 
+			try {
 			InputStream imageStream = WorkSpaceManager.class.getResourceAsStream(imagepath);
-			File f = new File("src/main/resources/tempImage.tmp");
+			
+			 f = new File("src/main/resources/tempImage.tmp");
 		    FileUtils.copyInputStreamToFile(imageStream, f);
+			}
+			catch(Exception e) {
+			 f =new File(imagepath);
+				
+			
+			}
 
 			raw = ImageIO.read(f);
 			Image rawRescale = raw.getScaledInstance(60, 60, Image.SCALE_FAST);

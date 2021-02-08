@@ -47,7 +47,10 @@ public class DeveloperMainFrame extends JFrame implements PropertyChangeListener
 
 	DeveloperMainFrame() {
 
+		
+		
 		super("Pair Leap");
+		this.setIconImage(DeveloperMainFrameWrapper.windowIcon);
 		support = PropertyChangeMessenger.getInstance();
 		instance = this;
 		somethingHasChanged = false;

@@ -18,6 +18,7 @@ import javax.swing.border.EmptyBorder;
 import network.ClientHandler;
 import network.GlobalRunRequestMessage;
 import network.ServerHandler;
+import userInterface.DeveloperMainFrameWrapper;
 
 @SuppressWarnings("serial")
 public class AcceptGlobalDialog extends JDialog {
@@ -52,7 +53,9 @@ public class AcceptGlobalDialog extends JDialog {
 	}
 	
 	public void construct() {
-		
+		this.setTitle("Global run request");
+		this.setIconImage(DeveloperMainFrameWrapper.windowIcon);
+
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());

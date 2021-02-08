@@ -14,6 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 
+import userInterface.DeveloperMainFrameWrapper;
 import userInterface.UIController;
 
 @SuppressWarnings("serial")
@@ -24,6 +25,9 @@ import userInterface.UIController;
  */
 public class awaitSyncDialog extends JDialog {
 	public awaitSyncDialog() {
+		
+		this.setIconImage(DeveloperMainFrameWrapper.windowIcon);
+		this.setTitle("Wait for syncing to complete");
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 440, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 44, 0, 0 };

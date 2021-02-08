@@ -13,6 +13,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import userInterface.DeveloperMainFrameWrapper;
+
 /**
  * Class used to pop a dialog for the user to add a new workspace 
  * @author Carmen Gómez Moreno
@@ -27,6 +29,9 @@ public class newWorkSpaceDialog extends JDialog {
 
 
 	public newWorkSpaceDialog() {
+		this.setTitle("Add a new workspace");
+		this.setIconImage(DeveloperMainFrameWrapper.windowIcon);
+
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));

@@ -52,6 +52,9 @@ public class JoinSessionDialog extends JFrame {
 	 * Create the dialog.
 	 */
 	public JoinSessionDialog() {
+		this.setIconImage(DeveloperMainFrameWrapper.windowIcon);
+		this.setTitle("Join a session");
+
 		imageChooser = new JFileChooser();
 		imageChooser.addChoosableFileFilter(new FileNameExtensionFilter("Image Files", "jpg", "png"));
 		getContentPane().setLayout(new BorderLayout());

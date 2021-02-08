@@ -15,6 +15,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -51,6 +52,9 @@ public class CreateSessionDialog extends JFrame {
 	 * Create the dialog.
 	 */
 	public CreateSessionDialog() {
+		this.setIconImage(DeveloperMainFrameWrapper.windowIcon);
+		this.setTitle("Create a session");
+
 		imageChooser = new JFileChooser();
 		imageChooser.addChoosableFileFilter(new FileNameExtensionFilter("Image Files", "png"));
 
@@ -89,6 +93,7 @@ public class CreateSessionDialog extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 
+				if (Integer.valueOf(maxClientsField_S.getText()) <= 4) {
 				UIController.developerComponent.setAsServer(serverNameField_S.getText(), ipField_S.getText(),
 						Integer.valueOf(maxClientsField_S.getText()), Integer.valueOf(serverPortField_S.getText()),
 						Integer.valueOf(maxClientsField_S.getText()), serverImageLabel.ImageByteData,
@@ -98,6 +103,14 @@ public class CreateSessionDialog extends JFrame {
 						serverNameField_S.getText());
 
 				dispose();
+				}else {
+					
+					JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
+						    "Can't create a session for more than four clients.",
+						    "Too many users",
+						    JOptionPane.ERROR_MESSAGE);
+				}
+				
 			}
 		});
 

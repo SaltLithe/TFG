@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 
 import network.ServerHandler;
+import userInterface.DeveloperMainFrameWrapper;
 import userInterface.UIController;
 
 @SuppressWarnings("serial")
@@ -39,6 +40,8 @@ public class serverAwaitSync extends JDialog {
 	 * @param parent   : The class that creates this dialog
 	 */
 	public serverAwaitSync(int nClients, ServerHandler parent) {
+		this.setIconImage(DeveloperMainFrameWrapper.windowIcon);
+		this.setTitle("Wait for syncing to complete");
 
 		this.parent = parent;
 		this.nClients = nClients;

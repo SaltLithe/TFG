@@ -9,9 +9,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -60,6 +62,16 @@ public class workSpaceSelect extends JFrame {
 	LinkedList<Component> selectPanelComponents;
 
 	public workSpaceSelect() {
+		
+		
+		this.setTitle("Select a workspace");
+		try {
+			this.setIconImage(ImageIO.read((workSpaceSelect.class.getResource("/resources/images/window_Icon.png"))));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+
 
 		self = this;
 		wsm = WorkSpaceManager.getInstance();

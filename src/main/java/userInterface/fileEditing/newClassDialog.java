@@ -13,6 +13,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import userInterface.DeveloperMainFrameWrapper;
 import userInterface.UIController;
 
 /**
@@ -31,6 +32,9 @@ public class newClassDialog extends JDialog {
 
 	public newClassDialog(String path, String project) {
 		setTitle("Create a new class");
+		this.setIconImage(DeveloperMainFrameWrapper.windowIcon);
+
+		
 
 		this.path = path;
 		this.project = project;

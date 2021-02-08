@@ -1,6 +1,10 @@
 package userInterface;
 
+import java.awt.Image;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import userInterface.fileNavigation.FileExplorerPanel;
 import userInterface.fileNavigation.FileExplorerToolbar;
@@ -26,6 +30,7 @@ public class DeveloperMainFrameWrapper implements Runnable {
 
 	private static DeveloperMainFrame instance = null;
 	private static DeveloperMainFrameWrapper singleInstance = null;
+	public static Image windowIcon ;
 
 	/**
 	 * 
@@ -100,6 +105,12 @@ public class DeveloperMainFrameWrapper implements Runnable {
 	 */
 	public static DeveloperMainFrameWrapper getSingleInstance() {
 		if (singleInstance == null) {
+			try {
+				windowIcon =  ImageIO.read((DeveloperMainFrameWrapper.class.getResource("/resources/images/window_Icon.png")));
+			} catch (IOException e) {
+				e.printStackTrace();
+				e.printStackTrace();
+			}
 			singleInstance = new DeveloperMainFrameWrapper();
 		}
 		return singleInstance;
