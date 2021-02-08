@@ -38,8 +38,7 @@ These are the features of TITLE summarized:
 
 [<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/generalShot.png?token=AKLE4HDEC62BEFQBDUDFUFDAFKMRA">]
 
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/noWorkspaceShot.png?token=AKLE4HBWB2ATLQSRIKHJ3XLAFKMSM
-">]
+[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/noWorkspaceShot.png?token=AKLE4HBWB2ATLQSRIKHJ3XLAFKMSM">]
 
 [<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/localRunShot.png?token=AKLE4HDIX6GZJFD6KH5GVADAFKMVS">]
 
@@ -49,6 +48,5 @@ These are the features of TITLE summarized:
 
 [<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/joinSessionShot.png?token=AKLE4HG4DAENDKF56RMOE63AFKM5U">]
 
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/sessionShot.png?token=AKLE4HAFBXVMWWMJAURXKWTAFKM7K
-">]
+[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/sessionShot.png?token=AKLE4HAFBXVMWWMJAURXKWTAFKM7K">]
 
