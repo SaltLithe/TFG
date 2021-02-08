@@ -2,7 +2,7 @@
 
 Hello, this a college project I designed and coded on my own as the final assignment required to graduate.
 
-#What is TITLE?
+# What is TITLE?
 
 TITLE is an experimental tool to assist in pair programming.
 
@@ -10,7 +10,7 @@ TITLE is an experimental tool to assist in pair programming.
 
 Most of the time, pair programmers will only work in pairs, use only one computer, and will switch roles but not share them, this tool tries to mix this dynamic by allowing small teams to work together in the same project at the same time with their own computer on a local network.
 
-#What can TITLE do?
+# What can TITLE do?
 
 These are the features of TITLE summarized:
 - 1 : Create and manage workspaces
@@ -24,7 +24,7 @@ These are the features of TITLE summarized:
 - 9 : Code with your friends and see the changes in real time
 - 10 : Run your code together and see real time output
 
-#How to use TITLE?
+# How to use TITLE?
 
 - 1 : Download the executable .jar file
 - 2 : Run the program, create at least one workspace if you want to create a session or just code on your own
@@ -32,7 +32,7 @@ These are the features of TITLE summarized:
 - 4 : To join a session you can start the program without a workspace, figure out your ipv4 address and ask your server for their ipv4 and port. Make sure that your server and other users share your lan network.
 - 5 : Make  sure that you allow this program to receive and send messages by allowing it through your firewall.
 
-#Screenshots
+# Screenshots
 
 [<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/launchShot.png?token=AKLE4HFQJVLITS66ASYBFDLAFKMO6">]
 
