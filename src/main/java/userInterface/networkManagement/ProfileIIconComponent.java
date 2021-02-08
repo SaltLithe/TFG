@@ -38,7 +38,7 @@ public class ProfileIIconComponent extends JPanel {
 	public String imagepath = "/resources/images/default_Profile.png";
 	public String iconpath = "/resources/images/";
 
-	public String chosenName = "Kermit";
+	public String chosenName = "";
 	public Color chosenColor = Color.BLUE;
 	public JLabel imagelabel;
 	public Image raw = null;

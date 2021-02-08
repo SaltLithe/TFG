@@ -22,7 +22,6 @@ import javax.swing.event.ChangeListener;
 
 import com.google.common.util.concurrent.MoreExecutors;
 
-import core.DEBUG;
 import network.HighLightMessage;
 import network.WriteMessage;
 import userInterface.ObserverActions;
@@ -277,7 +276,6 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			results = (ArrayList<Object>) evt.getNewValue();
 			String searchpath = (String) results.get(0);
 			String searchkey = findKeyFromPath(searchpath);
-			System.out.println("SEARCHED PATH IS : " + searchpath);
 			if(searchkey != null) {
 				this.tabCollection.get(searchkey).setTextEditorCode((String)results.get(1));
 			}
@@ -289,7 +287,6 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			String key = findKeyFromPath(editingpath);
 			if (key != null) {
 
-				DEBUG.debugmessage("Got a highlight for name " + (String) results.get(3));
 				int color = -1;
 				try {
 					color = (int) results.get(2);

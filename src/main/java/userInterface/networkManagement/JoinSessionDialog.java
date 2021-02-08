@@ -1,6 +1,7 @@
 package userInterface.networkManagement;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -250,7 +251,7 @@ public class JoinSessionDialog extends JFrame {
 				colorChoosercl.removeChooserPanel(accp);
 			}
 		}
-		setSize(getPreferredSize());
+		setSize(new Dimension(getPreferredSize().width , getPreferredSize().height+50 ));
 		setResizable(true);
 
 		setVisible(true);

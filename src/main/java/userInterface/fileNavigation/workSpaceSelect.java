@@ -142,7 +142,6 @@ public class workSpaceSelect extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				DEBUG.debugmessage("SET TO TRUE");
 				openAddWorkSpaceDialog();
 
 			}

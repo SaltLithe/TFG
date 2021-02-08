@@ -1,7 +1,6 @@
 package fileManagement;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +12,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
-
-import org.apache.commons.io.FileUtils;
 
 import core.DeveloperComponent;
 
@@ -131,6 +128,7 @@ public class WorkSpaceManager {
 	 */
 	public List<WorkSpace> getAllWorkSpaces() {
 
+		
 		Unmarshaller jaxbUnmarshaller = null;
 		JAXBContext jaxbContext = null;
 		WorkSpaces ws = null;
@@ -146,9 +144,7 @@ public class WorkSpaceManager {
 		}
 
 		try {
-		InputStream wsStream = WorkSpaceManager.class.getResourceAsStream("/resources/workspaces/WorkSpaces.xml");
-		File tempWS = new File("src/main/resources/workSpaces.tmp");
-	    FileUtils.copyInputStreamToFile(wsStream, tempWS);
+		File tempWS = new File("./WorkSpaces.xml");
 			ws = (WorkSpaces) jaxbUnmarshaller.unmarshal(tempWS);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -310,7 +306,10 @@ public class WorkSpaceManager {
 	 * @return if the operation has been completed successfully
 	 */
 	private boolean rewriteWorkSpaces(List<WorkSpace> ws) {
-		File workspacefile = new File("src/main/resources/WorkSpaces.xml");
+		
+	
+
+		File workspacefile = new File("./WorkSpaces.xml");
 		WorkSpaces newws = new WorkSpaces();
 		newws.setWorkSpaces(ws);
 
