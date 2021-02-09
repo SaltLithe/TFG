@@ -37,7 +37,7 @@ public class UIController {
 	public static UIController getInstance() {
 
 		if (instance == null) {
-			threadRunnerPool = Executors.newFixedThreadPool(1);
+			threadRunnerPool = Executors.newCachedThreadPool();
 			threadRunner = MoreExecutors.getExitingExecutorService((ThreadPoolExecutor) threadRunnerPool , 100 , TimeUnit.MILLISECONDS);
 			instance = new UIController();
 		}

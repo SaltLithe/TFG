@@ -277,6 +277,10 @@ public class ClientHandler implements ClientMessageHandler {
 			if (imageData.isServer) {
 				UIController.runOnThread(() -> UIController.developerComponent.addProfilePicture(imageData.image,
 						imageData.color, imageData.name, imageData.isServer, -1));
+				if(!images.containsKey(imageData.name)) {
+					colorData.put(imageData.name, imageData.color);
+
+				}
 
 			} else {
 				if (!images.containsKey(imageData.name)) {

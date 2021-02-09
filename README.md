@@ -34,21 +34,27 @@ These are the features of TITLE summarized:
 
 #Screenshots
 
+*Launch screen*
 [<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/launchShot.png?token=AKLE4HFQJVLITS66ASYBFDLAFKMO6">]
 
+*Local enviroment*
 [<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/generalShot.png?token=AKLE4HDEC62BEFQBDUDFUFDAFKMRA">]
 
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/noWorkspaceShot.png?token=AKLE4HBWB2ATLQSRIKHJ3XLAFKMSM
-">]
+*Local enviroment without a workspace loaded*
+[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/noWorkspaceShot.png?token=AKLE4HBWB2ATLQSRIKHJ3XLAFKMSM">]
 
+*Local enviroment running some code*
 [<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/localRunShot.png?token=AKLE4HDIX6GZJFD6KH5GVADAFKMVS">]
 
+*Choosing a main class*
 [<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/classSelectionShot.png?token=AKLE4HEGCRJB65C6JJE3MWTAFKM4A">]
 
+*Creating a session*
 [<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/createSessionShot.png?token=AKLE4HBKMCANND3L6OUDLQ3AFKMYY">]
 
+*Joining a session*
 [<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/joinSessionShot.png?token=AKLE4HG4DAENDKF56RMOE63AFKM5U">]
 
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/sessionShot.png?token=AKLE4HAFBXVMWWMJAURXKWTAFKM7K
-">]
+*A live session*
+[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/sessionShot.png token=AKLE4HAFBXVMWWMJAURXKWTAFKM7K">]
 
