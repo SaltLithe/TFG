@@ -578,7 +578,10 @@ public class DeveloperComponent implements PropertyChangeListener {
 				server.Stop();
 				server = null;
 				handler = null;
+				
 			}
+			support.notify(ObserverActions.CLEAR_ALL_ICON,null);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

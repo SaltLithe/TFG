@@ -1,16 +1,22 @@
 package userInterface.fileEditing;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
@@ -21,106 +27,119 @@ import userInterface.fileNavigation.workSpaceSelect;
 
 /**
  * Class used to pop a dialog for the user to add a new workspace
+ * 
  * @author Carmen Gómez Moreno
  *
  */
-@SuppressWarnings({"serial","unused"})
+@SuppressWarnings({ "serial", "unused" })
 public class AddWorkSpaceDialog extends JDialog {
 	private JTextField nameField;
 	private JTextField pathField;
-	private workSpaceSelect self; 
-	private WorkSpaceManager wsm; 
-	
+	private workSpaceSelect self;
+	private WorkSpaceManager wsm;
+	private JButton okButton;
+	private JButton cancelButton;
+	private JButton BrowseButton;
+	private JPanel panel_1;
+	private JPanel panel_2;
+	private JPanel panel_3;
+	private JPanel panel_4;
 
-	public AddWorkSpaceDialog( workSpaceSelect self){
-	
-		this.self = self; 
+	public AddWorkSpaceDialog(workSpaceSelect self) {
+
+		this.setTitle("Add a new workspace");
+		try {
+			this.setIconImage(ImageIO.read((workSpaceSelect.class.getResource("/resources/images/window_Icon.png"))));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+		this.self = self;
 		wsm = WorkSpaceManager.getInstance();
-		
+
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] { 161, 0, 84, 0, 0 };
-		gridBagLayout.rowHeights = new int[] { 0, 0, 41, 43, 123, 0, 0 };
-		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gridBagLayout.columnWidths = new int[] { 58, 21, 359, 0, 0 };
+		gridBagLayout.rowHeights = new int[] { 37, 52, 42, 22, -6, 0 };
+		gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		getContentPane().setLayout(gridBagLayout);
 
 		JLabel lblNewLabel = new JLabel(" New WorkSpace");
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-		gbc_lblNewLabel.anchor = GridBagConstraints.WEST;
+		gbc_lblNewLabel.anchor = GridBagConstraints.SOUTHWEST;
 		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel.gridx = 0;
+		gbc_lblNewLabel.gridx = 2;
 		gbc_lblNewLabel.gridy = 0;
 		getContentPane().add(lblNewLabel, gbc_lblNewLabel);
 
-		JLabel lblNewLabel_1 = new JLabel(" Name");
-		lblNewLabel_1.setHorizontalAlignment(SwingConstants.LEFT);
-		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
-		gbc_lblNewLabel_1.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_1.anchor = GridBagConstraints.EAST;
-		gbc_lblNewLabel_1.gridx = 0;
-		gbc_lblNewLabel_1.gridy = 2;
-		getContentPane().add(lblNewLabel_1, gbc_lblNewLabel_1);
+		panel_4 = new JPanel();
+		GridBagConstraints gbc_panel_4 = new GridBagConstraints();
+		gbc_panel_4.anchor = GridBagConstraints.EAST;
+		gbc_panel_4.insets = new Insets(0, 0, 5, 5);
+		gbc_panel_4.gridx = 0;
+		gbc_panel_4.gridy = 1;
+		getContentPane().add(panel_4, gbc_panel_4);
+		panel_4.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		nameField = new JTextField();
-		GridBagConstraints gbc_nameField = new GridBagConstraints();
-		gbc_nameField.insets = new Insets(0, 0, 5, 5);
-		gbc_nameField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_nameField.gridx = 1;
-		gbc_nameField.gridy = 2;
-		getContentPane().add(nameField, gbc_nameField);
-		nameField.setColumns(10);
+		JLabel lblNewLabel_1 = new JLabel(" Name");
+		panel_4.add(lblNewLabel_1);
+		lblNewLabel_1.setHorizontalAlignment(SwingConstants.LEFT);
+
+		panel_2 = new JPanel();
+		panel_2.setLayout(null);
+		GridBagConstraints gbc_panel_2 = new GridBagConstraints();
+		gbc_panel_2.fill = GridBagConstraints.BOTH;
+		gbc_panel_2.insets = new Insets(0, 0, 5, 5);
+		gbc_panel_2.gridx = 2;
+		gbc_panel_2.gridy = 1;
+		getContentPane().add(panel_2, gbc_panel_2);
+		
+				nameField = new JTextField();
+				nameField.setBounds(0, 11, 278, 20);
+				panel_2.add(nameField);
+				nameField.setColumns(30);
+				nameField.setDisabledTextColor(Color.white);
+				nameField.setEnabled(false);
+
+		panel_3 = new JPanel();
+		GridBagConstraints gbc_panel_3 = new GridBagConstraints();
+		gbc_panel_3.anchor = GridBagConstraints.NORTHEAST;
+		gbc_panel_3.insets = new Insets(0, 0, 5, 5);
+		gbc_panel_3.gridx = 0;
+		gbc_panel_3.gridy = 2;
+		getContentPane().add(panel_3, gbc_panel_3);
+		panel_3.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		JLabel lblNewLabel_2 = new JLabel(" Path");
-		GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
-		gbc_lblNewLabel_2.anchor = GridBagConstraints.EAST;
-		gbc_lblNewLabel_2.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_2.gridx = 0;
-		gbc_lblNewLabel_2.gridy = 3;
-		getContentPane().add(lblNewLabel_2, gbc_lblNewLabel_2);
+		panel_3.add(lblNewLabel_2);
+
+		panel_1 = new JPanel();
+		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
+		gbc_panel_1.anchor = GridBagConstraints.NORTH;
+		gbc_panel_1.fill = GridBagConstraints.HORIZONTAL;
+		gbc_panel_1.insets = new Insets(0, 0, 5, 5);
+		gbc_panel_1.gridx = 2;
+		gbc_panel_1.gridy = 2;
+		getContentPane().add(panel_1, gbc_panel_1);
+		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
 
 		pathField = new JTextField();
-		GridBagConstraints gbc_pathField = new GridBagConstraints();
-		gbc_pathField.insets = new Insets(0, 0, 5, 5);
-		gbc_pathField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_pathField.gridx = 1;
-		gbc_pathField.gridy = 3;
-		getContentPane().add(pathField, gbc_pathField);
-		pathField.setColumns(10);
+		pathField.setHorizontalAlignment(SwingConstants.LEFT);
+		panel_1.add(pathField);
+		Dimension minSize = new Dimension(5, 0);
+		Dimension prefSize = new Dimension(5, 0);
+		Dimension maxSize = new Dimension(Short.MAX_VALUE, 0);
+		panel_1.add(new Box.Filler(minSize, prefSize, maxSize));
+		pathField.setColumns(30);
 
-		JButton BrowseButton = new JButton("Browse");
-		GridBagConstraints gbc_BrowseButton = new GridBagConstraints();
-		gbc_BrowseButton.fill = GridBagConstraints.HORIZONTAL;
-		gbc_BrowseButton.insets = new Insets(0, 0, 5, 5);
-		gbc_BrowseButton.gridx = 2;
-		gbc_BrowseButton.gridy = 3;
-		getContentPane().add(BrowseButton, gbc_BrowseButton);
-
-		JButton okButton = new JButton("OK");
-		okButton.setVerticalAlignment(SwingConstants.BOTTOM);
-		GridBagConstraints gbc_okButton = new GridBagConstraints();
-		gbc_okButton.anchor = GridBagConstraints.SOUTHEAST;
-		gbc_okButton.insets = new Insets(0, 0, 0, 5);
-		gbc_okButton.gridx = 1;
-		gbc_okButton.gridy = 5;
-		okButton.setPreferredSize(BrowseButton.getPreferredSize());
-		getContentPane().add(okButton, gbc_okButton);
-
-		JButton cancelButton = new JButton("Cancel");
-		cancelButton.setVerticalAlignment(SwingConstants.BOTTOM);
-		GridBagConstraints gbc_cancelButton = new GridBagConstraints();
-		gbc_cancelButton.insets = new Insets(0, 0, 0, 5);
-		gbc_cancelButton.anchor = GridBagConstraints.SOUTH;
-		gbc_cancelButton.gridx = 2;
-		gbc_cancelButton.gridy = 5;
-		cancelButton.setPreferredSize(BrowseButton.getPreferredSize());
-		getContentPane().add(cancelButton, gbc_cancelButton);
+		BrowseButton = new JButton("Browse");
+		panel_1.add(BrowseButton);
 
 		BrowseButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				
 				String path = wsm.getFilePath();
 				if (path != null) {
 
@@ -128,7 +147,7 @@ public class AddWorkSpaceDialog extends JDialog {
 					int index = path.lastIndexOf(search);
 					String subname = path.substring(index + 1, path.length());
 					DEBUG.debugmessage(index + " " + subname);
-					
+
 					pathField.setText(path);
 
 					nameField.setText(subname);
@@ -137,44 +156,72 @@ public class AddWorkSpaceDialog extends JDialog {
 			}
 
 		});
-		okButton.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+		JPanel panel = new JPanel();
+		GridBagConstraints gbc_panel = new GridBagConstraints();
+		gbc_panel.anchor = GridBagConstraints.EAST;
+		gbc_panel.fill = GridBagConstraints.VERTICAL;
+		gbc_panel.insets = new Insets(0, 0, 0, 5);
+		gbc_panel.gridx = 2;
+		gbc_panel.gridy = 4;
+		getContentPane().add(panel, gbc_panel);
+		GridBagLayout gbl_panel = new GridBagLayout();
+		gbl_panel.columnWidths = new int[]{47, 65, 0};
+		gbl_panel.rowHeights = new int[]{23, 0};
+		gbl_panel.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+		panel.setLayout(gbl_panel);
+						
+								okButton = new JButton("OK");
+								okButton.setPreferredSize(BrowseButton.getPreferredSize());
+								
+										GridBagConstraints gbc_okButton = new GridBagConstraints();
+										gbc_okButton.anchor = GridBagConstraints.WEST;
+										gbc_okButton.insets = new Insets(0, 0, 0, 5);
+										gbc_okButton.gridx = 0;
+										gbc_okButton.gridy = 0;
+										panel.add(okButton, gbc_okButton);
+										okButton.setVerticalAlignment(SwingConstants.BOTTOM);
+										okButton.addActionListener(new ActionListener() {
 
-				WorkSpace ws = new WorkSpace();
-				ws.setName(nameField.getText());
-				ws.setPath(pathField.getText());
-			boolean result = wsm.addWorkSpace(ws,self);
-			if(result) {
-				
-			
-			
-				dispose(); 
-		
-			}
-			
-			}
+											@Override
+											public void actionPerformed(ActionEvent e) {
 
-		});
+												WorkSpace ws = new WorkSpace();
+												ws.setName(nameField.getText());
+												ws.setPath(pathField.getText());
+												boolean result = wsm.addWorkSpace(ws, self);
+												if (result) {
 
-		cancelButton.addActionListener(new ActionListener() {
+													dispose();
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+												}
 
-				
-				dispose(); 
+											}
 
-			}
-
-		});
-		nameField.setDisabledTextColor(Color.white);
-		nameField.setEnabled(false); 
-
-		setSize(500, 300);
-		setResizable(false);
+										});
+						cancelButton = new JButton("Cancel");
+						GridBagConstraints gbc_cancelButton = new GridBagConstraints();
+						gbc_cancelButton.anchor = GridBagConstraints.WEST;
+						gbc_cancelButton.gridx = 1;
+						gbc_cancelButton.gridy = 0;
+						panel.add(cancelButton, gbc_cancelButton);
+						cancelButton.setPreferredSize(BrowseButton.getPreferredSize());
+						cancelButton.setVerticalAlignment(SwingConstants.BOTTOM);
+						
+								cancelButton.addActionListener(new ActionListener() {
+						
+									@Override
+									public void actionPerformed(ActionEvent e) {
+						
+										dispose();
+						
+									}
+						
+								});
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		//this.setSize(this.getPreferredSize());
+		this.setSize(455,225);
 	}
 
 }

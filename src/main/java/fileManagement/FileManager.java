@@ -306,8 +306,9 @@ public class FileManager {
 	 * 
 	 * @param workspace : The workspace to search for projects from
 	 */
-	public void scanWorkSpace(WorkSpace workspace) {
+	public List<Project> scanWorkSpace(WorkSpace workspace) {
 
+		List<Project> returning = new ArrayList<>(); 
 		// Get workspace path
 		File path = new File(workspace.getPath());
 
@@ -338,13 +339,16 @@ public class FileManager {
 			try {
 				final String valueFromAttributes = new String(readBuffer.array(), StandardCharsets.UTF_8);
 				if (valueFromAttributes.equals(FILE_PROPERTIES.projectProperty)) {
-					this.editorProjects.put(dir.getAbsolutePath(), new Project(dir.getAbsolutePath(), dir.getName()));
+					Project newProject = new Project(dir.getAbsolutePath(),dir.getName());
+					this.editorProjects.put(dir.getAbsolutePath(), newProject);
+					returning.add(newProject);
 				}
 			} catch (NullPointerException e) {
 				e.printStackTrace();
 			}
 
 		}
+		return returning; 
 
 	}
 

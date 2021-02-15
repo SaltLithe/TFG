@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -20,8 +21,6 @@ import javax.swing.JToolBar;
 import userInterface.DeveloperMainFrameWrapper;
 import userInterface.ObserverActions;
 import userInterface.UIController;
-
-import javax.swing.ImageIcon;
 
 /**
  * Ui class that contains functionality to join and disconnect from sessions as
@@ -46,12 +45,13 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 
 	public UsersPanel() {
 
+		
 		icons = new LinkedList<ProfileIIconComponent>();
 		setLayout(new BorderLayout(0, 0));
 
 		JPanel panel = new JPanel();
 		add(panel, BorderLayout.NORTH);
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
 		JToolBar toolBar = new JToolBar();
 		panel.add(toolBar);
@@ -128,6 +128,11 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 		ArrayList<Object> result = (ArrayList<Object>) evt.getNewValue();
 
 		switch (action) {
+		case CLEAR_ALL_ICON:
+			userIconsPanel.removeAll();
+			userIconsPanel.updateUI();
+			break;
+		
 		case SET_SELF_ICON:
 
 			setSelf((Color) result.get(0), (String) result.get(1), (String) result.get(2));
@@ -217,6 +222,7 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 			c.setMaximumSize(c.getPreferredSize());
 			c.setMaximumSize(c.getPreferredSize());
 			c.setMaximumSize(c.getPreferredSize());
+			c.setAlignmentX(0.0f);
 			userIconsPanel.add(c);
 
 		}

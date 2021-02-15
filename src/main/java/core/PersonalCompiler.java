@@ -62,7 +62,7 @@ public class PersonalCompiler implements PropertyChangeListener {
 		console = new ConsoleWrapper();
 	}
 
-	public void run(String className, URLData[] added) {
+	public int run(String className, URLData[] added) {
 
 	
 		try {
@@ -120,12 +120,7 @@ public class PersonalCompiler implements PropertyChangeListener {
 
 			// Check that we can access the compiler
 			JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-			if (compiler == null) {
-				DEBUG.debugmessage("SE REQUIERE EL USO DE JAVA JDK ");
-			} else {
-				DEBUG.debugmessage("SE PUEDE COMPILAR EL FICHERO");
-			}
-
+		
 			// Prepare an array to pass onto the compiler
 			// This compiler needs the names of all of the classes it has to compile
 			// together
@@ -134,9 +129,11 @@ public class PersonalCompiler implements PropertyChangeListener {
 			compiling = new String[copied.length];
 			DEBUG.setExecuting();
 			// Divert the standard streams
+			if(!DEBUG.testing) {
 			System.setOut(console.getOutPrint());
 			System.setErr(console.getErrPrint());
 			System.setIn(console.getInStream());
+			}
 			boolean cantcompile = false;
 
 			// Fill this array
@@ -181,7 +178,14 @@ public class PersonalCompiler implements PropertyChangeListener {
 					// Create a class object using our classloader pointing to the bin folder and
 					// passing
 					// it a reference to the name of the entrypoint class
-					Class<?> cls = Class.forName(rawname, true, classLoader);
+					Class<?> cls = null;
+						
+						//cls = Class.forName(added[0].project + "\\bin\\" + rawname);
+					
+					
+						
+						cls = Class.forName(rawname, false, classLoader);
+					
 					// Instantiate the class
 					@SuppressWarnings("deprecation")
 					Object instance = cls.newInstance();
@@ -202,16 +206,20 @@ public class PersonalCompiler implements PropertyChangeListener {
 						// run the main method
 						method.invoke(instance, (Object) mainArgs);
 					} catch (Exception e) {
+						
 						console.reset();
-
+						
 					}
-
+					classLoader.close();
 					// If there are any errors , reset the standard streams
 				} catch (Exception e) {
+					
 					System.setOut(stdout);
 					System.setErr(stderr);
 					System.setIn(stdin);
+					classLoader.close();
 					e.printStackTrace();
+					return 2;
 
 				}
 
@@ -222,6 +230,8 @@ public class PersonalCompiler implements PropertyChangeListener {
 				System.setOut(stdout);
 				System.setErr(stderr);
 				System.setIn(stdin);
+				classLoader.close();
+				return 0;
 
 			} else {
 				DEBUG.unsetExecuting();
@@ -229,6 +239,7 @@ public class PersonalCompiler implements PropertyChangeListener {
 				System.setErr(stderr);
 				System.setIn(stdin);
 				console.reset();
+				return 1;
 
 			}
 
@@ -239,8 +250,10 @@ public class PersonalCompiler implements PropertyChangeListener {
 			System.setIn(stdin);
 
 			console.reset();
+			return 1;
 
 		}
+		
 	}
 
 	/**

@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <WorkSpaces>
-   
+    <WorkSpace>
+        <name>testWorkSpace</name>
+        <path>C:\Users\Usuario\Documents\GitHub\TFG\TFG\src\test\resources\unitTestFolder\fillerTestWorkspace</path>
+    </WorkSpace>
+    <WorkSpace>
+        <name>aNewWorkspace</name>
+        <path>C:\Users\Usuario\Desktop\aNewWorkspace</path>
+    </WorkSpace>
 </WorkSpaces>

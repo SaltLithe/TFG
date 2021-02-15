@@ -34,7 +34,6 @@ public class WorkSpaceManager {
 	 */
 	public static WorkSpaceManager getInstance() {
 		if (instance == null) {
-			
 
 			instance = new WorkSpaceManager();
 		}
@@ -128,7 +127,6 @@ public class WorkSpaceManager {
 	 */
 	public List<WorkSpace> getAllWorkSpaces() {
 
-		
 		Unmarshaller jaxbUnmarshaller = null;
 		JAXBContext jaxbContext = null;
 		WorkSpaces ws = null;
@@ -144,7 +142,7 @@ public class WorkSpaceManager {
 		}
 
 		try {
-		File tempWS = new File("./WorkSpaces.xml");
+			File tempWS = new File("./WorkSpaces.xml");
 			ws = (WorkSpaces) jaxbUnmarshaller.unmarshal(tempWS);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -153,7 +151,7 @@ public class WorkSpaceManager {
 		try {
 			return ws.getWorkSpaces();
 		} catch (Exception e) {
-			return null;
+			return new ArrayList<>();
 		}
 
 	}
@@ -202,13 +200,15 @@ public class WorkSpaceManager {
 		if (hasName) {
 			wslist.remove(id);
 			rewriteWorkSpaces(wslist);
-
-			JOptionPane.showMessageDialog(frame, "Deleted successfully.");
+			if (frame != null) {
+				JOptionPane.showMessageDialog(frame, "Deleted successfully.");
+			}
 		} else {
-
-			JOptionPane.showMessageDialog(frame,
-					"Delete operation failed, could not find a WorkSpace with the name: " + name + ".", "Delete error",
-					JOptionPane.ERROR_MESSAGE);
+			if (frame != null) {
+				JOptionPane.showMessageDialog(frame,
+						"Delete operation failed, could not find a WorkSpace with the name: " + name + ".",
+						"Delete error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 
@@ -306,8 +306,6 @@ public class WorkSpaceManager {
 	 * @return if the operation has been completed successfully
 	 */
 	private boolean rewriteWorkSpaces(List<WorkSpace> ws) {
-		
-	
 
 		File workspacefile = new File("./WorkSpaces.xml");
 		WorkSpaces newws = new WorkSpaces();

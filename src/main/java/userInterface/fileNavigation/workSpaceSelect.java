@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,7 +30,6 @@ import javax.swing.border.EmptyBorder;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
-import core.DEBUG;
 import fileManagement.CustomWorkSpaceElement;
 import fileManagement.WorkSpace;
 import fileManagement.WorkSpaceManager;
@@ -60,6 +60,7 @@ public class workSpaceSelect extends JFrame {
 	Dimension prefSize = new Dimension(0, 0);
 	Dimension maxSize = new Dimension(0, 0);
 	LinkedList<Component> selectPanelComponents;
+	private JPanel panel_1;
 
 	public workSpaceSelect() {
 		
@@ -89,9 +90,9 @@ public class workSpaceSelect extends JFrame {
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[] { 85, 0 };
-		gbl_contentPane.rowHeights = new int[] { 0, 21, 0, 0, 0 };
+		gbl_contentPane.rowHeights = new int[] { 0, 0, 0, 0 };
 		gbl_contentPane.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 1.0, Double.MIN_VALUE };
 		contentPane.setLayout(gbl_contentPane);
 
 		lblNewLabel = new JLabel("LAUNCH");
@@ -102,24 +103,46 @@ public class workSpaceSelect extends JFrame {
 		gbc_lblNewLabel.gridx = 0;
 		gbc_lblNewLabel.gridy = 0;
 		contentPane.add(lblNewLabel, gbc_lblNewLabel);
-
-		noWorkSpaceButton = new JButton("Start without WorkSpace");
-
-		GridBagConstraints gbc_noWorkspaceButton = new GridBagConstraints();
-		gbc_noWorkspaceButton.anchor = GridBagConstraints.WEST;
-		gbc_noWorkspaceButton.insets = new Insets(0, 0, 5, 0);
-		gbc_noWorkspaceButton.gridx = 0;
-		gbc_noWorkspaceButton.gridy = 1;
-		contentPane.add(noWorkSpaceButton, gbc_noWorkspaceButton);
-
-		newWorkSpaceButton = new JButton("New WorkSpace");
-		newWorkSpaceButton.setHorizontalAlignment(SwingConstants.LEFT);
-		GridBagConstraints gbc_btnNewButton1 = new GridBagConstraints();
-		gbc_btnNewButton1.anchor = GridBagConstraints.WEST;
-		gbc_btnNewButton1.insets = new Insets(0, 0, 5, 0);
-		gbc_btnNewButton1.gridx = 0;
-		gbc_btnNewButton1.gridy = 2;
-		contentPane.add(newWorkSpaceButton, gbc_btnNewButton1);
+		
+		panel_1 = new JPanel();
+		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
+		gbc_panel_1.anchor = GridBagConstraints.WEST;
+		gbc_panel_1.insets = new Insets(0, 0, 5, 0);
+		gbc_panel_1.fill = GridBagConstraints.VERTICAL;
+		gbc_panel_1.gridx = 0;
+		gbc_panel_1.gridy = 1;
+		contentPane.add(panel_1, gbc_panel_1);
+				panel_1.setLayout(new GridLayout(0, 2, 0, 0));
+		
+				newWorkSpaceButton = new JButton("New WorkSpace");
+				panel_1.add(newWorkSpaceButton);
+				
+						noWorkSpaceButton = new JButton("Start without WorkSpace");
+						panel_1.add(noWorkSpaceButton);
+						newWorkSpaceButton.setSize(noWorkSpaceButton.getSize());
+						
+								noWorkSpaceButton.addActionListener(new ActionListener() {
+						
+									@Override
+									public void actionPerformed(ActionEvent e) {
+						
+										WorkSpaceManager.getInstance().startMainApp();
+										dispose();
+						
+									}
+						
+								});
+				
+						newWorkSpaceButton.addActionListener(new ActionListener() {
+				
+							@Override
+							public void actionPerformed(ActionEvent e) {
+				
+								openAddWorkSpaceDialog();
+				
+							}
+				
+						});
 
 		panel = new JPanel();
 		scrollPanel = new JScrollPane(panel);
@@ -127,7 +150,7 @@ public class workSpaceSelect extends JFrame {
 		gbc_panel.fill = GridBagConstraints.BOTH;
 		gbc_panel.anchor = GridBagConstraints.NORTHWEST;
 		gbc_panel.gridx = 0;
-		gbc_panel.gridy = 3;
+		gbc_panel.gridy = 2;
 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.setSize(panel.getPreferredSize());
@@ -137,28 +160,6 @@ public class workSpaceSelect extends JFrame {
 		this.contentPane.add(scrollPanel, gbc_panel);
 		readAndGenerate();
 
-		newWorkSpaceButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				openAddWorkSpaceDialog();
-
-			}
-
-		});
-
-		noWorkSpaceButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				WorkSpaceManager.getInstance().startMainApp();
-				dispose();
-
-			}
-
-		});
 
 		setSize(500, 500);
 		setResizable(false);
@@ -205,6 +206,7 @@ public class workSpaceSelect extends JFrame {
 
 		}
 
+		
 	}
 
 	/**

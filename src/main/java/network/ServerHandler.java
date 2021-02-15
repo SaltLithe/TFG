@@ -361,6 +361,7 @@ public class ServerHandler implements ServerMessageHandler {
 
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(), "You have disconnected!.",
 				"Server disconnected warning", JOptionPane.WARNING_MESSAGE);
+		
 
 	}
 

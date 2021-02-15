@@ -115,7 +115,16 @@ public class CreateSessionDialog extends JFrame {
 		});
 
 		JButton cancelButton = new JButton("Cancel");
-		cancelButton.setActionCommand("Cancel");
+		cancelButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				dispose(); 
+			}
+			
+			
+		});
 		buttonPane.add(cancelButton);
 
 		serverNameField_S = new JTextField();

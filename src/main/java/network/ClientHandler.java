@@ -427,6 +427,9 @@ public class ClientHandler implements ClientMessageHandler {
 		UIController.developerComponent.disconnect(); 
 		support.notify(ObserverActions.ENABLE_LOCAL_RUN, null);
 		support.notify(ObserverActions.DISABLE_GLOBAL_RUN, null);
+		support.notify(ObserverActions.CLEAR_ALL_ICON,null);
+
+		
 		
 
 	}
