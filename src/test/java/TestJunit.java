@@ -42,21 +42,7 @@ public class TestJunit {
 	  
 
 
-	  @Test public void testCompileSuccess() {
-	  
-	  PersonalCompiler compiler = new PersonalCompiler(); 
-	  URLData[] testData_2 = new URLData[1]; 
-	  testData_2[0] = new URLData("C:\\Users\\Usuario\\Documents\\GitHub\\TFG\\TFG\\src\\test\\resources\\unitTestFolder\\" + "SuccessfulCompilationApp.java" , true, "SuccessfulCompilationApp", "C:\\Users\\Usuario\\Documents\\GitHub\\TFG\\TFG\\src\\test\\resources\\unitTestFolder"); 
-
-	  int result = compiler.run("SuccessfulCompilationApp.java", testData_2);
-	  assertTrue(result == 0);
-	 }
-	  
-
-	  
-	 
-	 
-
+	
 	private boolean workSpacecheck(String name) {
 		boolean result = false;
 		List<WorkSpace> readResult = WorkSpaceManager.getInstance().getAllWorkSpaces();
