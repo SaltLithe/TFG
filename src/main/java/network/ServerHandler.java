@@ -16,16 +16,25 @@ import javax.swing.JOptionPane;
 
 import com.google.common.util.concurrent.MoreExecutors;
 
+import commandController.CommandController;
 import core.DEBUG;
-import fileManagement.FILE_PROPERTIES;
 import javaMiniSockets.serverSide.ClientInfo;
 import javaMiniSockets.serverSide.ServerMessageHandler;
-import userInterface.DeveloperMainFrameWrapper;
-import userInterface.ObserverActions;
-import userInterface.PropertyChangeMessenger;
-import userInterface.UIController;
-import userInterface.networkManagement.AcceptGlobalDialog;
-import userInterface.networkManagement.serverAwaitSync;
+import networkMessages.ClientDisconnectedMessage;
+import networkMessages.GlobalRunRequestMessage;
+import networkMessages.GlobalRunRequestResponse;
+import networkMessages.HighLightMessage;
+import networkMessages.ImageDataMessage;
+import networkMessages.RequestWorkspaceMessage;
+import networkMessages.ResponseCreateFileMessage;
+import networkMessages.SyncEndedMessage;
+import networkMessages.WriteMessage;
+import observerController.ObserverActions;
+import observerController.PropertyChangeMessenger;
+import userInterface.uiFileManagement.FILE_PROPERTIES;
+import userInterface.uiGeneral.DeveloperMainFrameWrapper;
+import userInterface.uiNetwork.AcceptGlobalDialog;
+import userInterface.uiNetwork.serverAwaitSync;
 
 /**
  * Class implementing the SErver Message Handler it receives the calls from the
@@ -104,7 +113,7 @@ public class ServerHandler implements ServerMessageHandler {
 		if (syncCount.incrementAndGet() == nClients) {
 
 			SyncEndedMessage syncEnded = new SyncEndedMessage();
-			UIController.developerComponent.sendMessageToEveryone(syncEnded);
+			CommandController.developerComponent.sendMessageToEveryone(syncEnded);
 		}
 
 		syncSem.release();
@@ -116,9 +125,9 @@ public class ServerHandler implements ServerMessageHandler {
 	 */
 	public void closeServer(int newclients) {
 		this.nClients = newclients; 
-		UIController.developerComponent.closeServer(nClients);
+		CommandController.developerComponent.closeServer(nClients);
 		SyncEndedMessage syncEnded = new SyncEndedMessage();
-		UIController.developerComponent.sendMessageToEveryone(syncEnded);
+		CommandController.developerComponent.sendMessageToEveryone(syncEnded);
 		support.notify(ObserverActions.ENABLE_TEXT_EDITOR, null);
 
 	}
@@ -137,7 +146,7 @@ public class ServerHandler implements ServerMessageHandler {
 			try {
 				if(backlog.size() >0 ) {
 					incoming = backlog.take();
-					UIController.developerComponent.sendMessageToEveryone(incoming);
+					CommandController.developerComponent.sendMessageToEveryone(incoming);
 				}else {
 				incoming = processBuffer.take();
 				}
@@ -190,10 +199,12 @@ public class ServerHandler implements ServerMessageHandler {
 			
 		messageSem.acquire(); 
 		String messageclass = message.getClass().toString();
-
-		switch (messageclass) {
+		int lastindexof = messageclass.lastIndexOf('.');
+		
+		String rawname = messageclass.substring(lastindexof+1, messageclass.length());
+		switch (rawname) {
 		// Message is a write order
-		case "class network.WriteMessage":
+		case "WriteMessage":
 
 		
 			WriteMessage incoming = (WriteMessage) message;
@@ -202,7 +213,7 @@ public class ServerHandler implements ServerMessageHandler {
 			try {
 				if(!running) {
 				processBuffer.put(incoming);
-				UIController.developerComponent.sendMessageToEveryone(incoming);
+				CommandController.developerComponent.sendMessageToEveryone(incoming);
 				}else {
 					backlog.put(incoming);
 				}
@@ -214,7 +225,7 @@ public class ServerHandler implements ServerMessageHandler {
 			break;
 
 		// Message is a request from a client to receive wworkspace data
-		case "class network.RequestWorkspaceMessage":
+		case "RequestWorkspaceMessage":
 
 			ResponseCreateFileMessage response = new ResponseCreateFileMessage();
 
@@ -235,47 +246,47 @@ public class ServerHandler implements ServerMessageHandler {
 				response.newname = null;
 			}
 
-			response.path = UIController.developerComponent.getWorkSpaceName();
+			response.path = CommandController.developerComponent.getWorkSpaceName();
 			response.type = FILE_PROPERTIES.workspaceProperty;
 
-			UIController.runOnThread(() -> UIController.developerComponent.sendSyncToClient(response, client.clientID));
+			CommandController.runOnThread(() -> CommandController.developerComponent.sendSyncToClient(response, client.clientID));
 
 			break;
 
 		// Message contains image data from clients
-		case "class network.ImageDataMessage":
+		case "ImageDataMessage":
 			ImageDataMessage imageData = (ImageDataMessage) message;
 			imageData.clientID = client.clientID;
 			ImageDataMessage returnData = new ImageDataMessage(chosenImage, chosenColor.getRGB(), chosenName, true);
 			colorData.put(imageData.name, imageData.color);
 			try {
-				UIController.developerComponent.sendToClient(returnData, client.clientID);
+				CommandController.developerComponent.sendToClient(returnData, client.clientID);
 			
 				
 				for (ImageDataMessage clientData : connectedClients) {
 				
-						UIController.developerComponent.sendToClient(clientData, client.clientID);
+						CommandController.developerComponent.sendToClient(clientData, client.clientID);
 					
 				}
 				
-				UIController.developerComponent.sendMessageToEveryone(imageData);
+				CommandController.developerComponent.sendMessageToEveryone(imageData);
 			} catch (Exception e) {
 			}
 			if (!(connectedClients.contains(imageData))) {
 				connectedClients.add(imageData);
 			}
-			UIController.runOnThread(() -> UIController.developerComponent.addProfilePicture(imageData.image,
+			CommandController.runOnThread(() -> CommandController.developerComponent.addProfilePicture(imageData.image,
 					imageData.color, imageData.name, imageData.isServer, imageData.clientID));
 
 			break;
 
 		// Message contais highlight data for the server to paint highlights and
 		// redistribute
-		case "class network.HighLightMessage":
+		case "HighLightMessage":
 			HighLightMessage highlightData = (HighLightMessage) message;
 			try {
 				highlightBuffer.put(highlightData);
-				UIController.developerComponent.sendMessageToEveryone(highlightData);
+				CommandController.developerComponent.sendMessageToEveryone(highlightData);
 
 			} catch (InterruptedException e) {
 				
@@ -284,14 +295,13 @@ public class ServerHandler implements ServerMessageHandler {
 
 			break;
 		
-		case "class network.GlobalRunRequestResponse":
-			System.out.println("GOT A RUN RESPONSE");
+		case "GlobalRunRequestResponse":
 			GlobalRunRequestResponse runResponse = (GlobalRunRequestResponse) message;
 			if(!runResponse.ok) {
-				UIController.developerComponent.runningThread.interrupt();
+				CommandController.developerComponent.runningThread.interrupt();
 				GlobalRunRequestResponse clientResponse = new GlobalRunRequestResponse();
 				clientResponse.canceled = true;
-				UIController.runOnThread(()-> UIController.developerComponent.sendMessageToEveryone(clientResponse));
+				CommandController.runOnThread(()-> CommandController.developerComponent.sendMessageToEveryone(clientResponse));
 				JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 					    runResponse.name + " did not agree to a global Run.",
 					    "Run was canceled",
@@ -300,22 +310,22 @@ public class ServerHandler implements ServerMessageHandler {
 			else {
 				
 				DEBUG.debugmessage("COUNTING DOWN");
-				UIController.developerComponent.waitingResponses.countDown();
+				CommandController.developerComponent.waitingResponses.countDown();
 				
 				
 			}
 			
 			break;
-		case "class network.GlobalRunRequestMessage":
+		case "GlobalRunRequestMessage":
 			if(!running) {
 			running = true; 
 			GlobalRunRequestMessage runRequest = (GlobalRunRequestMessage) message;
-			if(UIController.developerComponent.focusedProject == null) {
+			if(CommandController.developerComponent.focusedProject == null) {
 				GlobalRunRequestResponse serverResponse = new GlobalRunRequestResponse();
 				serverResponse.name = chosenName;
 				serverResponse.ok = false;
 				serverResponse.noProject = true; 
-				UIController.developerComponent.sendToClient(serverResponse, client.clientID);
+				CommandController.developerComponent.sendToClient(serverResponse, client.clientID);
 			}
 			else {
 			 new AcceptGlobalDialog(runRequest.name , this , client.clientID , runRequest);
@@ -344,8 +354,8 @@ public class ServerHandler implements ServerMessageHandler {
 
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 				"The server is ready, other users can join your sesion now.");
-		UIController.developerComponent.saveAllFull();
-		UIController.developerComponent.closeAllTabs();
+		CommandController.developerComponent.saveAllFull();
+		CommandController.developerComponent.closeAllTabs();
 		support.notify(ObserverActions.DISABLE_TEXT_EDITOR, null);
 
 
@@ -395,8 +405,8 @@ public class ServerHandler implements ServerMessageHandler {
 		}
 
 		ClientDisconnectedMessage disconnected = new ClientDisconnectedMessage(clientID);
-		UIController.developerComponent.removeProfilePicture(clientID);
-		UIController.runOnThread(() -> UIController.developerComponent.sendMessageToEveryone(disconnected));
+		CommandController.developerComponent.removeProfilePicture(clientID);
+		CommandController.runOnThread(() -> CommandController.developerComponent.sendMessageToEveryone(disconnected));
 
 	}
 
@@ -411,15 +421,15 @@ public class ServerHandler implements ServerMessageHandler {
 
 		if(decision) {
 			  
-			UIController.developerComponent.startRunGlobal(true);
-			UIController.developerComponent.waitingResponses.countDown();
+			CommandController.developerComponent.startRunGlobal(true);
+			CommandController.developerComponent.waitingResponses.countDown();
 			
 		}
 		else {
 			GlobalRunRequestResponse message = new GlobalRunRequestResponse();
 			message.name = chosenName;
 			message.canceled = true;
-			UIController.developerComponent.sendToClient(message, invokerID);
+			CommandController.developerComponent.sendToClient(message, invokerID);
 			running = false; 
 			
 			

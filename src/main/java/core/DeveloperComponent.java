@@ -16,27 +16,26 @@ import java.util.concurrent.CountDownLatch;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import fileManagement.FILE_PROPERTIES;
-import fileManagement.FILE_TYPE;
-import fileManagement.FileManager;
-import fileManagement.WorkSpace;
-import fileManagement.WorkSpaceManager;
+import commandController.CommandController;
 import javaMiniSockets.clientSide.AsynchronousClient;
 import javaMiniSockets.serverSide.AsynchronousServer;
 import network.ClientHandler;
-import network.GlobalRunDone;
-import network.GlobalRunRequestMessage;
-import network.GlobalRunRequestResponse;
-import network.ResponseCreateFileMessage;
 import network.ServerHandler;
-import network.WriteToConsoleMessage;
-import userInterface.DeveloperMainFrame;
-import userInterface.DeveloperMainFrameWrapper;
-import userInterface.ObserverActions;
-import userInterface.PropertyChangeMessenger;
-import userInterface.UIController;
-import userInterface.RunConfigDialog;
-import userInterface.fileNavigation.CustomTreeNode;
+import networkMessages.GlobalRunDone;
+import networkMessages.GlobalRunRequestMessage;
+import networkMessages.GlobalRunRequestResponse;
+import networkMessages.ResponseCreateFileMessage;
+import networkMessages.WriteToConsoleMessage;
+import observerController.ObserverActions;
+import observerController.PropertyChangeMessenger;
+import userInterface.uiFileManagement.FILE_PROPERTIES;
+import userInterface.uiFileManagement.FILE_TYPE;
+import userInterface.uiFileManagement.WorkSpace;
+import userInterface.uiFileManagement.WorkSpaceManager;
+import userInterface.uiFileNavigation.CustomTreeNode;
+import userInterface.uiGeneral.DeveloperMainFrame;
+import userInterface.uiGeneral.DeveloperMainFrameWrapper;
+import userInterface.uiGeneral.RunConfigDialog;
 
 public class DeveloperComponent implements PropertyChangeListener {
 
@@ -86,7 +85,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 
 		// Other parts of this software may need references to developer component , so
 		// we save it in uicontroller
-		UIController.getInstance().setDeveloperComponent(this);
+		CommandController.getInstance().setDeveloperComponent(this);
 
 		// Start the user interface
 		try {
@@ -155,10 +154,10 @@ public class DeveloperComponent implements PropertyChangeListener {
 			client.setAutomaticIP();
 
 		}
-
+		support.notify(ObserverActions.DISABLE_NEW_PROJECT, null);
+		support.notify(ObserverActions.DISABLE_JOIN_BUTTON, null);
 		try {
-			support.notify(ObserverActions.DISABLE_NEW_PROJECT, null);
-			support.notify(ObserverActions.DISABLE_JOIN_BUTTON, null);
+			
 			client.Connect();
 			isConnected = true;
 
@@ -830,7 +829,6 @@ public class DeveloperComponent implements PropertyChangeListener {
 		case UPDATE_PANEL_CONTENTS:
 			String editingpath = (String) results.get(0);
 			String partialPath = workSpace.getPath().substring(0, workSpace.getPath().lastIndexOf("\\"));
-			System.out.println("CLOSE EDIT ON :" + partialPath+editingpath);
 			fileManager.updatePanelContents(partialPath + editingpath, results);
 			break;
 		case DELETE_CLASS_PATH:

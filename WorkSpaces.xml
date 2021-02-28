@@ -8,4 +8,12 @@
         <name>aNewWorkspace</name>
         <path>C:\Users\Usuario\Desktop\aNewWorkspace</path>
     </WorkSpace>
+    <WorkSpace>
+        <name>testWorkSpace</name>
+        <path>C:\Users\Usuario\Desktop\aquimismo\testWorkSpace</path>
+    </WorkSpace>
+    <WorkSpace>
+        <name>aNewWorkspace</name>
+        <path>C:\Users\Usuario\Desktop\aquimismo\aNewWorkspace</path>
+    </WorkSpace>
 </WorkSpaces>

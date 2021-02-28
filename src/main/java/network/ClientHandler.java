@@ -15,18 +15,26 @@ import javax.swing.JOptionPane;
 
 import com.google.common.util.concurrent.MoreExecutors;
 
+import commandController.CommandController;
 import core.DEBUG;
-import fileManagement.FILE_PROPERTIES;
-import fileManagement.FILE_TYPE;
 import javaMiniSockets.clientSide.ClientMessageHandler;
 import javaMiniSockets.clientSide.ServerInfo;
-import userInterface.DeveloperMainFrameWrapper;
-import userInterface.ObserverActions;
-import userInterface.PropertyChangeMessenger;
-import userInterface.UIController;
-import userInterface.networkManagement.AcceptGlobalDialog;
-import userInterface.networkManagement.acceptSyncDialog;
-import userInterface.networkManagement.awaitSyncDialog;
+import networkMessages.ClientDisconnectedMessage;
+import networkMessages.GlobalRunRequestMessage;
+import networkMessages.GlobalRunRequestResponse;
+import networkMessages.HighLightMessage;
+import networkMessages.ImageDataMessage;
+import networkMessages.ResponseCreateFileMessage;
+import networkMessages.WriteMessage;
+import networkMessages.WriteToConsoleMessage;
+import observerController.ObserverActions;
+import observerController.PropertyChangeMessenger;
+import userInterface.uiFileManagement.FILE_PROPERTIES;
+import userInterface.uiFileManagement.FILE_TYPE;
+import userInterface.uiGeneral.DeveloperMainFrameWrapper;
+import userInterface.uiNetwork.AcceptGlobalDialog;
+import userInterface.uiNetwork.acceptSyncDialog;
+import userInterface.uiNetwork.awaitSyncDialog;
 
 /**
  * Class implementing the Client Message Handler it receives the calls from the
@@ -53,7 +61,6 @@ public class ClientHandler implements ClientMessageHandler {
 	private HashMap<String, ImageDataMessage> images;
 	public boolean blocked = false; 
 	private Semaphore messageSem; 
-	
 	
 	
 	ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(3);
@@ -174,12 +181,12 @@ public class ClientHandler implements ClientMessageHandler {
 			messageSem.acquire(); 
 		// Get the class name
 		String messageclass = message.getClass().toString();
-
-		// Message is a write order
-		switch (messageclass) {
-		case "class network.WriteMessage":
+		int lastindexof = messageclass.lastIndexOf('.');
+		
+		String rawname = messageclass.substring(lastindexof+1, messageclass.length());
+		switch (rawname) {
+		case "WriteMessage":
 			WriteMessage incoming = (WriteMessage) message;
-
 			// Do not process this message if it is a broadcast from the server that is
 			// echoing
 			// your previous message
@@ -194,7 +201,7 @@ public class ClientHandler implements ClientMessageHandler {
 			break;
 
 		// Message is indicating the end of a sync operation
-		case "class network.SyncEndedMessage":
+		case "SyncEndedMessage":
 
 			if (sync != null) {
 
@@ -212,15 +219,15 @@ public class ClientHandler implements ClientMessageHandler {
 			// this client
 			support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);
 			support.notify(ObserverActions.ENABLE_GLOBAL_RUN, null);
-			UIController.developerComponent.setNewName(chosenName);
-			UIController.developerComponent.reloadWorkSpace();
+			CommandController.developerComponent.setNewName(chosenName);
+			CommandController.developerComponent.reloadWorkSpace();
 			ImageDataMessage imageMessage = new ImageDataMessage(chosenImage, chosenColor.getRGB(), chosenName, false);
-			UIController.developerComponent.sendMessageToServer(imageMessage);
+			CommandController.developerComponent.sendMessageToServer(imageMessage);
 
 			break;
 
 		// Message is indicating the client to create a file
-		case "class network.ResponseCreateFileMessage":
+		case "ResponseCreateFileMessage":
 			ResponseCreateFileMessage responseCreateFile = (ResponseCreateFileMessage) message;
 
 			// Behaviour changes if this message is indicating that the client should create
@@ -236,7 +243,7 @@ public class ClientHandler implements ClientMessageHandler {
 					unFlag = true;
 
 				}
-				UIController.developerComponent.createWorkSpace(responseCreateFile.path);
+				CommandController.developerComponent.createWorkSpace(responseCreateFile.path);
 				support.notify(ObserverActions.DISABLE_TEXT_EDITOR,null);
 				sync = new awaitSyncDialog();
 			}
@@ -248,34 +255,34 @@ public class ClientHandler implements ClientMessageHandler {
 			else if (responseCreateFile.type.equals(FILE_PROPERTIES.projectProperty)) {
 				String name = responseCreateFile.path.substring(responseCreateFile.path.lastIndexOf("\\"),
 						responseCreateFile.path.length());
-				UIController.developerComponent.createNewProject(name, false, false);
+				CommandController.developerComponent.createNewProject(name, false, false);
 			}
 
 			else if (responseCreateFile.type.equals(FILE_PROPERTIES.srcProperty)) {
-				UIController.developerComponent.writeFolder(responseCreateFile.path, FILE_TYPE.SRC_FOLDER);
+				CommandController.developerComponent.writeFolder(responseCreateFile.path, FILE_TYPE.SRC_FOLDER);
 			} else if (responseCreateFile.type.equals(FILE_PROPERTIES.binProperty)) {
-				UIController.developerComponent.writeFolder(responseCreateFile.path, FILE_TYPE.BIN_FOLDER);
+				CommandController.developerComponent.writeFolder(responseCreateFile.path, FILE_TYPE.BIN_FOLDER);
 
 			}
 
 			else if (responseCreateFile.type.equals(FILE_TYPE.JAVA_FILE.toString())) {
-				UIController.developerComponent.writeFile(responseCreateFile.path, responseCreateFile.contents,
+				CommandController.developerComponent.writeFile(responseCreateFile.path, responseCreateFile.contents,
 						FILE_TYPE.JAVA_FILE);
 
 			} else if (responseCreateFile.type.equals(FILE_TYPE.ANY_FILE.toString())) {
-				UIController.developerComponent.writeFile(responseCreateFile.path, responseCreateFile.contents,
+				CommandController.developerComponent.writeFile(responseCreateFile.path, responseCreateFile.contents,
 						FILE_TYPE.ANY_FILE);
 
 			}
 
 			break;
 		// The message contains image data from other users
-		case "class network.ImageDataMessage":
+		case "ImageDataMessage":
 			ImageDataMessage imageData = (ImageDataMessage) message;
 			DEBUG.debugmessage("LISTEN HERE YOU LITTLE SHIT NAME IS : " + imageData.name);
 
 			if (imageData.isServer) {
-				UIController.runOnThread(() -> UIController.developerComponent.addProfilePicture(imageData.image,
+				CommandController.runOnThread(() -> CommandController.developerComponent.addProfilePicture(imageData.image,
 						imageData.color, imageData.name, imageData.isServer, -1));
 				if(!images.containsKey(imageData.name)) {
 					colorData.put(imageData.name, imageData.color);
@@ -287,7 +294,7 @@ public class ClientHandler implements ClientMessageHandler {
 					images.put(imageData.name, imageData);
 					colorData.put(imageData.name, imageData.color);
 					DEBUG.debugmessage("GOT AN IMAGE FROM : " + imageData.name);
-					UIController.developerComponent.addProfilePicture(imageData.image, imageData.color, imageData.name,
+					CommandController.developerComponent.addProfilePicture(imageData.image, imageData.color, imageData.name,
 							imageData.isServer, imageData.clientID);
 				}
 
@@ -296,16 +303,16 @@ public class ClientHandler implements ClientMessageHandler {
 		/**
 		 * Message indicates that another user acting as client has disconnected
 		 */
-		case "class network.ClientDisconnectedMessage":
+		case "ClientDisconnectedMessage":
 			ClientDisconnectedMessage disconnected = (ClientDisconnectedMessage) message;
-			UIController.developerComponent.removeProfilePicture(disconnected.clientID);
+			CommandController.developerComponent.removeProfilePicture(disconnected.clientID);
 
 			break;
 
 		/**
 		 * Message contains orders to paint a highlight
 		 */
-		case "class network.HighLightMessage":
+		case "HighLightMessage":
 
 			HighLightMessage highlightData = (HighLightMessage) message;
 			try {
@@ -317,7 +324,7 @@ public class ClientHandler implements ClientMessageHandler {
 			}
 
 			break;
-		case "class network.GlobalRunRequestMessage":
+		case "GlobalRunRequestMessage":
 			
 			GlobalRunRequestMessage requestMessage = (GlobalRunRequestMessage) message;
 			if(!(requestMessage.name.equals(chosenName)) && !blocked) {
@@ -327,7 +334,7 @@ public class ClientHandler implements ClientMessageHandler {
 			
 			}
 			break;
-		case "class network.WriteToConsoleMessage":
+		case "WriteToConsoleMessage":
 			DEBUG.debugmessage("GOT WRITE TO CONSOLE");
 			WriteToConsoleMessage consoleMessage = (WriteToConsoleMessage) message;
 			try {
@@ -337,7 +344,7 @@ public class ClientHandler implements ClientMessageHandler {
 			}
 			break;
 		
-		case "class network.GlobalRunRequestResponse":
+		case "GlobalRunRequestResponse":
 			GlobalRunRequestResponse runResponse = (GlobalRunRequestResponse)message;
 			if(!runResponse.ok) {
 				
@@ -361,7 +368,7 @@ public class ClientHandler implements ClientMessageHandler {
 			
 			
 			break;
-		case "class network.GlobalRunDone":
+		case "GlobalRunDone":
 			
 			activateAll();
 
@@ -384,8 +391,8 @@ public class ClientHandler implements ClientMessageHandler {
 	@Override
 	public void onServerConnect(ServerInfo server) {
 
-		UIController.developerComponent.saveAllFull();
-		UIController.developerComponent.closeAllTabs();
+		CommandController.developerComponent.saveAllFull();
+		CommandController.developerComponent.closeAllTabs();
 
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 				"Success! You have connected to a session.");
@@ -411,7 +418,7 @@ public class ClientHandler implements ClientMessageHandler {
 				"You have been disconnected! The server may have failed or kicked you out of the session.",
 				"Disconnected warning", JOptionPane.WARNING_MESSAGE);
 		
-		UIController.developerComponent.disconnect();
+		CommandController.developerComponent.disconnect();
 		
 
 	}
@@ -424,7 +431,7 @@ public class ClientHandler implements ClientMessageHandler {
 	public void onDisconnect() {
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 				"You have disconnected from the current session.", "Disconnected warning", JOptionPane.WARNING_MESSAGE);
-		UIController.developerComponent.disconnect(); 
+		CommandController.developerComponent.disconnect(); 
 		support.notify(ObserverActions.ENABLE_LOCAL_RUN, null);
 		support.notify(ObserverActions.DISABLE_GLOBAL_RUN, null);
 		support.notify(ObserverActions.CLEAR_ALL_ICON,null);
@@ -443,7 +450,7 @@ public class ClientHandler implements ClientMessageHandler {
 		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
 				"Unable to connect to server, the server you are trying to connect is unreachable.", "Connection error",
 				JOptionPane.ERROR_MESSAGE);
-		UIController.developerComponent.disconnect(); 
+		CommandController.developerComponent.disconnect(); 
 	}
 
 	/**
@@ -467,7 +474,7 @@ public class ClientHandler implements ClientMessageHandler {
 		GlobalRunRequestResponse response = new GlobalRunRequestResponse();
 		response.name = chosenName;
 		response.ok = decision;
-		UIController.developerComponent.sendMessageToServer(response);
+		CommandController.developerComponent.sendMessageToServer(response);
 		
 
 	}

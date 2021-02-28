@@ -7,14 +7,14 @@ import java.util.List;
 
 import org.junit.Test;
 
+import core.FileManager;
 import core.PersonalCompiler;
 import core.URLData;
-import fileManagement.FILE_TYPE;
-import fileManagement.FileManager;
-import fileManagement.Project;
-import fileManagement.WorkSpace;
-import fileManagement.WorkSpaceManager;
-import network.ResponseCreateFileMessage;
+import networkMessages.ResponseCreateFileMessage;
+import userInterface.uiFileManagement.FILE_TYPE;
+import userInterface.uiFileManagement.Project;
+import userInterface.uiFileManagement.WorkSpace;
+import userInterface.uiFileManagement.WorkSpaceManager;
 
 public class TestJunit {
 

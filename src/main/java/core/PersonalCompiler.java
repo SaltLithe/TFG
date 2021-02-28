@@ -25,9 +25,9 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
 import console.ConsoleWrapper;
-import fileManagement.FILE_PROPERTIES;
-import userInterface.ObserverActions;
-import userInterface.PropertyChangeMessenger;
+import observerController.ObserverActions;
+import observerController.PropertyChangeMessenger;
+import userInterface.uiFileManagement.FILE_PROPERTIES;
 
 /**
  * Class in charge of receiving file paths from the file system to compile and

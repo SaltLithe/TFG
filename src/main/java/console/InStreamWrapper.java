@@ -7,7 +7,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Semaphore;
 
-import userInterface.ObserverActions;
+import observerController.ObserverActions;
 
 /**
  * Class that serves as wrapper for the console's input stream. In order to

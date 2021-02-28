@@ -1,6 +1,6 @@
 package core;
 
-import userInterface.fileNavigation.workSpaceSelect;
+import userInterface.uiFileNavigation.workSpaceSelect;
 
 /**
  * Launches Startup menu

@@ -2,9 +2,9 @@ package console;
 
 import java.io.PrintStream;
 
-import userInterface.ObserverActions;
-import userInterface.PropertyChangeMessenger;
-import userInterface.UIController;
+import commandController.CommandController;
+import observerController.ObserverActions;
+import observerController.PropertyChangeMessenger;
 
 /**
  * 
@@ -96,7 +96,7 @@ public class ConsoleWrapper {
 		
 
 			try {
-				UIController.developerComponent.consoleBuffer.put(out);
+				CommandController.developerComponent.consoleBuffer.put(out);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 				e.printStackTrace();
