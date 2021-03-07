@@ -1,4 +1,4 @@
-package userInterface.uiFileManagement;
+package fileManagement;
 
 /**
  * Static class used to retrieve the strings to use as metadata for certain folders 

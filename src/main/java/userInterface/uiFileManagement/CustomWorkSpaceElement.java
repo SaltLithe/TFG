@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import fileManagement.WorkSpaceManager;
 import userInterface.uiFileNavigation.workSpaceSelect;
 
 /**

@@ -19,9 +19,9 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import commandController.CommandController;
+import fileManagement.FILE_PROPERTIES;
 import observerController.ObserverActions;
 import observerController.PropertyChangeMessenger;
-import userInterface.uiFileManagement.FILE_PROPERTIES;
 
 /**
  * Represents a file sistem with tree nodes for the user to navigate

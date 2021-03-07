@@ -1,6 +1,7 @@
 package core;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -17,6 +18,11 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import commandController.CommandController;
+import fileManagement.FILE_PROPERTIES;
+import fileManagement.FILE_TYPE;
+import fileManagement.FileManager;
+import fileManagement.WorkSpace;
+import fileManagement.WorkSpaceManager;
 import javaMiniSockets.clientSide.AsynchronousClient;
 import javaMiniSockets.serverSide.AsynchronousServer;
 import network.ClientHandler;
@@ -28,10 +34,6 @@ import networkMessages.ResponseCreateFileMessage;
 import networkMessages.WriteToConsoleMessage;
 import observerController.ObserverActions;
 import observerController.PropertyChangeMessenger;
-import userInterface.uiFileManagement.FILE_PROPERTIES;
-import userInterface.uiFileManagement.FILE_TYPE;
-import userInterface.uiFileManagement.WorkSpace;
-import userInterface.uiFileManagement.WorkSpaceManager;
 import userInterface.uiFileNavigation.CustomTreeNode;
 import userInterface.uiGeneral.DeveloperMainFrame;
 import userInterface.uiGeneral.DeveloperMainFrameWrapper;
@@ -157,7 +159,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 		support.notify(ObserverActions.DISABLE_NEW_PROJECT, null);
 		support.notify(ObserverActions.DISABLE_JOIN_BUTTON, null);
 		try {
-			
+
 			client.Connect();
 			isConnected = true;
 
@@ -187,7 +189,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 		waitingResponses = new CountDownLatch(maxClients);
 		chosenName = name;
 
-		responses = (LinkedList<ResponseCreateFileMessage>) fileManager.scanAndReturn(workSpace.getPath(), workSpace.getName());
+		responses = (LinkedList<ResponseCreateFileMessage>) fileManager.scanAndReturn(workSpace.getPath(),
+				workSpace.getName());
 		handler = new ServerHandler(name, maxClients, imageByteData, chosenColor);
 		if (queueSize == -1) {
 			queueSize = defaultQueueSize;
@@ -461,16 +464,15 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	public void setProjectFocus(String project) {
 
-		
 		this.focusedProject = project;
 	}
-	
-	public void setProjectFocus(String name ,String project, String path) {
+
+	public void setProjectFocus(String name, String project, String path) {
 		this.focusedProject = project;
 		String retrieveContents = fileManager.openTextFile(name, path, project);
-		Object[] message = {path , retrieveContents};
-		support.notify(ObserverActions.FULL_SET_TEXT,message);
-		
+		Object[] message = { path, retrieveContents };
+		support.notify(ObserverActions.FULL_SET_TEXT, message);
+
 	}
 
 	/**
@@ -577,9 +579,9 @@ public class DeveloperComponent implements PropertyChangeListener {
 				server.Stop();
 				server = null;
 				handler = null;
-				
+
 			}
-			support.notify(ObserverActions.CLEAR_ALL_ICON,null);
+			support.notify(ObserverActions.CLEAR_ALL_ICON, null);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -675,7 +677,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 		String firsthalf = writingpath.replace(workSpace.getPath(), "");
 		firsthalf = firsthalf.substring(1, firsthalf.length());
 		firsthalf = firsthalf.substring(0, firsthalf.indexOf("\\"));
-		String projectpath = workSpace.getPath() + FILE_PROPERTIES.doubleSlash+ firsthalf;
+		String projectpath = workSpace.getPath() + FILE_PROPERTIES.doubleSlash + firsthalf;
 		fileManager.writeFolder(writingpath, property, false, writingname, projectpath);
 
 	}
@@ -905,7 +907,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	/**
 	 * Method used by users acting as server to scan their workspace for files and
 	 * folders and send special messages that the clients will use to recreate the
-	 * server's workspace 
+	 * server's workspace
 	 * 
 	 * @param clientID
 	 */
@@ -941,7 +943,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	 */
 	private void compileAndRun(boolean global) {
 
-		support.notify(ObserverActions.SAVE_FULL,null);
+		support.notify(ObserverActions.SAVE_FULL, null);
 		support.notify(ObserverActions.CLEAR_CONSOLE, null);
 		// Check if there is no project focused
 		if (focusedProject == null || focusedProject.equals("") || !stillExists(focusedProject)) {
@@ -1017,7 +1019,14 @@ public class DeveloperComponent implements PropertyChangeListener {
 		compiler.run(className, files);
 
 	}
+	/**
+	 * Directly sets contents in memory
+	 * @param path
+	 * @param contents
+	 */
+	public void setInternalContent( String path, String contents) {
 
-
+			fileManager.overrideOnClose(path,contents);
+	}
 
 }

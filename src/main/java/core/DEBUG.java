@@ -13,7 +13,7 @@ public class DEBUG {
 	public static boolean executing = false;
 	public static boolean serverside = false;
 	public static boolean clientside = false;
-	public static boolean testing = true; 
+	public static boolean testing = false; 
 
 	public static void servermessage(String message) {
 		

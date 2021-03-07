@@ -1,4 +1,4 @@
-package userInterface.uiFileManagement;
+package fileManagement;
 
 import java.io.File;
 

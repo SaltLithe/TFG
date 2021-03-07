@@ -10,7 +10,7 @@ import java.nio.file.attribute.UserDefinedFileAttributeView;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import userInterface.uiFileManagement.FILE_PROPERTIES;
+import fileManagement.FILE_PROPERTIES;
 
 /**
  * Nodes of the trees that serve as file navigation for the user

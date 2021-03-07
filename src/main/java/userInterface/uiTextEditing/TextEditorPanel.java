@@ -129,7 +129,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 					CommandController.developerComponent.setProjectFocus(name,tab.getProject(),path);
 					updateContainer(tab.getProject(), tab.getPath());
 					}else {
-
+						CommandController.developerComponent.setInternalContent(path,tab.getContents());
 					}
 					
 

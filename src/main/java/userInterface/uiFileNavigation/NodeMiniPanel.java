@@ -13,8 +13,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import userInterface.uiFileManagement.FILE_PROPERTIES;
-import userInterface.uiFileManagement.FILE_TYPE;
+import fileManagement.FILE_PROPERTIES;
+import fileManagement.FILE_TYPE;
 
 /**
  * UI class that contains a panel for the graphical part of the tree nodes This

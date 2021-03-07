@@ -1,4 +1,4 @@
-package userInterface.uiFileManagement;
+package fileManagement;
 
 import java.util.concurrent.Semaphore;
 
@@ -79,7 +79,16 @@ public class TextFile {
 	 * @param content
 	 */
 	public void setContent(String content) {
+		try {
+			editingSem.acquire();
+		
 		this.content = content;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			Thread.currentThread().interrupt();
+		}finally {
+		editingSem.release();
+		}
 	}
 
 	/**

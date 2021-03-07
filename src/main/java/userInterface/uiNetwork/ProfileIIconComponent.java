@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 
 import org.apache.commons.io.FileUtils;
 
-import userInterface.uiFileManagement.WorkSpaceManager;
+import fileManagement.WorkSpaceManager;
 
 @SuppressWarnings("serial")
 /**

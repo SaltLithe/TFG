@@ -17,6 +17,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 
 import commandController.CommandController;
 import core.DEBUG;
+import fileManagement.FILE_PROPERTIES;
+import fileManagement.FILE_TYPE;
 import javaMiniSockets.clientSide.ClientMessageHandler;
 import javaMiniSockets.clientSide.ServerInfo;
 import networkMessages.ClientDisconnectedMessage;
@@ -29,8 +31,6 @@ import networkMessages.WriteMessage;
 import networkMessages.WriteToConsoleMessage;
 import observerController.ObserverActions;
 import observerController.PropertyChangeMessenger;
-import userInterface.uiFileManagement.FILE_PROPERTIES;
-import userInterface.uiFileManagement.FILE_TYPE;
 import userInterface.uiGeneral.DeveloperMainFrameWrapper;
 import userInterface.uiNetwork.AcceptGlobalDialog;
 import userInterface.uiNetwork.acceptSyncDialog;

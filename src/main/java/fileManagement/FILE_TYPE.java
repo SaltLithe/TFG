@@ -1,4 +1,4 @@
-package userInterface.uiFileManagement;
+package fileManagement;
 
 /**
  * Enum class used in certain swithes and methods to indicate a specific type of

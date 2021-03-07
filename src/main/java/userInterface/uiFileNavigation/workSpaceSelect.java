@@ -30,10 +30,10 @@ import javax.swing.border.EmptyBorder;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
+import fileManagement.WorkSpace;
+import fileManagement.WorkSpaceManager;
 import userInterface.uiFileEditing.AddWorkSpaceDialog;
 import userInterface.uiFileManagement.CustomWorkSpaceElement;
-import userInterface.uiFileManagement.WorkSpace;
-import userInterface.uiFileManagement.WorkSpaceManager;
 
 @SuppressWarnings("serial")
 /**

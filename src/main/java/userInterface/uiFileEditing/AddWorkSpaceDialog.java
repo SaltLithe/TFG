@@ -21,8 +21,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import core.DEBUG;
-import userInterface.uiFileManagement.WorkSpace;
-import userInterface.uiFileManagement.WorkSpaceManager;
+import fileManagement.WorkSpace;
+import fileManagement.WorkSpaceManager;
 import userInterface.uiFileNavigation.workSpaceSelect;
 
 /**
