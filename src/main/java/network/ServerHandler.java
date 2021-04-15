@@ -1,4 +1,4 @@
-package network;
+package network; 
 
 import java.awt.Color;
 import java.io.Serializable;
@@ -129,6 +129,8 @@ public class ServerHandler implements ServerMessageHandler {
 		SyncEndedMessage syncEnded = new SyncEndedMessage();
 		CommandController.developerComponent.sendMessageToEveryone(syncEnded);
 		support.notify(ObserverActions.ENABLE_TEXT_EDITOR, null);
+		support.notify(ObserverActions.ENABLE_USERS_PANEL,null);
+
 
 	}
 
@@ -156,7 +158,8 @@ public class ServerHandler implements ServerMessageHandler {
 				e.printStackTrace();
 			}
 
-			Object[] message = { incoming.path, incoming };
+			Object[] message = { incoming.path, incoming};
+			
 			support.notify(ObserverActions.UPDATE_PANEL_CONTENTS, message);
 
 		}
@@ -194,9 +197,7 @@ public class ServerHandler implements ServerMessageHandler {
 	 */
 	@Override
 	public void onMessageSent(Serializable message, ClientInfo client) {
-
 		try {
-			
 		messageSem.acquire(); 
 		String messageclass = message.getClass().toString();
 		int lastindexof = messageclass.lastIndexOf('.');
@@ -357,6 +358,8 @@ public class ServerHandler implements ServerMessageHandler {
 		CommandController.developerComponent.saveAllFull();
 		CommandController.developerComponent.closeAllTabs();
 		support.notify(ObserverActions.DISABLE_TEXT_EDITOR, null);
+		support.notify(ObserverActions.DISABLE_USERS_PANEL,null);
+
 
 
 		sync = new serverAwaitSync(nClients, this);
@@ -414,6 +417,8 @@ public class ServerHandler implements ServerMessageHandler {
 		support.notify(ObserverActions.DISABLE_LOCAL_RUN, null);
 		support.notify(ObserverActions.ENABLE_GLOBAL_RUN,null);
 		support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);
+		support.notify(ObserverActions.ENABLE_USERS_PANEL,null);
+
 	}
 
 	
@@ -442,7 +447,13 @@ public class ServerHandler implements ServerMessageHandler {
 		executorService.shutdown();
 	}
 	
-	
+	@Override
+	public void onServerConnectionProblem() {
+		JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(), "There was a problem starting the server, check your ip address, consider using another port and try again ",
+				"Server start error", JOptionPane.ERROR_MESSAGE);
+		CommandController.developerComponent.disconnect();
+	}
+
 
 	
 

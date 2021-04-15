@@ -160,6 +160,7 @@ public class MenuToolbar extends JPanel implements PropertyChangeListener {
 
 				}
 				else if (CommandController.developerComponent.client != null) {
+					support.notify(ObserverActions.CLEAR_CONSOLE, null);
 					disableSaveButtons();
 					disableGlobalRun(); 
 					

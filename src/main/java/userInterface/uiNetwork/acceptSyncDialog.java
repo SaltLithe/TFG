@@ -168,6 +168,7 @@ public class acceptSyncDialog extends JDialog {
 			}
 		});
 		pathField.setEnabled(false);
+		this.setLocationRelativeTo(DeveloperMainFrameWrapper.getInstance());
 		this.setVisible(true);
 	}
 

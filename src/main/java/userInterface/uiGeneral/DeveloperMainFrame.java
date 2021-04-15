@@ -110,6 +110,7 @@ public class DeveloperMainFrame extends JFrame implements PropertyChangeListener
 				System.exit(0);
 			}
 		});
+		setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		setVisible(true);
 
 	}

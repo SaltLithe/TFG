@@ -12,18 +12,19 @@ public class WriteMessage implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 6106677430760056507L;
+	private static final long serialVersionUID = 141679437617562355L;
 
 	
 	public WriteMessage(String ownerName) {
 		this.ownerName = ownerName;
 	}
 
-	public String ownerName;
-	public String path; 
-	public String changes;
-	public int offset; 
-	public int lenght;
-	public boolean adding;
+	public String ownerName = "";
+	public String path = "";
+	public String changes = "";
+	public int offset = -1;
+	public int lenght = -1;
+	public boolean adding = true;
+	public int filler = -1;
 
 }

@@ -29,6 +29,7 @@ import networkMessages.ImageDataMessage;
 import networkMessages.ResponseCreateFileMessage;
 import networkMessages.WriteMessage;
 import networkMessages.WriteToConsoleMessage;
+import networkMessages.controlPassMessage;
 import observerController.ObserverActions;
 import observerController.PropertyChangeMessenger;
 import userInterface.uiGeneral.DeveloperMainFrameWrapper;
@@ -172,6 +173,7 @@ public class ClientHandler implements ClientMessageHandler {
 	 * Implementation of the method that sends messages as they are received Behaves
 	 * differently depending on the type of message received
 	 */
+	
 	@Override
 	public void onMessageSent(Serializable message, ServerInfo serverInfo) {
 		
@@ -185,6 +187,14 @@ public class ClientHandler implements ClientMessageHandler {
 		
 		String rawname = messageclass.substring(lastindexof+1, messageclass.length());
 		switch (rawname) {
+		case "controlPassMessage":
+			controlPassMessage controlPass =(controlPassMessage) message;
+			
+			Object[] arrayMessage = {controlPass.name};
+			support.notify(ObserverActions.HIGHLIGHT_PROFILE_ICONS, arrayMessage);
+
+			
+			break;
 		case "WriteMessage":
 			WriteMessage incoming = (WriteMessage) message;
 			// Do not process this message if it is a broadcast from the server that is
@@ -469,6 +479,7 @@ public class ClientHandler implements ClientMessageHandler {
 	 */
 	public void decideRun(boolean decision) {
 		if(!decision) {
+			support.notify(ObserverActions.CLEAR_CONSOLE, null);
 			activateAll();
 		}
 		GlobalRunRequestResponse response = new GlobalRunRequestResponse();
@@ -495,6 +506,7 @@ public class ClientHandler implements ClientMessageHandler {
 		support.notify(ObserverActions.ENABLE_TEXT_EDITOR,null);
 		support.notify(ObserverActions.ENABLE_GLOBAL_RUN,null);
 		support.notify(ObserverActions.ENABLE_SAVE_BUTTONS,null);
+		support.notify(ObserverActions.ENABLE_USERS_PANEL,null);
 	}
 	
 	/**
@@ -504,7 +516,10 @@ public class ClientHandler implements ClientMessageHandler {
 		support.notify(ObserverActions.DISABLE_TEXT_EDITOR,null);
 		support.notify(ObserverActions.DISABLE_GLOBAL_RUN,null);
 		support.notify(ObserverActions.DISABLE_SAVE_BUTTONS,null);
+		support.notify(ObserverActions.DISABLE_USERS_PANEL,null);
+
 	}
+
 
 
 }

@@ -46,6 +46,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 	public ArrayBlockingQueue<WriteMessage> sendBuffer = new ArrayBlockingQueue<>(200);
 	public ArrayBlockingQueue<HighLightMessage> highlightBuffer = new ArrayBlockingQueue<>(200);
+	public boolean canEdit = true;
 
 	private JTabbedPane tabPane;
 	private HashMap<String, TextEditorTab> tabCollection;
@@ -57,20 +58,15 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	private long sendDelay = 50;
 	private TextEditorContainer parent;
 	private Semaphore editingSem = new Semaphore(1);
-	
+
 	public TextEditorPanel(TextEditorContainer parent) {
-		this.parent = parent; 
+		this.parent = parent;
 		propertyChangeMessenger = PropertyChangeMessenger.getInstance();
 
 		tabCollection = new HashMap<>();
 
-	
-		
-		
-		executorService.submit(()-> sendMessages());
-		executorService.submit(()->sendHighlights());
-		
-	
+		executorService.submit(() -> sendMessages());
+		executorService.submit(() -> sendHighlights());
 
 		setLayout(new BorderLayout());
 		this.setSize(new Dimension(ImageObserver.WIDTH, ImageObserver.HEIGHT));
@@ -109,29 +105,28 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 		CommandController.developerComponent.setProjectFocus(project);
 		TabMiniPanel mp1 = new TabMiniPanel(name, path, project);
-		TextEditorTab tab = new TextEditorTab(path, mp1, project, chosenName, this , name);
+		TextEditorTab tab = new TextEditorTab(path, mp1, project, chosenName, this, name);
+
+		tab.textEditorArea.setEditable(canEdit);
+
 		tab.setTextEditorCode(contents);
 		mp1.setParent(tab);
 
 		tabPane.addTab("", tab);
-		
-	
-		tabPane.addChangeListener(new ChangeListener() {
 
-			
+		tabPane.addChangeListener(new ChangeListener() {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
 
 				try {
-					
-					if(tab == tabPane.getSelectedComponent()) {
-					CommandController.developerComponent.setProjectFocus(name,tab.getProject(),path);
-					updateContainer(tab.getProject(), tab.getPath());
-					}else {
-						CommandController.developerComponent.setInternalContent(path,tab.getContents());
+
+					if (tab == tabPane.getSelectedComponent()) {
+						CommandController.developerComponent.setProjectFocus(name, tab.getProject(), path);
+						updateContainer(tab.getProject(), tab.getPath());
+					} else {
+						CommandController.developerComponent.setInternalContent(path, tab.getContents());
 					}
-					
 
 				} catch (Exception excp) {
 					excp.printStackTrace();
@@ -191,7 +186,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	}
 
 	/**
-	 * Method used by a special thread that sends highlights to other users 
+	 * Method used by a special thread that sends highlights to other users
 	 */
 	public void sendHighlights() {
 
@@ -223,7 +218,7 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	}
 
 	/**
-	 * Method used by a special thread that sends write updates to other users 
+	 * Method used by a special thread that sends write updates to other users
 	 */
 	public void sendMessages() {
 
@@ -251,6 +246,13 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 
 	}
 
+	public void toggleTabs() {
+		for(String tabkey : tabCollection.keySet()) {
+			tabCollection.get(tabkey).textEditorArea.setEditable(canEdit);
+			tabCollection.get(tabkey).updateUI();
+		}
+	}
+
 	/**
 	 * Implementation of propertyChange from PropertyChangeListener so that this
 	 * class can listen to ui notifications
@@ -259,48 +261,44 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		ObserverActions action = Enum.valueOf(ObserverActions.class, evt.getPropertyName());
-		ArrayList<Object> results;
+		ArrayList<Object> results = (ArrayList<Object>) evt.getNewValue();
+
 		switch (action) {
 
 		case UPDATE_PANEL_CONTENTS:
 			try {
-				editingSem.acquire(); 
+				editingSem.acquire();
 				String[] focus = parent.getFocus();
-				
-				
-				results = (ArrayList<Object>) evt.getNewValue();
+
 				String editingpath = (String) results.get(0);
 
 				String key = findKeyFromPath(editingpath);
 				if (key != null) {
 					TextEditorTab tab = tabCollection.get(key);
 					String tabname = tab.getName();
-					focus[0] = focus[0].substring(focus[0].lastIndexOf("\\")+1, focus[0].length());
-					tabname = tabname.substring(tabname.lastIndexOf("\\")+1,tabname.length());
-					if(tab.getProject().equals(focus[1]) && tabname.equals(focus[0])) {
-					this.tabCollection.get(key).updateContents(results);
+					focus[0] = focus[0].substring(focus[0].lastIndexOf("\\") + 1, focus[0].length());
+					tabname = tabname.substring(tabname.lastIndexOf("\\") + 1, tabname.length());
+					if (tab.getProject().equals(focus[1]) && tabname.equals(focus[0])) {
+						this.tabCollection.get(key).updateContents(results);
 					}
 				} else {
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+			} finally {
+				editingSem.release();
 			}
-			finally {
-				editingSem.release(); 
-			}
-			
+
 			break;
 		case FULL_SET_TEXT:
-			results = (ArrayList<Object>) evt.getNewValue();
 			String searchpath = (String) results.get(0);
 			String searchkey = findKeyFromPath(searchpath);
-			if(searchkey != null) {
-				this.tabCollection.get(searchkey).setTextEditorCode((String)results.get(1));
+			if (searchkey != null) {
+				this.tabCollection.get(searchkey).setTextEditorCode((String) results.get(1));
 			}
 			break;
 
 		case UPDATE_HIGHLIGHT:
-			results = (ArrayList<Object>) evt.getNewValue();
 			String editingpath = (String) results.get(4);
 			String key = findKeyFromPath(editingpath);
 			if (key != null) {
@@ -309,14 +307,13 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 				try {
 					color = (int) results.get(2);
 				} catch (Exception uwu) {
-					
+
 				}
 				this.tabCollection.get(key).paintHighLight((int) results.get(0), (int) results.get(1), color,
 						(String) results.get(3));
 			}
 			break;
 		case SET_TEXT_CONTENT:
-			results = (ArrayList<Object>) evt.getNewValue();
 			String path = (String) results.get(2);
 
 			if (!tabCollection.containsKey(path)) {
@@ -329,7 +326,6 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			}
 			break;
 		case CLOSE_TAB:
-			results = (ArrayList<Object>) evt.getNewValue();
 			String closingpath = (String) results.get(0);
 			if (this.tabCollection.containsKey(closingpath)) {
 				TextEditorTab removing = tabCollection.get(closingpath);
@@ -341,7 +337,6 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			break;
 		case SAVED_SINGLE_FILE:
 
-			results = (ArrayList<Object>) evt.getNewValue();
 			String savingpath = (String) results.get(0);
 			if (tabCollection.containsKey(savingpath)) {
 				tabCollection.get(savingpath).setAsSaved();
@@ -353,10 +348,8 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			tabCollection.clear();
 
 			break;
-		
 
 		case SET_CHOSEN_NAME:
-			results = (ArrayList<Object>) evt.getNewValue();
 			String newname = (String) results.get(0);
 			setChosenName(newname);
 			break;
@@ -368,11 +361,30 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 			enableComponents(this, true);
 			break;
 		case SAFETY_STOP:
-			
-			executorService.shutdown();
-			
-			break;
 
+			executorService.shutdown();
+
+			break;
+		case HIGHLIGHT_PROFILE_ICONS:
+			
+			String name = (String) results.get(0);
+			if (name.equals(this.chosenName)) {
+				this.canEdit = true;
+			} else {
+				this.canEdit = false;
+			}
+			toggleTabs();
+			break;
+		
+		case ALLOW_EDIT_SERVER:
+			this.canEdit = true;
+			toggleTabs(); 
+			break;
+			
+		case DISABLE_EDIT_SERVER:
+			this.canEdit = false;
+			toggleTabs(); 
+			break;
 		default:
 
 			break;
@@ -392,12 +404,12 @@ public class TextEditorPanel extends JPanel implements PropertyChangeListener {
 		for (String key : tabCollection.keySet()) {
 
 			if (key.contains(editingpath)) {
-				
-			similar = key;
+
+				similar = key;
+
+			}
 
 		}
-
-	}
 		return similar;
 
 	}

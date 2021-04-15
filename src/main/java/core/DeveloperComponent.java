@@ -1,7 +1,6 @@
 package core;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -25,6 +24,7 @@ import fileManagement.WorkSpace;
 import fileManagement.WorkSpaceManager;
 import javaMiniSockets.clientSide.AsynchronousClient;
 import javaMiniSockets.serverSide.AsynchronousServer;
+import javaMiniSockets.serverSide.ServerMessageHandler;
 import network.ClientHandler;
 import network.ServerHandler;
 import networkMessages.GlobalRunDone;
@@ -69,7 +69,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	// Structure that saves classpaths and uses projects as its keys
 	private HashMap<String, ClassPath> classpaths;
 	private String separator = "pairLeap.codeString";
-	private String chosenName = null;
+	public String chosenName = null;
 	private Thread consoleSender;
 
 	public DeveloperComponent(WorkSpace workSpace) {
@@ -150,7 +150,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 		this.chosenName = chosenName;
 
 		clientHandler = new ClientHandler(chosenName, imageByteData, chosenColor);
-		client = new AsynchronousClient(serverAddress, ownAddress, serverPort, clientHandler, separator);
+		client = new AsynchronousClient(serverAddress, ownAddress, serverPort,  clientHandler, separator);
 		if (ownAddress == null) {
 
 			client.setAutomaticIP();
@@ -167,7 +167,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 			e.printStackTrace();
 		}
 		support.notify(ObserverActions.ENABLE_DISCONNECT_BUTTON, null);
-
+		DeveloperMainFrameWrapper.getTextEditorPanel().canEdit = false;
 		setNewName(chosenName);
 	}
 
@@ -196,18 +196,23 @@ public class DeveloperComponent implements PropertyChangeListener {
 			queueSize = defaultQueueSize;
 		}
 
-		server = new AsynchronousServer(name, handler, maxClients, port, ip, queueSize, separator);
+		server = new AsynchronousServer(name, (ServerMessageHandler) handler, maxClients, port, ip, queueSize, separator);
 		if (ip == null) {
 			server.setAutomaticIP();
 		}
 
 		support.notify(ObserverActions.DISABLE_NEW_PROJECT, null);
 		support.notify(ObserverActions.DISABLE_JOIN_BUTTON, null);
-		server.Start();
+		boolean success = server.Start();
+		if(success) {
 		isConnected = true;
 		support.notify(ObserverActions.ENABLE_DISCONNECT_BUTTON, null);
 
 		setNewName(name);
+		Object[] message = {name};
+		support.notify(ObserverActions.HIGHLIGHT_PROFILE_ICONS,message);
+		support.notify(ObserverActions.DISABLE_USERS_PANEL, null);
+		}
 
 	}
 
@@ -518,7 +523,6 @@ public class DeveloperComponent implements PropertyChangeListener {
 
 			triggerNoProjectDialog();
 		} else {
-			DEBUG.debugmessage("DEBUGA UNO : " + global);
 			new RunConfigDialog(this.classpaths.get(focusedProject).getClassPath(), global);
 		}
 	}
@@ -579,9 +583,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 				server.Stop();
 				server = null;
 				handler = null;
-
+				
 			}
-			support.notify(ObserverActions.CLEAR_ALL_ICON, null);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -592,7 +595,10 @@ public class DeveloperComponent implements PropertyChangeListener {
 		support.notify(ObserverActions.ENABLE_SAVE_BUTTONS, null);
 		support.notify(ObserverActions.ENABLE_NEW_PROJECT, null);
 		support.notify(ObserverActions.ENABLE_JOIN_BUTTON, null);
+		support.notify(ObserverActions.ENABLE_USERS_PANEL,null);
 		support.notify(ObserverActions.DISABLE_DISCONNECT_BUTTON, null);
+		support.notify(ObserverActions.CLEAR_ALL_ICON, null);
+		support.notify(ObserverActions.ALLOW_EDIT_SERVER, null);
 
 	}
 
@@ -789,6 +795,7 @@ public class DeveloperComponent implements PropertyChangeListener {
 	public void requestGlobalRun() {
 		clientHandler.blocked = true;
 		support.notify(ObserverActions.DISABLE_TEXT_EDITOR, null);
+		support.notify(ObserverActions.DISABLE_USERS_PANEL,null);
 		GlobalRunRequestMessage message = new GlobalRunRequestMessage(this.chosenName);
 		sendMessageToServer(message);
 	}
@@ -989,6 +996,8 @@ public class DeveloperComponent implements PropertyChangeListener {
 				consoleSender.interrupt();
 				support.notify(ObserverActions.ENABLE_SAVE_BUTTONS, null);
 				support.notify(ObserverActions.ENABLE_TEXT_EDITOR, null);
+				support.notify(ObserverActions.ENABLE_USERS_PANEL, null);
+
 				// Disable the terminate button , this button is enabled by the compiler when
 				// terminating the
 				// running process is safe

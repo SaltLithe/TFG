@@ -1,5 +1,6 @@
 package userInterface.uiNetwork;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -73,6 +74,11 @@ public class awaitSyncDialog extends JDialog {
 		});
 
 		setSize(new Dimension(getPreferredSize().width, 200));
+		Color c = getContentPane().getBackground();
+		
+		getContentPane().setBackground(new Color (c.getRed()-10, c.getGreen()-10,c.getBlue()-10));  
+		this.setUndecorated(true);
+		this.setLocationRelativeTo(DeveloperMainFrameWrapper.getInstance());
 		setVisible(true);
 	}
 

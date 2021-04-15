@@ -94,23 +94,21 @@ public class CreateSessionDialog extends JFrame {
 			public void actionPerformed(ActionEvent event) {
 
 				if (Integer.valueOf(maxClientsField_S.getText()) <= 4) {
-				CommandController.developerComponent.setAsServer(serverNameField_S.getText(), ipField_S.getText(),
-						Integer.valueOf(maxClientsField_S.getText()), Integer.valueOf(serverPortField_S.getText()),
-						Integer.valueOf(maxClientsField_S.getText()), serverImageLabel.ImageByteData,
-						colorChoosersv.getColor());
-				
-				CommandController.developerComponent.setIcon(colorChoosersv.getColor(), serverImageLabel.imagepath,
-						serverNameField_S.getText());
+					CommandController.developerComponent.setIcon(colorChoosersv.getColor(), serverImageLabel.imagepath,
+							serverNameField_S.getText());
+					CommandController.developerComponent.setAsServer(serverNameField_S.getText(), ipField_S.getText(),
+							Integer.valueOf(maxClientsField_S.getText()), Integer.valueOf(serverPortField_S.getText()),
+							Integer.valueOf(maxClientsField_S.getText()), serverImageLabel.ImageByteData,
+							colorChoosersv.getColor());
 
-				dispose();
-				}else {
-					
+					dispose();
+				} else {
+
 					JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
-						    "Can't create a session for more than four clients.",
-						    "Too many users",
-						    JOptionPane.ERROR_MESSAGE);
+							"Can't create a session for more than four clients.", "Too many users",
+							JOptionPane.ERROR_MESSAGE);
 				}
-				
+
 			}
 		});
 
@@ -120,16 +118,15 @@ public class CreateSessionDialog extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				dispose(); 
+				dispose();
 			}
-			
-			
+
 		});
 		buttonPane.add(cancelButton);
 
 		serverNameField_S = new JTextField();
 		serverNameField_S.setHorizontalAlignment(SwingConstants.LEFT);
-		serverNameField_S.setText("a");
+		serverNameField_S.setText("Carmen");
 		GridBagConstraints gbc_serverNameField_S = new GridBagConstraints();
 		gbc_serverNameField_S.fill = GridBagConstraints.HORIZONTAL;
 		gbc_serverNameField_S.insets = new Insets(0, 0, 5, 0);
@@ -146,7 +143,7 @@ public class CreateSessionDialog extends JFrame {
 		panel.add(lblNewLabel_1, gbc_lblNewLabel_1);
 
 		serverPortField_S = new JTextField();
-		serverPortField_S.setText("8080");
+		serverPortField_S.setText("8085");
 		GridBagConstraints gbc_serverPortField_S = new GridBagConstraints();
 		gbc_serverPortField_S.insets = new Insets(0, 0, 5, 0);
 		gbc_serverPortField_S.fill = GridBagConstraints.HORIZONTAL;
@@ -180,7 +177,7 @@ public class CreateSessionDialog extends JFrame {
 		panel.add(lblNewLabel_4, gbc_lblNewLabel_4);
 
 		ipField_S = new JTextField();
-		ipField_S.setText("192.168.1.15");
+		ipField_S.setText("25.113.201.139");
 		GridBagConstraints gbc_ipField_S = new GridBagConstraints();
 		gbc_ipField_S.fill = GridBagConstraints.HORIZONTAL;
 		gbc_ipField_S.insets = new Insets(0, 0, 5, 0);
@@ -209,7 +206,7 @@ public class CreateSessionDialog extends JFrame {
 
 		serverImageButton = new JButton("Browse");
 
-		serverImageLabel = new ProfileIIconComponent(null, null, null, true);
+		serverImageLabel = new ProfileIIconComponent(null, null, null, true, null);
 		serverImageButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -220,7 +217,7 @@ public class CreateSessionDialog extends JFrame {
 					File selectedFile = imageChooser.getSelectedFile();
 
 					panel.remove(serverImageLabel);
-					serverImageLabel = new ProfileIIconComponent(selectedFile.getPath(), null, null, true);
+					serverImageLabel = new ProfileIIconComponent(selectedFile.getPath(), null, null, true, null);
 					panel.add(serverImageLabel, gbc_serverImageLabel);
 					panel.updateUI();
 

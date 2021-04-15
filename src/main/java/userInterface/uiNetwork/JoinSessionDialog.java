@@ -57,7 +57,7 @@ public class JoinSessionDialog extends JFrame {
 		this.setTitle("Join a session");
 
 		imageChooser = new JFileChooser();
-		imageChooser.addChoosableFileFilter(new FileNameExtensionFilter("Image Files", "jpg", "png"));
+		imageChooser.addChoosableFileFilter(new FileNameExtensionFilter("Image Files", "png"));
 		getContentPane().setLayout(new BorderLayout());
 
 		panel = new JPanel();
@@ -124,7 +124,7 @@ public class JoinSessionDialog extends JFrame {
 		panel.add(lblNewLabel_5, gbc_lblNewLabel_5);
 
 		clientNameField_C = new JTextField();
-		clientNameField_C.setText("a");
+		clientNameField_C.setText("Tu nombre aqui");
 		GridBagConstraints gbc_clientNameField_C = new GridBagConstraints();
 		gbc_clientNameField_C.insets = new Insets(0, 0, 5, 0);
 		gbc_clientNameField_C.fill = GridBagConstraints.HORIZONTAL;
@@ -141,7 +141,7 @@ public class JoinSessionDialog extends JFrame {
 		panel.add(lblNewLabel_6, gbc_lblNewLabel_6);
 
 		ipField_C = new JTextField();
-		ipField_C.setText("192.168.1.15");
+		ipField_C.setText("25.113.201.139");
 		GridBagConstraints gbc_ipField_C = new GridBagConstraints();
 		gbc_ipField_C.insets = new Insets(0, 0, 5, 0);
 		gbc_ipField_C.fill = GridBagConstraints.HORIZONTAL;
@@ -158,7 +158,7 @@ public class JoinSessionDialog extends JFrame {
 		panel.add(lblNewLabel_7, gbc_lblNewLabel_7);
 
 		serverPortField_C = new JTextField();
-		serverPortField_C.setText("8080");
+		serverPortField_C.setText("8085");
 		GridBagConstraints gbc_serverPortField_C = new GridBagConstraints();
 		gbc_serverPortField_C.insets = new Insets(0, 0, 5, 0);
 		gbc_serverPortField_C.fill = GridBagConstraints.HORIZONTAL;
@@ -175,7 +175,7 @@ public class JoinSessionDialog extends JFrame {
 		panel.add(lblNewLabel_9, gbc_lblNewLabel_9);
 
 		clientIPField_C = new JTextField();
-		clientIPField_C.setText("192.168.1.15");
+		clientIPField_C.setText("Tu ipv4 de hamachi aqui");
 		GridBagConstraints gbc_clientIPField_C = new GridBagConstraints();
 		gbc_clientIPField_C.insets = new Insets(0, 0, 5, 0);
 		gbc_clientIPField_C.fill = GridBagConstraints.HORIZONTAL;
@@ -203,7 +203,7 @@ public class JoinSessionDialog extends JFrame {
 
 		clientImageButton = new JButton("Browse");
 
-		imageLabelClient = new ProfileIIconComponent(null, null, null, true);
+		imageLabelClient = new ProfileIIconComponent(null, null, null, true,null);
 		clientImageButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -231,7 +231,7 @@ public class JoinSessionDialog extends JFrame {
 
 					else {
 						panel.remove(imageLabelClient);
-						imageLabelClient = new ProfileIIconComponent(selectedFile.getPath(), null, null, true);
+						imageLabelClient = new ProfileIIconComponent(selectedFile.getPath(), null, null, true,null);
 						panel.add(imageLabelClient, gbc_imageLabelClient);
 						panel.updateUI();
 					}

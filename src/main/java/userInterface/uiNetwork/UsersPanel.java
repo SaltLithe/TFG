@@ -2,6 +2,7 @@ package userInterface.uiNetwork;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -17,9 +18,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import javax.swing.border.EmptyBorder;
 
 import commandController.CommandController;
+import networkMessages.controlPassMessage;
 import observerController.ObserverActions;
+import observerController.PropertyChangeMessenger;
 import userInterface.uiGeneral.DeveloperMainFrameWrapper;
 
 /**
@@ -42,13 +46,14 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 	ProfileIIconComponent server;
 	LinkedList<ProfileIIconComponent> icons;
 	private JButton createSessionButton;
+	private PropertyChangeMessenger support;
 
 	public UsersPanel() {
 
-		
 		icons = new LinkedList<ProfileIIconComponent>();
 		setLayout(new BorderLayout(0, 0));
 
+		support = PropertyChangeMessenger.getInstance();
 		JPanel panel = new JPanel();
 		add(panel, BorderLayout.NORTH);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -57,7 +62,8 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 		panel.add(toolBar);
 
 		joinSessionButton = new JButton("Join");
-		joinSessionButton.setIcon(new ImageIcon(UsersPanel.class.getResource("/resources/images/joinSession_Icon.png")));
+		joinSessionButton
+				.setIcon(new ImageIcon(UsersPanel.class.getResource("/resources/images/joinSession_Icon.png")));
 		joinSessionButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -69,24 +75,22 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 		});
 
 		toolBar.add(joinSessionButton);
-		
+
 		createSessionButton = new JButton("Create");
-		createSessionButton.setIcon(new ImageIcon(UsersPanel.class.getResource("/resources/images/createSession_Icon.png")));
+		createSessionButton
+				.setIcon(new ImageIcon(UsersPanel.class.getResource("/resources/images/createSession_Icon.png")));
 		toolBar.add(createSessionButton);
 		createSessionButton.addActionListener(new ActionListener() {
-			
-			
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if(CommandController.developerComponent.workSpace == null) {
+				if (CommandController.developerComponent.workSpace == null) {
 					JOptionPane.showMessageDialog(DeveloperMainFrameWrapper.getInstance(),
-						    "You are trying to create a session without a workspace loaded , restart this software and choose a workspace to create"
-						    + "a session.",
-						    "No Workspace error",
-						    JOptionPane.ERROR_MESSAGE);
-				}else {
-					new CreateSessionDialog(); 
+							"You are trying to create a session without a workspace loaded , restart this software and choose a workspace to create"
+									+ "a session.",
+							"No Workspace error", JOptionPane.ERROR_MESSAGE);
+				} else {
+					new CreateSessionDialog();
 
 				}
 			}
@@ -95,7 +99,7 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 
 		disconnectButton = new JButton("Disconnect");
 		disconnectButton.setIcon(new ImageIcon(UsersPanel.class.getResource("/resources/images/disconnect_Icon.png")));
-	
+
 		toolBar.add(disconnectButton);
 		disconnectButton.setEnabled(false);
 		disconnectButton.addActionListener(new ActionListener() {
@@ -107,13 +111,11 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 			}
 
 		});
-		
-		
-		
 
 		userIconsPanel = new JPanel();
 		add(userIconsPanel, BorderLayout.WEST);
 		userIconsPanel.setLayout(new BoxLayout(userIconsPanel, BoxLayout.Y_AXIS));
+		
 
 	}
 
@@ -129,12 +131,13 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 
 		switch (action) {
 		case CLEAR_ALL_ICON:
+			
+			this.icons.clear();
 			userIconsPanel.removeAll();
 			userIconsPanel.updateUI();
 			break;
-		
-		case SET_SELF_ICON:
 
+		case SET_SELF_ICON:
 			setSelf((Color) result.get(0), (String) result.get(1), (String) result.get(2));
 			rearange();
 			break;
@@ -166,7 +169,23 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 			break;
 		case DISABLE_DISCONNECT_BUTTON:
 			disconnectButton.setEnabled(false);
+			updateUI(); 
 			break;
+		case HIGHLIGHT_PROFILE_ICONS:
+
+			this.cleanSelection((String) result.get(0));
+			
+			break;
+		case ENABLE_USERS_PANEL:
+			System.out.println("Enabling panel");
+			toggleAll(this,true);
+			break;
+		
+		case DISABLE_USERS_PANEL:
+			System.out.println("Disabling panel");
+			toggleAll(this,false);
+			break;
+
 		default:
 
 			break;
@@ -175,6 +194,12 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 
 	}
 
+	private void toggleAll(JPanel panel, boolean toggle) {
+	
+		for(ProfileIIconComponent icon : this.icons) {
+			icon.canSelect = toggle;
+		}
+	}
 	private void removeClient(int clientID) {
 		Iterator<ProfileIIconComponent> i = icons.iterator();
 		int index = -1;
@@ -198,19 +223,29 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 	}
 
 	private void setSelf(Color color, String image, String name) {
-		self = new ProfileIIconComponent(image, color, name, false);
+		self = new ProfileIIconComponent(image, color, name, false, this);
 		icons.addFirst(self);
 	}
 
 	private void setServer(String string, int color, String name) {
-		server = new ProfileIIconComponent(color, string, name, -1);
+		server = new ProfileIIconComponent(color, string, name, -1, this);
 		icons.addFirst(server);
 
 	}
 
 	private void setClient(String string, int color, String name, int clientID) {
-		ProfileIIconComponent client = new ProfileIIconComponent(color, string, name, clientID);
+		ProfileIIconComponent client = new ProfileIIconComponent(color, string, name, clientID, this);
 		icons.addLast(client);
+
+	}
+
+	private void reHighlight(int id) {
+
+		for (int i = 0; i < icons.size(); i++) {
+
+			icons.get(i).setBackground(null);
+
+		}
 
 	}
 
@@ -227,6 +262,32 @@ public class UsersPanel extends JPanel implements PropertyChangeListener {
 
 		}
 		userIconsPanel.updateUI();
+
+	}
+
+	public void cleanSelection(String name) {
+	
+		for (ProfileIIconComponent icon : icons) {
+
+			if (icon.chosenName.equals(name)) {
+				icon.setHighlight();
+			} else {
+
+				icon.setOpaque(false);
+				icon.setBorder(new EmptyBorder(0, 0, 0, 0));
+			}
+		}
+		if (CommandController.developerComponent.server != null) {
+			if (CommandController.developerComponent.chosenName.equals(name)) {
+				support.notify(ObserverActions.ALLOW_EDIT_SERVER, null);
+			} else {
+				support.notify(ObserverActions.DISABLE_EDIT_SERVER, null);
+
+			}
+
+			controlPassMessage message = new controlPassMessage(name);
+			CommandController.runOnThread(() -> CommandController.developerComponent.sendMessageToEveryone(message));
+		}
 
 	}
 

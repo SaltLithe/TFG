@@ -174,9 +174,11 @@ public class TextEditorTab extends JPanel {
 						WriteMessage message = new WriteMessage(chosenName);
 						message.path = keypath;
 						message.adding = true;
+						
 						message.offset = e.getOffset();
 						message.changes = textEditorArea.getText().substring(e.getOffset(),
 								e.getOffset() + e.getLength());
+						
 
 						try {
 							parent.sendBuffer.put(message);

@@ -34,6 +34,7 @@ import fileManagement.WorkSpace;
 import fileManagement.WorkSpaceManager;
 import userInterface.uiFileEditing.AddWorkSpaceDialog;
 import userInterface.uiFileManagement.CustomWorkSpaceElement;
+import userInterface.uiGeneral.DeveloperMainFrameWrapper;
 
 @SuppressWarnings("serial")
 /**
@@ -163,7 +164,7 @@ public class workSpaceSelect extends JFrame {
 
 		setSize(500, 500);
 		setResizable(false);
-
+		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 
 	}

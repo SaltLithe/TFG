@@ -16,6 +16,8 @@ public class TextFile {
 	private String name;
 	private String path;
 	private Semaphore editingSem;
+	private int counter = 0 ;
+	private int lastcounter = -1;
 
 	/***
 	 * 
@@ -126,10 +128,17 @@ public class TextFile {
 	public void insert(String changes, int offset) {
 		try {
 			editingSem.acquire();
-			String firsthalf = content.substring(0, offset);
-			String secondhalf = content.substring(offset, content.length());
+			
+			lastcounter = counter; 
+			counter++;
+			
+			String firsthalf = content.substring(0, offset-changes.length());
+			String secondhalf = content.substring(offset-changes.length(), content.length());
 			content = firsthalf + changes + secondhalf;
 		} catch (Exception e) {
+			System.out.println("CHANGES : " + changes);
+			System.out.println("OFFSET : " + offset);
+
 			e.printStackTrace();
 		} finally {
 
@@ -148,9 +157,17 @@ public class TextFile {
 
 		try {
 			editingSem.acquire();
-			String firsthalf = content.substring(0, offset);
+			
+			try {
+				String firsthalf = content.substring(0, offset);
 			String secondhalf = content.substring(length, content.length());
 			content = firsthalf + secondhalf;
+
+			}
+			catch(Exception e) {
+				//content = firsthalf;
+
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

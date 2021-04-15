@@ -14,6 +14,7 @@ import javax.swing.JTextArea;
 import commandController.CommandController;
 import core.DEBUG;
 import observerController.ObserverActions;
+import javax.swing.JCheckBox;
 
 /**
  * UI class serving as the console for the user , uses a JPanel to write text
@@ -28,12 +29,18 @@ public class ConsolePanel extends JPanel implements PropertyChangeListener {
 	private JTextArea consoleTextArea;
 	private boolean readingListener;
 	int lastlenght;
+	private JCheckBox clearCheck;
 
 	public ConsolePanel() {
 		readingListener = false;
 		consoleTextArea = new JTextArea();
 		setLayout(new BorderLayout());
-		add(new JScrollPane(consoleTextArea), BorderLayout.CENTER);
+		JScrollPane scrollPane = new JScrollPane(consoleTextArea);
+		add(scrollPane, BorderLayout.CENTER);
+		
+		clearCheck = new JCheckBox("Clear console on run");
+		clearCheck.setSelected(true);
+		scrollPane.setColumnHeaderView(clearCheck);
 
 		// Detect when the user has pressed enter, determine the lenght of the input and
 		// send it to the console
@@ -104,7 +111,9 @@ public class ConsolePanel extends JPanel implements PropertyChangeListener {
 			consoleTextArea.setEnabled(true);
 			break;
 		case CLEAR_CONSOLE:
+			if(clearCheck.isSelected()){
 			consoleTextArea.setText("");
+			}
 			break; 
 		default:
 			break;

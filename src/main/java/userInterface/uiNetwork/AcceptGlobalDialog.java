@@ -1,6 +1,7 @@
 package userInterface.uiNetwork;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -63,9 +64,12 @@ public class AcceptGlobalDialog extends JDialog {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		{
 			JLabel lblNewLabel = new JLabel(invokerName + " is requesting a global run.");
-			lblNewLabel.setHorizontalAlignment(SwingConstants.LEFT);
+			lblNewLabel.setBounds(62, 33, 190, 14);
+			lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			JLabel savelbl = new JLabel("Your work will be saved before running.");
-			contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+			savelbl.setBounds(62, 57, 190, 14);
+			savelbl.setHorizontalAlignment(SwingConstants.CENTER);
+			contentPanel.setLayout(null);
 			contentPanel.add(lblNewLabel);
 			contentPanel.add(savelbl);
 		}
@@ -123,7 +127,12 @@ public class AcceptGlobalDialog extends JDialog {
 		setMaximumSize(new Dimension(width,height));
 		setPreferredSize(new Dimension(width,height));
 		setSize(width,height);
-		setAlwaysOnTop(true);
+		setAlwaysOnTop(true);Color c = getContentPane().getBackground();
+	
+		getContentPane().setBackground(new Color (c.getRed()-10, c.getGreen()-10,c.getBlue()-10));  
+		this.setUndecorated(true);
+		this.setLocationRelativeTo(DeveloperMainFrameWrapper.getInstance());
+		
 		setVisible(true);
 		
 	}

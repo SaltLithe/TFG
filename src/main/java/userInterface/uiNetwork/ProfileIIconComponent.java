@@ -6,6 +6,8 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,19 +18,23 @@ import java.io.InputStream;
 import java.util.Base64;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 
 import org.apache.commons.io.FileUtils;
 
+import commandController.CommandController;
 import fileManagement.WorkSpaceManager;
 
 @SuppressWarnings("serial")
 /**
  * UI class that represents the profile icon of the users , contains methods for
  * adding images from file paths and base64 Strings and displays it alongside a
- * color and a name for each use 
+ * color and a name for each use
  * 
  * @author Usuario
  *
@@ -44,87 +50,93 @@ public class ProfileIIconComponent extends JPanel {
 	public Image raw = null;
 	public int clientID;
 
+	private UsersPanel parent; 
 	protected String ImageByteData = null;
+	private Border redBorder = BorderFactory.createLineBorder(Color.RED, 5);
+	public boolean canSelect = true; 
 
 	/**
 	 * 
-	 * @param image : A String containing an image path 
+	 * @param image : A String containing an image path
 	 * @param color : An object representing the color chosen by the user
-	 * @param name : The users name
-	 * @param test : A flag indicathing if this component should be rendered with a color 
+	 * @param name  : The users name
+	 * @param test  : A flag indicathing if this component should be rendered with a
+	 *              color
 	 */
-	public ProfileIIconComponent(String image, Color color, String name, boolean test) {
-	
+	public ProfileIIconComponent(String image, Color color, String name, boolean test, UsersPanel parent) {
+		
+		this.parent = parent; 
+		
 		if (image != null) {
 			imagepath = image;
 		}
-	
+
 		try {
-			File f; 
+			File f;
 			try {
-			InputStream imageStream = WorkSpaceManager.class.getResourceAsStream(imagepath);
-			
-			 f = new File("src/main/resources/tempImage.tmp");
-		    FileUtils.copyInputStreamToFile(imageStream, f);
-			}
-			catch(Exception e) {
-			 f =new File(imagepath);
-				
-			
+				InputStream imageStream = WorkSpaceManager.class.getResourceAsStream(imagepath);
+
+				f = new File("src/main/resources/tempImage.tmp");
+				FileUtils.copyInputStreamToFile(imageStream, f);
+			} catch (Exception e) {
+				f = new File(imagepath);
+
 			}
 
 			raw = ImageIO.read(f);
 			Image rawRescale = raw.getScaledInstance(60, 60, Image.SCALE_FAST);
 			BufferedImage bimage = new BufferedImage(rawRescale.getWidth(null), rawRescale.getHeight(null),
 					BufferedImage.TYPE_INT_ARGB);
-	
+
 			Graphics2D bGr = bimage.createGraphics();
 			bGr.drawImage(rawRescale, 0, 0, null);
 			bGr.dispose();
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ImageIO.write(bimage, getFormat(imagepath), baos);
 			byte[] bytes = baos.toByteArray();
-	
+
 			encoder(bytes);
-	
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	
+
 		createTestIconComponent(name, color, test);
-	
+
 	}
 
 	/**
 	 * 
 	 * @param colorNum : An integer representing the color of the user
-	 * @param image : A base64 String containing the user's image data
-	 * @param name : The name of the user
+	 * @param image    : A base64 String containing the user's image data
+	 * @param name     : The name of the user
 	 * @param clientID : The id of the user for a session
 	 */
-	public ProfileIIconComponent(int colorNum, String image, String name, int clientID) {
-	
+	public ProfileIIconComponent(int colorNum, String image, String name, int clientID, UsersPanel parent) {
+
+		this.parent = parent;
 		this.clientID = clientID;
 		Color color = new Color(colorNum);
-	
+
 		decoder(image);
 		createTestIconComponent(name, color, false);
-	
+
 	}
 
 	/**
 	 * Method that actually creates this component , called by the two constructors
-	 * @param name : The name of the user
+	 * 
+	 * @param name  : The name of the user
 	 * @param color : An object representing the color chosen by the user
-	 * @param test : A flag that indicates if the color should be rendered 
+	 * @param test  : A flag that indicates if the color should be rendered
 	 */
 	private void createTestIconComponent(String name, Color color, boolean test) {
 		if (color != null) {
-	
+
 			chosenColor = color;
-	
+
 		}
-	
+
 		if (name != null) {
 			chosenName = name;
 		}
@@ -141,7 +153,7 @@ public class ProfileIIconComponent extends JPanel {
 		BufferedImage master = new BufferedImage(setWidth, setHeight, BufferedImage.TYPE_INT_ARGB);
 		BufferedImage mask = new BufferedImage(setWidth, setHeight, BufferedImage.TYPE_INT_ARGB);
 		BufferedImage background = new BufferedImage(setWidth + 10, setHeight + 10, BufferedImage.TYPE_INT_ARGB);
-	
+
 		Graphics2D g2d1 = background.createGraphics();
 		Graphics2D g2d2 = mask.createGraphics();
 		if (!test) {
@@ -150,14 +162,14 @@ public class ProfileIIconComponent extends JPanel {
 			g2d1.drawImage(background, 0, 0, null);
 		}
 		g2d1.dispose();
-	
+
 		g2d2.fillOval(0, 0, diameter - 1, diameter - 1);
 		g2d2.dispose();
-	
+
 		Graphics2D g2d3 = master.createGraphics();
 		g2d3.drawImage(tmp, 0, 0, null);
 		g2d3.dispose();
-	
+
 		BufferedImage maskedIcon = new BufferedImage(diameter, diameter, BufferedImage.TYPE_INT_ARGB);
 		g2d2 = maskedIcon.createGraphics();
 		int x2 = (diameter - master.getWidth()) / 2;
@@ -166,7 +178,7 @@ public class ProfileIIconComponent extends JPanel {
 		g2d2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_IN));
 		g2d2.drawImage(mask, 0, 0, null);
 		g2d2.dispose();
-	
+
 		ImageIcon backgroundicon = (new ImageIcon(background));
 		ImageIcon imageicon = (new ImageIcon(maskedIcon));
 		JLabel backgroundlabel = new JLabel(backgroundicon);
@@ -174,19 +186,56 @@ public class ProfileIIconComponent extends JPanel {
 		backgroundlabel.setSize(100, 100);
 		imagelabel = new JLabel(imageicon);
 		imagelabel.setSize(20, 20);
-	
+
 		backgroundlabel.add(imagelabel);
-	
+
 		add(backgroundlabel);
-	
+
 		JLabel namelabel = new JLabel(chosenName);
 		add(namelabel);
-	
+
+		this.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if (!test && CommandController.developerComponent.server != null && canSelect) {
+					parent.cleanSelection(chosenName); 
+					
+					
+					}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				//No necesitamos implementar este metodo
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				//No necesitamos implementar este metodo
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				//No necesitamos implementar este metodo
+
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				//No necesitamos implementar este metodo
+			}
+
+		});
+
 		setVisible(true);
 	}
 
 	/**
 	 * Support method that decodes a base64 String into an image
+	 * 
 	 * @param base64Image : The base64 string that represents an image
 	 */
 	private void decoder(String base64Image) {
@@ -205,12 +254,13 @@ public class ProfileIIconComponent extends JPanel {
 
 	/**
 	 * Support method that encodes an Image into a base64 string
-	 * @param image : The image to be decoded 
+	 * 
+	 * @param image : The image to be decoded
 	 */
 	private void encoder(byte[] image) {
 		String base64Image = "";
 		try {
-			
+
 			base64Image = Base64.getEncoder().encodeToString(image);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -220,11 +270,19 @@ public class ProfileIIconComponent extends JPanel {
 
 	/**
 	 * Support method that , given the path of an image , returns its format
-	 * @param path : The path of an image 
+	 * 
+	 * @param path : The path of an image
 	 * @return a String containing an image's format
 	 */
 	private String getFormat(String path) {
 		return path.substring(path.lastIndexOf(".") + 1, path.length());
+	}
+
+	public void setHighlight() {
+
+		setOpaque(true);
+		setBackground(new Color(chosenColor.getRed(), chosenColor.getGreen(), chosenColor.getBlue(), 50));
+		setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));		
 	}
 
 }
