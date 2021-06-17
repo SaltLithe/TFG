@@ -124,7 +124,7 @@ public class JoinSessionDialog extends JFrame {
 		panel.add(lblNewLabel_5, gbc_lblNewLabel_5);
 
 		clientNameField_C = new JTextField();
-		clientNameField_C.setText("Tu nombre aqui");
+		clientNameField_C.setText("");
 		GridBagConstraints gbc_clientNameField_C = new GridBagConstraints();
 		gbc_clientNameField_C.insets = new Insets(0, 0, 5, 0);
 		gbc_clientNameField_C.fill = GridBagConstraints.HORIZONTAL;
@@ -141,7 +141,7 @@ public class JoinSessionDialog extends JFrame {
 		panel.add(lblNewLabel_6, gbc_lblNewLabel_6);
 
 		ipField_C = new JTextField();
-		ipField_C.setText("25.113.201.139");
+		ipField_C.setText("");
 		GridBagConstraints gbc_ipField_C = new GridBagConstraints();
 		gbc_ipField_C.insets = new Insets(0, 0, 5, 0);
 		gbc_ipField_C.fill = GridBagConstraints.HORIZONTAL;
@@ -158,7 +158,7 @@ public class JoinSessionDialog extends JFrame {
 		panel.add(lblNewLabel_7, gbc_lblNewLabel_7);
 
 		serverPortField_C = new JTextField();
-		serverPortField_C.setText("8085");
+		serverPortField_C.setText("");
 		GridBagConstraints gbc_serverPortField_C = new GridBagConstraints();
 		gbc_serverPortField_C.insets = new Insets(0, 0, 5, 0);
 		gbc_serverPortField_C.fill = GridBagConstraints.HORIZONTAL;
@@ -175,7 +175,7 @@ public class JoinSessionDialog extends JFrame {
 		panel.add(lblNewLabel_9, gbc_lblNewLabel_9);
 
 		clientIPField_C = new JTextField();
-		clientIPField_C.setText("Tu ipv4 de hamachi aqui");
+		clientIPField_C.setText("");
 		GridBagConstraints gbc_clientIPField_C = new GridBagConstraints();
 		gbc_clientIPField_C.insets = new Insets(0, 0, 5, 0);
 		gbc_clientIPField_C.fill = GridBagConstraints.HORIZONTAL;

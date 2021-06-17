@@ -95,12 +95,12 @@ public class ConsolePanel extends JPanel implements PropertyChangeListener {
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		ObserverActions action = ObserverActions.valueOf(evt.getPropertyName());
+		@SuppressWarnings("unchecked")
+		ArrayList<Object> results = (ArrayList<Object>) evt.getNewValue();
+
 		switch (action) {
 		case CONSOLE_PANEL_CONTENTS:
 		
-			DEBUG.debugmessage("got a message for the console now");
-			@SuppressWarnings("unchecked")
-			ArrayList<Object> results = (ArrayList<Object>) evt.getNewValue();
 			this.setContents((String) results.get(0));
 			break;
 		case ENABLE_READING_LISTENER:

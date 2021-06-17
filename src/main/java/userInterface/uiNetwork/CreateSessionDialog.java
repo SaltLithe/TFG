@@ -126,7 +126,7 @@ public class CreateSessionDialog extends JFrame {
 
 		serverNameField_S = new JTextField();
 		serverNameField_S.setHorizontalAlignment(SwingConstants.LEFT);
-		serverNameField_S.setText("Carmen");
+		serverNameField_S.setText("");
 		GridBagConstraints gbc_serverNameField_S = new GridBagConstraints();
 		gbc_serverNameField_S.fill = GridBagConstraints.HORIZONTAL;
 		gbc_serverNameField_S.insets = new Insets(0, 0, 5, 0);
@@ -143,7 +143,7 @@ public class CreateSessionDialog extends JFrame {
 		panel.add(lblNewLabel_1, gbc_lblNewLabel_1);
 
 		serverPortField_S = new JTextField();
-		serverPortField_S.setText("8085");
+		serverPortField_S.setText("");
 		GridBagConstraints gbc_serverPortField_S = new GridBagConstraints();
 		gbc_serverPortField_S.insets = new Insets(0, 0, 5, 0);
 		gbc_serverPortField_S.fill = GridBagConstraints.HORIZONTAL;
@@ -160,7 +160,7 @@ public class CreateSessionDialog extends JFrame {
 		panel.add(lblNewLabel_3, gbc_lblNewLabel_3);
 
 		maxClientsField_S = new JTextField();
-		maxClientsField_S.setText("2");
+		maxClientsField_S.setText("");
 		GridBagConstraints gbc_maxClientsField_S = new GridBagConstraints();
 		gbc_maxClientsField_S.insets = new Insets(0, 0, 5, 0);
 		gbc_maxClientsField_S.fill = GridBagConstraints.HORIZONTAL;
@@ -177,7 +177,7 @@ public class CreateSessionDialog extends JFrame {
 		panel.add(lblNewLabel_4, gbc_lblNewLabel_4);
 
 		ipField_S = new JTextField();
-		ipField_S.setText("25.113.201.139");
+		ipField_S.setText("");
 		GridBagConstraints gbc_ipField_S = new GridBagConstraints();
 		gbc_ipField_S.fill = GridBagConstraints.HORIZONTAL;
 		gbc_ipField_S.insets = new Insets(0, 0, 5, 0);
