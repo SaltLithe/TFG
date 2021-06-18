@@ -1,3 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <WorkSpaces>
+    <WorkSpace>
+        <name>miWorkspace</name>
+        <path>C:\Users\Usuario\Desktop\miWorkspace</path>
+    </WorkSpace>
+    <WorkSpace>
+        <name>miWorkspace</name>
+        <path>C:\Users\Usuario\Desktop\aquimismo\miWorkspace</path>
+    </WorkSpace>
 </WorkSpaces>
