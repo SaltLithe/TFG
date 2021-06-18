@@ -1,8 +1,8 @@
-# TITLE
+# PairLeap
 
 Hello, this a college project I designed and coded on my own as the final assignment required to graduate.
 
-# What is TITLE?
+# What is PairLeap?
 
 TITLE is an experimental tool to assist in pair programming.
 
@@ -10,7 +10,7 @@ TITLE is an experimental tool to assist in pair programming.
 
 Most of the time, pair programmers will only work in pairs, use only one computer, and will switch roles but not share them, this tool tries to mix this dynamic by allowing small teams to work together in the same project at the same time with their own computer on a local network.
 
-# What can TITLE do?
+# What can PairLeap do?
 
 These are the features of TITLE summarized:
 - 1 : Create and manage workspaces
@@ -24,7 +24,7 @@ These are the features of TITLE summarized:
 - 9 : Code with your friends and see the changes in real time
 - 10 : Run your code together and see real time output
 
-# How to use TITLE?
+# How to use PairLeap?
 
 - 1 : Download the executable .jar file
 - 2 : Run the program, create at least one workspace if you want to create a session or just code on your own
@@ -34,19 +34,4 @@ These are the features of TITLE summarized:
 
 # Screenshots
 
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/launchShot.png?token=AKLE4HFQJVLITS66ASYBFDLAFKMO6">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/generalShot.png?token=AKLE4HDEC62BEFQBDUDFUFDAFKMRA">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/noWorkspaceShot.png?token=AKLE4HBWB2ATLQSRIKHJ3XLAFKMSM">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/localRunShot.png?token=AKLE4HDIX6GZJFD6KH5GVADAFKMVS">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/classSelectionShot.png token=AKLE4HEGCRJB65C6JJE3MWTAFKM4A">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/createSessionShot.png?token=AKLE4HBKMCANND3L6OUDLQ3AFKMYY">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/joinSessionShot.png?token=AKLE4HG4DAENDKF56RMOE63AFKM5U">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/sessionShot.png?token=AKLE4HAFBXVMWWMJAURXKWTAFKM7K">]
-
+[<img src="https://raw.githubusercontent.com/CarmenGomezMoreno/TFG/master/screenshots/sessionShot.png?token=AKLE4HBEDWKSGAD75XGXIFDA2WIAG">]
