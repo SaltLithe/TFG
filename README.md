@@ -34,19 +34,4 @@ These are the features of TITLE summarized:
 
 # Screenshots
 
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/launchShot.png?token=AKLE4HFQJVLITS66ASYBFDLAFKMO6">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/generalShot.png?token=AKLE4HDEC62BEFQBDUDFUFDAFKMRA">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/noWorkspaceShot.png?token=AKLE4HBWB2ATLQSRIKHJ3XLAFKMSM">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/localRunShot.png?token=AKLE4HDIX6GZJFD6KH5GVADAFKMVS">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/classSelectionShot.png token=AKLE4HEGCRJB65C6JJE3MWTAFKM4A">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/createSessionShot.png?token=AKLE4HBKMCANND3L6OUDLQ3AFKMYY">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/joinSessionShot.png?token=AKLE4HG4DAENDKF56RMOE63AFKM5U">]
-
-[<img src="https://raw.githubusercontent.com/SaltLithe/TFG/master/screenshots/sessionShot.png?token=AKLE4HAFBXVMWWMJAURXKWTAFKM7K">]
-
+[<img src="https://raw.githubusercontent.com/CarmenGomezMoreno/TFG/master/screenshots/sessionShot.png?token=AKLE4HBEDWKSGAD75XGXIFDA2WIAG">]
