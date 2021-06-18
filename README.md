@@ -1,8 +1,8 @@
-# TITLE
+# PairLeap
 
 Hello, this a college project I designed and coded on my own as the final assignment required to graduate.
 
-# What is TITLE?
+# What is PairLeap?
 
 TITLE is an experimental tool to assist in pair programming.
 
@@ -10,7 +10,7 @@ TITLE is an experimental tool to assist in pair programming.
 
 Most of the time, pair programmers will only work in pairs, use only one computer, and will switch roles but not share them, this tool tries to mix this dynamic by allowing small teams to work together in the same project at the same time with their own computer on a local network.
 
-# What can TITLE do?
+# What can PairLeap do?
 
 These are the features of TITLE summarized:
 - 1 : Create and manage workspaces
@@ -24,7 +24,7 @@ These are the features of TITLE summarized:
 - 9 : Code with your friends and see the changes in real time
 - 10 : Run your code together and see real time output
 
-# How to use TITLE?
+# How to use PairLeap?
 
 - 1 : Download the executable .jar file
 - 2 : Run the program, create at least one workspace if you want to create a session or just code on your own
